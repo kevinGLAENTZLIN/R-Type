@@ -1,0 +1,27 @@
+name: R-Type
+run-name: R-Type
+env:
+    MIRROR_URL: "git@github.com:EpitechPromo2027/B-CPP-500-MLH-5-1-rtype-hugo.bardet.git"
+
+on:
+    push:
+        branches-ignore:
+            - "ga-ignore**"
+    pull_request:
+        branches-ignore:
+            - "ga-ignore**"
+
+jobs:
+    push_to_mirror:
+        runs-on: ubuntu-latest
+        if: ${{ github.event_name == 'push' }}
+        steps:
+            - name: Checkout Code v2
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+            - name: Push to Mirrorv2
+              uses: pixta-dev/repository-mirroring-action@v1.1.1
+              with:
+                  target_repo_url: ${{env.MIRROR_URL}}
+                  ssh_private_key: ${{secrets.SSH_PRIVATE_KEY}}

@@ -1,10 +1,20 @@
+/*
+** EPITECH PROJECT, 2024
+** Missile.hh
+** File description:
+** EntityManeger class
+*/
+
 #include <cstddef>
+#include <iostream>
 
 class Missile {
 
     public:
-        Missile();
-        ~Missile();
+        Missile(std::size_t id);
+        ~Missile() = default;
+
+        std::size_t getId() const;
 
     protected:
 

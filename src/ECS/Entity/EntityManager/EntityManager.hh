@@ -5,6 +5,7 @@
 ** EntityManeger class
 */
 
+#pragma once
 #include <cstddef>
 #include <vector>
 #include <iostream>

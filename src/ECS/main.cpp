@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ECS/Entity/EntityManager/EntityManager.hh"
+#include "Entity/EntityManager/EntityManager.hh"
 
 int main(void)
 {

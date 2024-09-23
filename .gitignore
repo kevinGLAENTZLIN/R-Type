@@ -91,3 +91,4 @@ cmake-build-*/
 *.cache
 
 r-type*
+vcpkg/

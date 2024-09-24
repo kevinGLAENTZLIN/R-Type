@@ -1,27 +1,76 @@
-name: R-Type
-run-name: R-Type
+name: R-Type CI/CD
+run-name: R-Type Build and Test
+
 env:
-    MIRROR_URL: "git@github.com:EpitechPromo2027/B-CPP-500-MLH-5-1-rtype-hugo.bardet.git"
+  MIRROR_URL: "git@github.com:EpitechPromo2027/B-CPP-500-MLH-5-1-rtype-hugo.bardet.git"
 
 on:
-    push:
-        branches-ignore:
-            - "ga-ignore**"
-    pull_request:
-        branches-ignore:
-            - "ga-ignore**"
+  push:
+    branches-ignore:
+      - "ga-ignore**"
+  pull_request:
+    branches-ignore:
+      - "ga-ignore**"
 
 jobs:
-    push_to_mirror:
-        runs-on: ubuntu-latest
-        if: ${{ github.event_name == 'push' }}
-        steps:
-            - name: Checkout Code v2
-              uses: actions/checkout@v3
-              with:
-                  fetch-depth: 0
-            - name: Push to Mirrorv2
-              uses: pixta-dev/repository-mirroring-action@v1.1.1
-              with:
-                  target_repo_url: ${{env.MIRROR_URL}}
-                  ssh_private_key: ${{secrets.SSH_PRIVATE_KEY}}
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v7
+        with:
+          vcpkgDirectory: "${{ runner.workspace }}/vcpkg"
+          vcpkgGitCommitId: "2023.11.20"
+
+      - name: Build Project
+        run: |
+          echo "${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
+          chmod +x build.sh
+          ./build.sh Init
+          ./build.sh Release
+          ./build.sh Build
+
+      - name: Check Binaries
+        run: |
+          if [ ! -f "build/lib/libmyraylib.a" ]; then
+            echo "libmyraylib.a not found"
+            exit 1
+          fi
+          if [ ! -f "build/lib/r-type.a" ]; then
+            echo "r-type.a not found"
+            exit 1
+          fi
+          if [ ! -f "build/r-type_client" ]; then
+            echo "r-type_client not found"
+            exit 1
+          fi
+          if [ ! -f "build/r-type_server" ]; then
+            echo "r-type_server not found"
+            exit 1
+          fi
+          echo "All required binaries are present"
+
+  push_to_mirror:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Push to Mirror
+        uses: pixta-dev/repository-mirroring-action@v1.1.1
+        with:
+          target_repo_url: ${{env.MIRROR_URL}}
+          ssh_private_key: ${{secrets.SSH_PRIVATE_KEY}}

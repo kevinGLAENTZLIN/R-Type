@@ -7,7 +7,8 @@
 
 #include "EntityManager.hh"
 
-EntityManager::EntityManager()
+EntityManager::EntityManager():
+    mLivingEntityCount(0)
 {
     for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
         mAvailableEntities.push(entity);
@@ -16,7 +17,7 @@ EntityManager::EntityManager()
 
 std::size_t EntityManager::CreateEntity()
 {
-    if (mLivingEntityCount < MAX_ENTITIES)
+    if (mLivingEntityCount > MAX_ENTITIES)
         return MAX_ENTITIES;
     std::size_t id = mAvailableEntities.front();
     mAvailableEntities.pop();

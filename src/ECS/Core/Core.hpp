@@ -32,7 +32,7 @@ namespace ECS {
 
             template<typename T>
             T& GetComponent(std::size_t entity) {
-                return _componentManager->getComponents<T>();
+                return _componentManager->getComponents<T>()[entity].value();
             }
 
             template<typename T>
@@ -41,8 +41,24 @@ namespace ECS {
             }
 
             template<typename T>
+            void AddComponent(std::size_t entity, T component)
+            {
+                auto signature = _entityManager->GetSignature(entity);
+                std::cout << "signature in add compo in core : " << signature << std::endl;
+                //signature.set(typeid(T), true);
+                _entityManager->SetSignature(entity, signature);
+                _systemManager->EntitySignatureChanged(entity, signature);
+                _componentManager->getComponents<T>().insertAt(entity, component);
+            }
+
+            template<typename T>
             void SetSystemSignature(Signature signature) {
                 _systemManager->SetSignature<T>(signature);
+            }
+
+            void setEntitySignature(std::size_t entity, Signature signature) {
+                _entityManager->SetSignature(entity, signature);
+                _systemManager->EntitySignatureChanged(entity, signature);
             }
 
         protected:

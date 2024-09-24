@@ -29,8 +29,3 @@ std::pair<float, float> Components::Velocity::getVelPair() const
 {
     return std::make_pair(_x, _y);
 }
-
-std::ostream & operator<< (std::ostream & stream, const Components::Velocity & velocity) {
-    stream << "(" << velocity.getX() << ", " << velocity.getY() << ")";
-    return stream;
-}

@@ -25,5 +25,8 @@ namespace Components {
         float _y;
     };
 
-    std::ostream & operator<< (std::ostream & stream, const Velocity & velocity);
+    inline std::ostream & operator<< (std::ostream & stream, const Components::Velocity & velocity) {
+        stream << "(" << velocity.getX() << ", " << velocity.getY() << ")";
+        return stream;
+    }
 }

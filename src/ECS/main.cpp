@@ -1,9 +1,9 @@
-/*
-** EPITECH PROJECT, 2024
-** main.cpp
-** File description:
-** main to test ECS Core
-*/
+// /*
+// ** EPITECH PROJECT, 2024
+// ** main.cpp
+// ** File description:
+// ** main to test ECS Core
+// */
 
 #include "Core/Core.hpp"
 #include "Component/Position/Position.hpp"
@@ -32,22 +32,29 @@ int main(void)
     std::cout << "Entity 1: " << entity1 << std::endl;
     std::cout << "Entity 2: " << entity2 << std::endl;
 
-    core.GetComponent<Components::Position>(entity1) = Components::Position{1.0f, 2.0f};
-    core.GetComponent<Components::Position>(entity2) = Components::Position{4.4f, 5.7f};
-    core.GetComponent<Components::Velocity>(entity2) = Components::Velocity{0.5f, 0.5f};
+    Signature entity1Signature;
+    entity1Signature.set(1);
+    core.setEntitySignature(entity1, entity1Signature);
+    Signature entity2Signature;
+    entity2Signature.set(1);
+    entity2Signature.set(2);
+    core.setEntitySignature(entity2, entity2Signature);
+
+    core.AddComponent(entity1, Components::Position{4.4f, 5.7f});
+    core.AddComponent(entity2, Components::Position{84.0f, 42.0f});
+    core.AddComponent(entity2, Components::Velocity{0.5f, 0.5f});
 
     std::cout << "-----------------------------------\n";
-
     std::cout << "Initial Entity 1 Position: " << core.GetComponent<Components::Position>(entity1) << std::endl;
     std::cout << "Initial Entity 2 Position: " << core.GetComponent<Components::Position>(entity2) << std::endl;
 
     std::cout << "-----------------------------------\n";
 
-    std::vector<std::size_t> entities = {entity1, entity2};
-    velocitySystem->update(core.GetComponent<Components::Position>(), core.GetComponent<Components::Velocity>(), entities);
+    // std::vector<std::size_t> entities = {entity1, entity2};
+    // velocitySystem->update(core.GetComponent<Components::Position>(entity2), core.GetComponent<Components::Velocity>(entity2), entities);
 
-    std::cout << "Updated Entity 1 Position: " << core.GetComponent<Components::Position>(entity1) << std::endl;
-    std::cout << "Updated Entity 2 Position: " << core.GetComponent<Components::Position>(entity2) << std::endl;
+    // std::cout << "Updated Entity 1 Position: " << core.GetComponent<Components::Position>(entity1) << std::endl;
+    // std::cout << "Updated Entity 2 Position: " << core.GetComponent<Components::Position>(entity2) << std::endl;
 
     return 0;
 }

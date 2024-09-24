@@ -1,4 +1,4 @@
-#include "udp_server.hpp"
+#include "udp_server.hh"
 
 udpServer::udpServer(boost::asio::io_service& io_service, short port)
   : _socket(io_service, udp::endpoint(udp::v4(), port))
@@ -28,7 +28,7 @@ void udpServer::my_udp_send_back()
     myStr += std::to_string((int)_sender_endpoint.port());
     myStr += " Message : ";
     myStr += _data;
-    _socket.async_send_to(boost::asio::buffer(myStr.c_str(), myStr.length()), _sender_endpoint,
+    _socket.async_send_to(boost::asio::buffer(myStr), _sender_endpoint,
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         my_udp_receive();
     });

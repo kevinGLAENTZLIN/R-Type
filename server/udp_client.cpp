@@ -1,11 +1,8 @@
-#include "./udp_client.hpp"
+#include "./udp_client.hh"
+#include "./socket.hh"
 
-udpSocket::udpSocket(char *inServer, int inPort) : _port(inPort), _sByte(0), _rByte(0)
+udpSocket::udpSocket(char *inServer, int inPort) : _port(inPort), _sByte(0), _rByte(0), _server(inServer)
 {
-    memset(_bufferSend, '\0', sizeof(_bufferSend)+1);
-    memset(_bufferRecv, '\0', sizeof(_bufferRecv)+1);
-    memset(_server, '\0', sizeof(_server)+1);
-    memcpy(_server, inServer, strlen(inServer));
 }
 
 udpSocket::~udpSocket()
@@ -21,12 +18,12 @@ ssize_t udpSocket::sendRecv(char *inMsg)
     socklen_t sLen = sizeof(servAddr);
 
     servAddr.sin_family = AF_INET;
-    servAddr.sin_port = htons(_port);
-    servAddr.sin_addr.s_addr = inet_addr(_server);
-    memcpy(_bufferSend, inMsg, strlen(inMsg));
-    _sByte = sendto(sockfd, _bufferSend,sizeof( _bufferSend),0,(struct sockaddr * )&servAddr,sLen);
+    servAddr.sin_port = Encapsulation::c_socket::my_htons(_port);
+    servAddr.sin_addr.s_addr = Encapsulation::c_socket::my_inet_addr(_server);
+    _bufferSend = inMsg;
+    _sByte = Encapsulation::c_socket::my_sendto(sockfd, _bufferSend,0,(struct sockaddr * )&servAddr,sLen);
     std::cout << "[" << _sByte << "] Bytes Sent : " << std::endl;
-    _rByte = recvfrom(sockfd, _bufferRecv,sizeof( _bufferRecv),0,(struct sockaddr *)&cliAddr,&cLen);
+    _rByte = Encapsulation::c_socket::my_recvfrom(sockfd, _bufferRecv,0,(struct sockaddr *)&cliAddr,&cLen);
     close(sockfd);
     return _sByte;
 }
@@ -52,14 +49,10 @@ int main(int argc, char **argv)
         std::cout << "Usage:udp_client [server] [_port] [Message]" << std::endl;
         exit(84);
     }
-
-    // for (int i = 0; i < 1000; i++) {
-        udpSocket mUDP(argv[1], std::stoi(argv[2]));
-        if ( mUDP.sendRecv(argv[3]) > 0 ) {
-            // mUDP.printMsg();
-            std::cout << "[" << mUDP.getRecvBytes() << "] " << mUDP.getRecvMsg() << std::endl;
-        }
-    // }
+    udpSocket mUDP(argv[1], std::stoi(argv[2]));
+    if ( mUDP.sendRecv(argv[3]) > 0 ) {
+        std::cout << "[" << mUDP.getRecvBytes() << "] " << mUDP.getRecvMsg() << std::endl;
+    }
 
     exit(0);
 }

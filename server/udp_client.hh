@@ -26,7 +26,7 @@ class udpSocket {
         int     _port;
         ssize_t _sByte;
         ssize_t _rByte;
-        char    _server[100];
-        char _bufferSend[256];
-        char _bufferRecv[256];
+        std::string _server;
+        std::string _bufferSend;
+        std::string _bufferRecv;
 };

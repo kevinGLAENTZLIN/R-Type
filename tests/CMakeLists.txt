@@ -8,8 +8,6 @@ set(TEST_SOURCES
 
 # Create a test executable
 add_executable(${TEST_NAME} ${TEST_SOURCES})
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/tests")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/tests")
 # Link the Doctest library
 target_link_libraries(${TEST_NAME} PRIVATE doctest::doctest)
 

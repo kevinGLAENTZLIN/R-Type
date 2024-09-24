@@ -35,7 +35,6 @@ jobs:
           echo "./vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
           chmod +x build.sh
           ./build.sh Init
-          cat  /home/runner/work/R-Type/R-Type/vcpkg/buildtrees/glfw3/config-x64-linux-dbg-CMakeCache.txt.log
           ./build.sh Release
           ./build.sh Build
 
@@ -58,6 +57,9 @@ jobs:
             exit 1
           fi
           echo "All required binaries are present"
+      - name: Run Tests
+        run: |
+          ./build Tests
 
   push_to_mirror:
     needs: build_and_test

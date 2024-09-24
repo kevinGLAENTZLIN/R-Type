@@ -20,6 +20,7 @@ show_help() {
     echo -e "  ${YELLOW}Release${NC}     - Configure CMake in Release mode"
     echo -e "  ${YELLOW}Debug${NC}       - Configure CMake in Debug mode"
     echo -e "  ${YELLOW}Build${NC}       - Build the project"
+    echo -e "  ${YELLOW}Test${NC}        - Test the project"
     echo -e "  ${YELLOW}Help${NC}        - Show this help message"
 }
 
@@ -107,6 +108,23 @@ build_project() {
     echo -e "${GREEN}Project build completed.${NC}"
 }
 
+test_project() {
+    echo -e "${BLUE}Testing project...${NC}"
+    check_vcpkg_setup
+    cd build || exit 1
+    echo -e "${YELLOW}Running CMake build...${NC}"
+    cmake --build .
+    cd .. || exit 1
+    echo -e "${YELLOW}Testing project...${NC}"
+    cd build || exit 1
+    ctest
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error with testing !${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}Testing project completed.${NC}"
+}
+
 # Vérification des arguments
 if [ $# -eq 0 ]; then
     echo -e "${RED}Error: No rule specified.${NC}"
@@ -133,6 +151,9 @@ case $1 in
         ;;
     Build)
         build_project
+        ;;
+    Test)
+        test_project
         ;;
     Help)
         show_help

@@ -6,43 +6,22 @@
 */
 
 #pragma once
-
+#include <iostream>
 #include <raylib.h>
 
 namespace Components {
 
     class Render {
         public:
-            Render(std::string textureFilePath, float rotation = 0.0f, float scale = 1.0f)
-                : _texture(LoadTexture(textureFilePath)), _rotation(rotation), _scale(scale) {}
+            Render(std::string textureFilePath, float rotation = 0.0f, float scale = 1.0f);
+            ~Render() = default;
 
-            ~Render() {
-                UnloadTexture(_texture);
-            }
+            const Texture2D& getTexture() const;
+            float getRotation() const;
+            float getScale() const;
 
-            Texture2D& getTexture() {
-                return _texture;
-            }
-
-            const Texture2D& getTexture() const {
-                return _texture;
-            }
-
-            float getRotation() const {
-                return _rotation;
-            }
-
-            void setRotation(float rotation) {
-                _rotation = rotation;
-            }
-
-            float getScale() const {
-                return _scale;
-            }
-
-            void setScale(float scale) {
-                _scale = scale;
-            }
+            void setRotation(float rotation);
+            void setScale(float scale);
 
         private:
             Texture2D _texture;

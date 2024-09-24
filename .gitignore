@@ -5,7 +5,7 @@
 /out/
 /OUT/
 /cmake-build-*/
-/Debug/
+**/Debug/
 
 # Fichiers générés par CMake
 CMakeCache.txt

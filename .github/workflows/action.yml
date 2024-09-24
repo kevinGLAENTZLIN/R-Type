@@ -28,11 +28,11 @@ jobs:
 
       - name: download vcpkg
         run: |
-          pwd
+          ls -lR
           git clone https://github.com/microsoft/vcpkg
       - name: Build Project
         run: |
-          echo "${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
+          echo "./vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
           chmod +x build.sh
           ./build.sh Init
           ./build.sh Release

@@ -5,15 +5,22 @@
 ** main to test
 */
 
+#include "Component/ComponentManager/SparseArray.hpp"
+#include "Component/Position/Position.hpp"
+#include "Component/Velocity/Velocity.hh"
 #include "Entity/EntityManager/EntityManager.hh"
 #include "System/SystemVelocity/SystemVelocity.hpp"
 #include "System/SystemManager/SystemManager.hpp"
+#include "Component/ComponentManager/ComponentManager.hpp"
 
 int main(void)
 {
     EntityManager em;
     SystemManager systemManager;
+    ComponentManager::ComponentManager componentManager;
 
+    componentManager.registerComponent<Components::Position>();
+    componentManager.registerComponent<Components::Velocity>();
     auto velocitySystem = systemManager.RegisterSystem<SystemVelocity>();
 
     Signature velocitySystemSignature;
@@ -31,9 +38,6 @@ int main(void)
     std::cout << "Entity 1: " << entity1 << std::endl;
     std::cout << "Entity 2: " << entity2 << std::endl;
 
-    ComponentManager::SparseArray<Components::Position> positionArray;
-    ComponentManager::SparseArray<Components::Velocity> velocityArray;
-
     Signature entity1Signature;
     entity1Signature.set(1);
     em.SetSignature(entity1, entity1Signature);
@@ -49,6 +53,9 @@ int main(void)
     std::cout << "Entity 2 Signature: " << em.GetSignature(entity2) << std::endl;
 
     std::cout << "-----------------------------------\n";
+
+    ComponentManager::SparseArray<Components::Position> positionArray = componentManager.getComponents<Components::Position>();
+    ComponentManager::SparseArray<Components::Velocity> velocityArray = componentManager.getComponents<Components::Velocity>();
 
     positionArray.insertAt(entity1, Components::Position{1.0f, 2.0f});
     positionArray.insertAt(entity2, Components::Position{4.4f, 5.7f});

@@ -59,7 +59,7 @@ jobs:
           echo "All required binaries are present"
       - name: Run Tests
         run: |
-          ./build Tests
+          ./build.sh Tests
 
   push_to_mirror:
     needs: build_and_test

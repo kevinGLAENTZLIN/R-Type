@@ -22,6 +22,7 @@ show_help() {
     echo -e "  ${YELLOW}Build${NC}       - Build the project"
     echo -e "  ${YELLOW}Test${NC}        - Test the project"
     echo -e "  ${YELLOW}Help${NC}        - Show this help message"
+    echo -e "  ${YELLOW}Clean${NC}       - Clean binaries, testing folder, and Debug folders"
 }
 
 # Fonction pour vérifier si vcpkg est configuré
@@ -125,6 +126,26 @@ test_project() {
     echo -e "${GREEN}Testing project completed.${NC}"
 }
 
+clean_project() {
+    echo -e "${BLUE}Cleaning project...${NC}"
+
+    # Supprimer le dossier testing à la racine
+    echo -e "${YELLOW}Removing testing directory...${NC}"
+    rm -rf Testing
+
+    # Supprimer les dossiers Debug dans src
+    echo -e "${YELLOW}Removing Debug folders in src...${NC}"
+    find src -type d -name "Debug" -exec rm -rf {} +
+
+    # Supprimer les binaires spécifiques
+    echo -e "${YELLOW}Removing specific binaries...${NC}"
+    rm -rf r-type_client
+    rm -rf r-type_server
+    rm -rf ./lib/*
+
+    echo -e "${GREEN}Project cleaned successfully.${NC}"
+}
+
 # Vérification des arguments
 if [ $# -eq 0 ]; then
     echo -e "${RED}Error: No rule specified.${NC}"
@@ -154,6 +175,9 @@ case $1 in
         ;;
     Test)
         test_project
+        ;;
+    Clean)
+        clean_project
         ;;
     Help)
         show_help

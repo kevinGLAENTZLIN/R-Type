@@ -14,7 +14,7 @@
 namespace ComponentManager {
 
     class ComponentManager {
-    public:        
+    public:
         template <class Component>
         SparseArray<Component> &registerComponent() {
             if (_sparseArrays.count(std::type_index(typeid(Component))) != 0) {

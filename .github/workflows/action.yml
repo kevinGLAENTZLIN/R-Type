@@ -41,19 +41,19 @@ jobs:
 
       - name: Check Binaries
         run: |
-          if [ ! -f "lib/libmyraylib.a" ]; then
+          if [ ! -f "/home/runner/work/R-Type/R-Type/lib/libmyraylib.a" ]; then
             echo "libmyraylib.a not found"
             exit 1
           fi
-          if [ ! -f "lib/r-type.a" ]; then
+          if [ ! -f "/home/runner/work/R-Type/R-Type/lib/libr-type.a" ]; then
             echo "r-type.a not found"
             exit 1
           fi
-          if [ ! -f "r-type_client" ]; then
+          if [ ! -f "/home/runner/work/R-Type/R-Type/r-type_client" ]; then
             echo "r-type_client not found"
             exit 1
           fi
-          if [ ! -f "r-type_server" ]; then
+          if [ ! -f "/home/runner/work/R-Type/R-Type/r-type_server" ]; then
             echo "r-type_server not found"
             exit 1
           fi

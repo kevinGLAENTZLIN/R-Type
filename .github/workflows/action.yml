@@ -28,6 +28,7 @@ jobs:
 
       - name: download vcpkg
         run: |
+          pwd
           git clone https://github.com/microsoft/vcpkg
       - name: Build Project
         run: |

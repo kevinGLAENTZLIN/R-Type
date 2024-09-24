@@ -26,15 +26,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake build-essential
 
-      - name: vcpkg build
-        id: vcpkg
-        uses: johnwason/vcpkg-action@v6
-        with:
-          manifest-dir: ${{ github.workspace }} # Set to directory containing vcpkg.json
-          triplet: x64-linux
-          token: ${{ github.token }}
-          github-binarycache: true
-
+      - name: download vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg
       - name: Build Project
         run: |
           echo "${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
@@ -45,19 +39,19 @@ jobs:
 
       - name: Check Binaries
         run: |
-          if [ ! -f "build/lib/libmyraylib.a" ]; then
+          if [ ! -f "lib/libmyraylib.a" ]; then
             echo "libmyraylib.a not found"
             exit 1
           fi
-          if [ ! -f "build/lib/r-type.a" ]; then
+          if [ ! -f "lib/r-type.a" ]; then
             echo "r-type.a not found"
             exit 1
           fi
-          if [ ! -f "build/r-type_client" ]; then
+          if [ ! -f "r-type_client" ]; then
             echo "r-type_client not found"
             exit 1
           fi
-          if [ ! -f "build/r-type_server" ]; then
+          if [ ! -f "r-type_server" ]; then
             echo "r-type_server not found"
             exit 1
           fi

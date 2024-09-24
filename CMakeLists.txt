@@ -17,6 +17,7 @@ file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 add_subdirectory(src/ECS)
 add_subdirectory(src/Client)
 add_subdirectory(src/Server)
+add_subdirectory(src/MyRaylib)
 
 # Configurations spécifiques pour Debug et Release
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Werror")

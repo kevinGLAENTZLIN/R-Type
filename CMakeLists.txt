@@ -19,6 +19,10 @@ add_subdirectory(src/Client)
 add_subdirectory(src/Server)
 add_subdirectory(src/MyRaylib)
 
+# Testing
+enable_testing()
+add_subdirectory(tests)
+
 # Configurations spécifiques pour Debug et Release
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")

@@ -6,6 +6,7 @@
 /OUT/
 /cmake-build-*/
 **/Debug/
+.vcpkg_path
 
 # Fichiers générés par CMake
 CMakeCache.txt

@@ -1,14 +1,18 @@
 #include "./udp_client.hpp"
 
-udpSocket::udpSocket( std::string inServer, int inPort) : _port(inPort), _sByte(0), _rByte(0), _server(inServer) 
+udpSocket::udpSocket(char *inServer, int inPort) : _port(inPort), _sByte(0), _rByte(0)
 {
+    memset(_bufferSend, '\0', sizeof(_bufferSend)+1);
+    memset(_bufferRecv, '\0', sizeof(_bufferRecv)+1);
+    memset(_server, '\0', sizeof(_server)+1);
+    memcpy(_server, inServer, strlen(inServer));
 }
 
 udpSocket::~udpSocket()
 {
 }
 
-ssize_t udpSocket::sendRecv( std::string inMsg)
+ssize_t udpSocket::sendRecv(char *inMsg)
 {
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     struct sockaddr_in servAddr;
@@ -18,11 +22,11 @@ ssize_t udpSocket::sendRecv( std::string inMsg)
 
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(_port);
-    servAddr.sin_addr.s_addr = inet_addr(_server.c_str());
-    _bufferSend = inMsg;
-    _sByte = sendto(sockfd, _bufferSend.c_str(), sizeof(_bufferSend), 0, (struct sockaddr * )&servAddr, sLen);
+    servAddr.sin_addr.s_addr = inet_addr(_server);
+    memcpy(_bufferSend, inMsg, strlen(inMsg));
+    _sByte = sendto(sockfd, _bufferSend,sizeof( _bufferSend),0,(struct sockaddr * )&servAddr,sLen);
     std::cout << "[" << _sByte << "] Bytes Sent : " << std::endl;
-    _rByte = recvfrom(sockfd, (void *)_bufferRecv.c_str(), sizeof(_bufferRecv), 0, (struct sockaddr *)&cliAddr, &cLen);
+    _rByte = recvfrom(sockfd, _bufferRecv,sizeof( _bufferRecv),0,(struct sockaddr *)&cliAddr,&cLen);
     close(sockfd);
     return _sByte;
 }
@@ -45,7 +49,7 @@ ssize_t udpSocket::getRecvBytes()
 int main(int argc, char **argv)
 {
     if ( argc != 4 ) {
-        std::cout << "Usage:udp_client [server] [port] [Message]" << std::endl;
+        std::cout << "Usage:udp_client [server] [_port] [Message]" << std::endl;
         exit(84);
     }
 

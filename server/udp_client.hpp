@@ -14,10 +14,10 @@ using namespace std;
 class udpSocket {
 
     public:
-        udpSocket(std::string inServer, int inPort);
+        udpSocket(char *inServer, int inPort);
         ~udpSocket();
 
-        ssize_t sendRecv(std::string inMsg);
+        ssize_t sendRecv(char *inMsg);
         void  printMsg();
         std::string getRecvMsg();
         ssize_t getRecvBytes();
@@ -26,7 +26,7 @@ class udpSocket {
         int     _port;
         ssize_t _sByte;
         ssize_t _rByte;
-        std::string    _server;
-        std::string _bufferSend;
-        std::string _bufferRecv;
+        char    _server[100];
+        char _bufferSend[256];
+        char _bufferRecv[256];
 };

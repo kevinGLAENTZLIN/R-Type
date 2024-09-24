@@ -26,11 +26,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake build-essential
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v7
+      - name: vcpkg build
+        id: vcpkg
+        uses: johnwason/vcpkg-action@v6
         with:
-          vcpkgDirectory: "${{ runner.workspace }}/vcpkg"
-          vcpkgGitCommitId: "2023.11.20"
+          manifest-dir: ${{ github.workspace }} # Set to directory containing vcpkg.json
+          triplet: x64-linux
+          token: ${{ github.token }}
+          github-binarycache: true
 
       - name: Build Project
         run: |

@@ -5,9 +5,9 @@
 ** main to test
 */
 
-#include "ECS/Entity/EntityManager/EntityManager.hh"
-#include "ECS/System/SystemVelocity/SystemVelocity.hpp"
-#include "ECS/System/SystemManager/SystemManager.hpp"
+#include "Entity/EntityManager/EntityManager.hh"
+#include "System/SystemVelocity/SystemVelocity.hpp"
+#include "System/SystemManager/SystemManager.hpp"
 
 int main(void)
 {

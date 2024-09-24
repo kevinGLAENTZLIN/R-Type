@@ -13,6 +13,8 @@
 #include <array>
 #include <bitset>
 #define MAX_ENTITIES 10000
+#include <cstdint>
+
 
 using ComponentType = std::uint8_t;
 const ComponentType MAX_COMPONENTS = 32;

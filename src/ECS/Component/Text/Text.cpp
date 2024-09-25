@@ -7,16 +7,16 @@
 
 #include "Text.hh"
 
-Components::Text::Text(std::string text):
+ECS::Components::Text::Text(std::string text):
     _text(text)
 {}
 
-std::string Components::Text::getText() const
+std::string ECS::Components::Text::getText() const
 {
     return _text;
 }
 
-void Components::Text::setText(std::string text)
+void ECS::Components::Text::setText(std::string text)
 {
     _text = text;
 }

@@ -20,18 +20,22 @@ using ComponentType = std::uint8_t;
 const ComponentType MAX_COMPONENTS = 32;
 using Signature = std::bitset<MAX_COMPONENTS>;
 
-class EntityManager {
-    public:
-        EntityManager();
-        ~EntityManager() = default;
+namespace ECS {
+    namespace EntityManager {
+        class EntityManager {
+        public:
+            EntityManager();
+            ~EntityManager() = default;
 
-        std::size_t CreateEntity();
-        void DestroyEntity(std::size_t entity);
-        void SetSignature(std::size_t entity, Signature signature);
-        Signature GetSignature(std::size_t entity) const;
+            std::size_t createEntity();
+            void destroyEntity(std::size_t entity);
+            void setSignature(std::size_t entity, Signature signature);
+            Signature getSignature(std::size_t entity) const;
 
         private:
-            std::queue<std::size_t> mAvailableEntities;
-            std::array<Signature, MAX_ENTITIES> mSignatures;
-            std::size_t mLivingEntityCount;
-};
+            std::queue<std::size_t> _mAvailableEntities;
+            std::array<Signature, MAX_ENTITIES> _mSignatures;
+            std::size_t _mLivingEntityCount;
+        };
+    }
+}

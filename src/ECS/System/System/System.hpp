@@ -4,17 +4,18 @@
 ** File description:
 ** System class
 */
-
 #pragma once
+
 #include <cstddef>
 #include <set>
 
-class System {
+namespace ECS {
+    namespace Systems {
 
-    public:
-        std::set<std::size_t> _entities;
+        class System {
 
-    protected:
-
-    private:
-};
+        public:
+            std::set<std::size_t> _entities;
+        };
+    }
+}

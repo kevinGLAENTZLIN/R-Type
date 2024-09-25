@@ -7,25 +7,25 @@
 
 #include "Velocity.hh"
 
-Components::Velocity::Velocity(float x, float y):
+ECS::Components::Velocity::Velocity(float x, float y):
     _x(x), _y(y)
 {}
 
-Components::Velocity::Velocity(std::pair<float, float> vel):
+ECS::Components::Velocity::Velocity(std::pair<float, float> vel):
     _x(vel.first), _y(vel.second)
 {}
 
-float Components::Velocity::getX() const
+float ECS::Components::Velocity::getX() const
 {
     return _x;
 }
 
-float Components::Velocity::getY() const
+float ECS::Components::Velocity::getY() const
 {
     return _y;
 }
 
-std::pair<float, float> Components::Velocity::getVelPair() const
+std::pair<float, float> ECS::Components::Velocity::getVelPair() const
 {
     return std::make_pair(_x, _y);
 }

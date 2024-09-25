@@ -5,28 +5,27 @@
 ** Core class is the main class of the ECS.
 ** It will coordinate the behaviors of the managers.
 */
-
 #include "Core.hpp"
 
-ECS::Core::Core()
+ECS::Core::Core::Core()
 {
-    _entityManager = std::make_shared<EntityManager>();
-    _systemManager = std::make_shared<SystemManager>();
+    _entityManager = std::make_shared<EntityManager::EntityManager>();
+    _systemManager = std::make_shared<SystemManager::SystemManager>();
     _componentManager = std::make_shared<ComponentManager::ComponentManager>();
 }
 
-std::size_t ECS::Core::createEntity()
+std::size_t ECS::Core::Core::createEntity()
 {
-    return _entityManager->CreateEntity();
+    return _entityManager->createEntity();
 }
 
-void ECS::Core::destroyEntity(std::size_t entity)
+void ECS::Core::Core::destroyEntity(std::size_t entity)
 {
-    _entityManager->DestroyEntity(entity);
-    _systemManager->EntityDestroyed(entity);
+    _entityManager->destroyEntity(entity);
+    _systemManager->entityDestroyed(entity);
 }
 
-Signature ECS::Core::getSignature(std::size_t entity) const
+Signature ECS::Core::Core::getSignature(std::size_t entity) const
 {
-    return _entityManager->GetSignature(entity);
+    return _entityManager->getSignature(entity);
 }

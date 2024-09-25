@@ -4,14 +4,13 @@
 ** File description:
 ** Player class
 */
-
 #include "Player.hh"
 
-Player::Player(std::size_t id):
+ECS::Entities::Player::Player(std::size_t id):
     _id(id)
 {}
 
-std::size_t Player::getId() const
+std::size_t ECS::Entities::Player::getId() const
 {
     return _id;
 }

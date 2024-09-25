@@ -4,27 +4,29 @@
 ** File description:
 ** Volume Component
 */
-
 #pragma once
+
 #include <iostream>
 
-namespace Components {
+namespace ECS {
+    namespace Components {
 
-    class Volume {
-    public:
-        Volume(float masterVolume = 1.0f, float musicVolume = 1.0f, float sfxVolume = 1.0f);
-        ~Volume() = default;
+        class Volume {
+        public:
+            Volume(float masterVolume = 1.0f, float musicVolume = 1.0f, float sfxVolume = 1.0f);
+            ~Volume() = default;
 
-        float getMasterVolume() const;
-        void setMasterVolume(float volume);
-        float getMusicVolume() const;
-        void setMusicVolume(float volume);
-        float getSfxVolume() const;
-        void setSfxVolume(float volume);
+            float getMasterVolume() const;
+            void setMasterVolume(float volume);
+            float getMusicVolume() const;
+            void setMusicVolume(float volume);
+            float getSfxVolume() const;
+            void setSfxVolume(float volume);
 
-    private:
-        float _masterVolume;
-        float _musicVolume;
-        float _sfxVolume;
-    };
-};
+        private:
+            float _masterVolume;
+            float _musicVolume;
+            float _sfxVolume;
+        };
+    }
+}

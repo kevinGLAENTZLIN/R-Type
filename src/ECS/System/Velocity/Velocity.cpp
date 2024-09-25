@@ -5,9 +5,9 @@
 ** SystemVelocity cpp
 */
 
-#include "SystemVelocity.hpp"
+#include "Velocity.hpp"
 
-void Systems::SystemVelocity::update(
+void ECS::Systems::SystemVelocity::update(
     ComponentManager::SparseArray<Components::Position> &positions,
     ComponentManager::SparseArray<Components::Velocity> &velocities,
     std::vector<std::size_t> &entities)

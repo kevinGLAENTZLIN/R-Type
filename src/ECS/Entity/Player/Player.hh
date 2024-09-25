@@ -4,21 +4,22 @@
 ** File description:
 ** Player class
 */
-
 #include <cstddef>
+
 #include <iostream>
 
-class Player {
+namespace ECS {
+    namespace Entities {
+        class Player {
 
-    public:
-        Player(std::size_t id);
-        ~Player() = default;
+        public:
+            Player(std::size_t id);
+            ~Player() = default;
 
-        std::size_t getId() const;
+            std::size_t getId() const;
 
-    protected:
-
-    private:
-        std::size_t _id;
-
-};
+        private:
+            std::size_t _id;
+        };
+    }
+}

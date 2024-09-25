@@ -4,13 +4,14 @@
 ** File description:
 ** Text Component
 */
-
 #pragma once
+
 #include <iostream>
 
-namespace Components {
+namespace ECS {
+    namespace Components {
 
-    class Text {
+        class Text {
         public:
             Text(std::string text);
             ~Text() = default;
@@ -21,5 +22,6 @@ namespace Components {
 
         private:
             std::string _text;
-    };
-};
+        };
+    }
+}

@@ -6,6 +6,7 @@
 */
 
 #include "SystemVelocity.hpp"
+#include <iostream>
 
 void Systems::SystemVelocity::update(
     ComponentManager::SparseArray<Components::Position> &positions,
@@ -13,11 +14,9 @@ void Systems::SystemVelocity::update(
     std::vector<std::size_t> &entities)
 {
     for (auto &entity : entities) {
-        if (positions[entity].has_value() && velocities[entity].has_value()) {
             auto &position = positions[entity].value();
             auto &velocity = velocities[entity].value();
             position.setX(position.getX() + velocity.getX());
             position.setY(position.getY() + velocity.getY());
-        }
     }
 }

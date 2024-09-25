@@ -47,3 +47,15 @@ Signature EntityManager::GetSignature(std::size_t entity) const
     }
     return mSignatures[entity];
 }
+
+std::vector<std::size_t> EntityManager::GetEntities() const
+{
+    std::vector<std::size_t> activeEntities;
+
+    for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
+        if (mSignatures[entity].any()) {
+            activeEntities.push_back(entity);
+        }
+    }
+    return activeEntities;
+}

@@ -26,9 +26,11 @@ class EntityManager {
         ~EntityManager() = default;
 
         std::size_t CreateEntity();
+
         void DestroyEntity(std::size_t entity);
         void SetSignature(std::size_t entity, Signature signature);
         Signature GetSignature(std::size_t entity) const;
+        std::vector<std::size_t> GetEntities() const;
 
         private:
             std::queue<std::size_t> mAvailableEntities;

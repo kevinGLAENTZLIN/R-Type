@@ -36,7 +36,7 @@ namespace ECS {
         T& GetComponent(std::size_t entity) {
             return _componentManager->getComponents<T>()[entity].value();
         }
-        
+
         template<typename T>
         ComponentManager::SparseArray<T>& GetComponents() {
             return _componentManager->getComponents<T>();
@@ -68,7 +68,16 @@ namespace ECS {
             _systemManager->EntitySignatureChanged(entity, signature);
         }
 
-    protected:
+        std::vector<std::size_t> getEntitiesWithSignature(Signature systemSignature) const {
+            std::vector<std::size_t> matchingEntities;
+            auto entities = _entityManager->GetEntities();
+            for (auto &entity : entities) {
+                if ((getSignature(entity) & systemSignature) == systemSignature) {
+                    matchingEntities.push_back(entity);
+                }
+            }
+            return matchingEntities;
+        }
 
     private:
         std::shared_ptr<ComponentManager::ComponentManager> _componentManager;

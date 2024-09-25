@@ -15,13 +15,18 @@ ECS::Core::Core()
     _componentManager = std::make_shared<ComponentManager::ComponentManager>();
 }
 
-std::size_t ECS::Core::CreateEntity()
+std::size_t ECS::Core::createEntity()
 {
     return _entityManager->CreateEntity();
 }
 
-void ECS::Core::DestroyEntity(std::size_t entity)
+void ECS::Core::destroyEntity(std::size_t entity)
 {
     _entityManager->DestroyEntity(entity);
     _systemManager->EntityDestroyed(entity);
+}
+
+Signature ECS::Core::getSignature(std::size_t entity) const
+{
+    return _entityManager->GetSignature(entity);
 }

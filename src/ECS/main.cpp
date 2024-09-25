@@ -27,30 +27,19 @@ int main(void)
 
     std::cout << "-----------------------------------\n";
 
-    std::size_t entity1 = core.CreateEntity();
-    std::size_t entity2 = core.CreateEntity();
+    std::size_t entity1 = core.createEntity();
+    std::size_t entity2 = core.createEntity();
 
     std::cout << "Entity 1: " << entity1 << std::endl;
     std::cout << "Entity 2: " << entity2 << std::endl;
-
-    Signature entity1Signature;
-    entity1Signature.set(
-        ComponentManager::ComponentTypeRegistry::getTypeId<Components::Position>());
-    core.setEntitySignature(entity1, entity1Signature);
-    Signature entity2Signature;
-    entity2Signature.set(
-        ComponentManager::ComponentTypeRegistry::getTypeId<Components::Position>());
-    entity2Signature.set(
-        ComponentManager::ComponentTypeRegistry::getTypeId<Components::Velocity>());
-    core.setEntitySignature(entity2, entity2Signature);
-    
-    std::cout << "-----------------------------------" << std::endl;
-    std::cout << "entity1Signature:" << entity1Signature << std::endl;
-    std::cout << "entity2Signature:" << entity2Signature << std::endl;
     
     core.AddComponent(entity1, Components::Position{4.4f, 5.7f});
     core.AddComponent(entity2, Components::Position{84.0f, 42.0f});
     core.AddComponent(entity2, Components::Velocity{0.5f, 0.5f});
+
+    std::cout << "-----------------------------------" << std::endl;
+    std::cout << "entity1 signature:" << core.getSignature(entity1) << std::endl;
+    std::cout << "entity2 signature:" << core.getSignature(entity2) << std::endl;
 
     std::cout << "-----------------------------------\n";
     std::cout << "Initial Entity 1 Position: ";

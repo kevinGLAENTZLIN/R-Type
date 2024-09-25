@@ -1,22 +1,18 @@
-/*
-** EPITECH PROJECT, 2024
-** main.cpp
-** File description:
-** main to test ECS Core
-*/
+#include </opt/homebrew/Cellar/sfml/2.6.1/include/SFML/Graphics.hpp>
 #include "Component/Health/Health.hh"
 #include "Core/Core.hpp"
 #include "Component/Position/Position.hpp"
 #include "Component/Velocity/Velocity.hh"
-#include "Component/Health/Health.hh"
+#include "System/Velocity/Velocity.hpp"
 #include "System/Velocity/Velocity.hpp"
 
 std::size_t ECS::ComponentManager::ComponentTypeRegistry::nextTypeIndex = 0;
 
 int main(void)
 {
-    ECS::Core::Core core;
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ECS - Moving Squares");
 
+    ECS::Core::Core core;
     core.registerComponent<ECS::Components::Position>();
     core.registerComponent<ECS::Components::Velocity>();
     core.registerComponent<ECS::Components::Health>();
@@ -26,47 +22,49 @@ int main(void)
     Signature velocitySystemSignature;
     velocitySystemSignature.set(ECS::ComponentManager::ComponentTypeRegistry::getTypeId<ECS::Components::Position>());
     velocitySystemSignature.set(ECS::ComponentManager::ComponentTypeRegistry::getTypeId<ECS::Components::Velocity>());
-    velocitySystemSignature.set(ECS::ComponentManager::ComponentTypeRegistry::getTypeId<ECS::Components::Health>());
     core.setSystemSignature<ECS::Systems::SystemVelocity>(velocitySystemSignature);
-
-    std::cout << "-----------------------------------\n";
 
     std::size_t entity1 = core.createEntity();
     std::size_t entity2 = core.createEntity();
 
-    std::cout << "Entity 1: " << entity1 << std::endl;
-    std::cout << "Entity 2: " << entity2 << std::endl;
-    
-    core.addComponent(entity1, ECS::Components::Position{4.4f, 5.7f});
-    core.addComponent(entity2, ECS::Components::Position{84.0f, 42.0f});
-    core.addComponent(entity2, ECS::Components::Velocity{0.5f, 0.5f});
+    core.addComponent(entity1, ECS::Components::Position{400.0f, 100.0f});
+    core.addComponent(entity1, ECS::Components::Velocity{0.001f, 0.001f});
 
-    core.addComponent(entity1, ECS::Components::Position{4.4f, 5.7f});
-    core.addComponent(entity1, ECS::Components::Velocity{49.0f, 90.0f});
-    core.addComponent(entity2, ECS::Components::Position{84.0f, 42.0f});
-    core.addComponent(entity2, ECS::Components::Velocity{0.5f, 0.5f});
+    core.addComponent(entity2, ECS::Components::Position{400.0f, 100.0f});
+    core.addComponent(entity2, ECS::Components::Velocity{0.001f, -0.001f});
 
-    std::cout << "-----------------------------------" << std::endl;
-    std::cout << "entity1 signature:" << core.getSignature(entity1) << std::endl;
-    std::cout << "entity2 signature:" << core.getSignature(entity2) << std::endl;
+    sf::RectangleShape square1(sf::Vector2f(50.0f, 50.0f));
+    square1.setFillColor(sf::Color::Red);
 
-    std::cout << "-----------------------------------\n";
+    sf::RectangleShape square2(sf::Vector2f(50.0f, 50.0f));
+    square2.setFillColor(sf::Color::Blue);
 
-    std::cout << "Signature system: " << velocitySystemSignature << std::endl;
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+        }
 
-    std::cout << "-----------------------------------\n";
-    std::cout << "Initial Entity 1 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity1) << std::endl;
-    std::cout << "-----------------------------------\n";
-    std::cout << "Initial Entity 2 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity2) << std::endl;
-    std::cout << "Initial Entity 2 Velocity: ";
-    std::cout << core.getComponent<ECS::Components::Velocity>(entity2) << std::endl;
+        std::vector<std::size_t> entities = core.getEntitiesWithSignature(velocitySystemSignature);
+        velocitySystem->update(core.getComponents<ECS::Components::Position>(),
+                               core.getComponents<ECS::Components::Velocity>(),
+                               entities);
 
-    std::cout << "Updated Entity 1 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity1) << std::endl;
-    std::cout << "Updated Entity 2 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity2) << std::endl;
+        auto &pos1 = core.getComponent<ECS::Components::Position>(entity1);
+        square1.setPosition(pos1.getX(), pos1.getY());
+
+        auto &pos2 = core.getComponent<ECS::Components::Position>(entity2);
+        square2.setPosition(pos2.getX(), pos2.getY());
+
+        window.clear();
+
+        window.draw(square1);
+        window.draw(square2);
+
+        window.display();
+    }
 
     return 0;
 }

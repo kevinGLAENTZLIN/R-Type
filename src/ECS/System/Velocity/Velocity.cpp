@@ -7,8 +7,8 @@
 #include "Velocity.hpp"
 
 void ECS::Systems::SystemVelocity::update(
-    ComponentManager::SparseArray<Components::Position> &positions,
-    ComponentManager::SparseArray<Components::Velocity> &velocities,
+    ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
+    ECS::ComponentManager::SparseArray<ECS::Components::Velocity> &velocities,
     std::vector<std::size_t> &entities)
 {
     for (auto &entity : entities) {

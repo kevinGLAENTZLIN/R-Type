@@ -4,17 +4,17 @@
 ** File description:
 ** EntityManeger class
 */
-
 #pragma once
+
 #include <cstddef>
 #include <vector>
 #include <iostream>
 #include <queue>
 #include <array>
 #include <bitset>
-#define MAX_ENTITIES 10000
 #include <cstdint>
 
+#define MAX_ENTITIES 10000
 
 using ComponentType = std::uint8_t;
 const ComponentType MAX_COMPONENTS = 32;

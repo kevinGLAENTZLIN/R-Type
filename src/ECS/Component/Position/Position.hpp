@@ -27,7 +27,7 @@ namespace Components {
     };
 
     inline std::ostream & operator<< (std::ostream & stream, const Position & position) {
-        stream << "Position : x = " << position.getX() << ", y = " << position.getY();
+        stream << "(" << position.getX() << ", " << position.getY() << ")";
         return stream;
     }
 }

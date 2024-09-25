@@ -1,14 +1,15 @@
-// /*
-// ** EPITECH PROJECT, 2024
-// ** main.cpp
-// ** File description:
-// ** main to test ECS Core
-// */
-
+/*
+** EPITECH PROJECT, 2024
+** main.cpp
+** File description:
+** main to test ECS Core
+*/
 #include "Core/Core.hpp"
 #include "Component/Position/Position.hpp"
 #include "Component/Velocity/Velocity.hh"
 #include "System/SystemVelocity/SystemVelocity.hpp"
+
+std::size_t ComponentManager::ComponentTypeRegistry::nextTypeIndex = 0;
 
 int main(void)
 {
@@ -17,12 +18,12 @@ int main(void)
     core.RegisterComponent<Components::Position>();
     core.RegisterComponent<Components::Velocity>();
 
-    auto velocitySystem = core.RegisterSystem<SystemVelocity>();
+    auto velocitySystem = core.RegisterSystem<Systems::SystemVelocity>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(1);
     velocitySystemSignature.set(2);
-    core.SetSystemSignature<SystemVelocity>(velocitySystemSignature);
+    core.SetSystemSignature<Systems::SystemVelocity>(velocitySystemSignature);
 
     std::cout << "-----------------------------------\n";
 
@@ -33,28 +34,43 @@ int main(void)
     std::cout << "Entity 2: " << entity2 << std::endl;
 
     Signature entity1Signature;
-    entity1Signature.set(1);
+    entity1Signature.set(
+        ComponentManager::ComponentTypeRegistry::getTypeId<Components::Position>());
     core.setEntitySignature(entity1, entity1Signature);
     Signature entity2Signature;
-    entity2Signature.set(1);
-    entity2Signature.set(2);
+    entity2Signature.set(
+        ComponentManager::ComponentTypeRegistry::getTypeId<Components::Position>());
+    entity2Signature.set(
+        ComponentManager::ComponentTypeRegistry::getTypeId<Components::Velocity>());
     core.setEntitySignature(entity2, entity2Signature);
-
+    
+    std::cout << "-----------------------------------" << std::endl;
+    std::cout << "entity1Signature:" << entity1Signature << std::endl;
+    std::cout << "entity2Signature:" << entity2Signature << std::endl;
+    
     core.AddComponent(entity1, Components::Position{4.4f, 5.7f});
     core.AddComponent(entity2, Components::Position{84.0f, 42.0f});
     core.AddComponent(entity2, Components::Velocity{0.5f, 0.5f});
 
     std::cout << "-----------------------------------\n";
-    std::cout << "Initial Entity 1 Position: " << core.GetComponent<Components::Position>(entity1) << std::endl;
-    std::cout << "Initial Entity 2 Position: " << core.GetComponent<Components::Position>(entity2) << std::endl;
+    std::cout << "Initial Entity 1 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity1) << std::endl;
+    std::cout << "Initial Entity 2 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity2) << std::endl;
+    std::cout << "Initial Entity 2 Velocity: ";
+    std::cout << core.GetComponent<Components::Velocity>(entity2) << std::endl;
 
     std::cout << "-----------------------------------\n";
 
-    // std::vector<std::size_t> entities = {entity1, entity2};
-    // velocitySystem->update(core.GetComponent<Components::Position>(entity2), core.GetComponent<Components::Velocity>(entity2), entities);
+    std::vector<std::size_t> entities = {entity1, entity2};
+    velocitySystem->update(core.GetComponents<Components::Position>(),
+                           core.GetComponents<Components::Velocity>(),
+                           entities);
 
-    // std::cout << "Updated Entity 1 Position: " << core.GetComponent<Components::Position>(entity1) << std::endl;
-    // std::cout << "Updated Entity 2 Position: " << core.GetComponent<Components::Position>(entity2) << std::endl;
+    std::cout << "Updated Entity 1 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity1) << std::endl;
+    std::cout << "Updated Entity 2 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity2) << std::endl;
 
     return 0;
 }

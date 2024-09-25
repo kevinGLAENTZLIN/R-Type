@@ -11,6 +11,7 @@
 #include "../Component/ComponentManager/ComponentManager.hpp"
 #include "../System/SystemManager/SystemManager.hpp"
 #include "../Entity/EntityManager/EntityManager.hh"
+#include "../Component/ComponentManager/ComponentTypeRegistry.hpp"
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -34,6 +35,11 @@ namespace ECS {
             T& GetComponent(std::size_t entity) {
                 return _componentManager->getComponents<T>()[entity].value();
             }
+        
+            template<typename T>
+            ComponentManager::SparseArray<T>& GetComponents() {
+                return _componentManager->getComponents<T>();
+            }
 
             template<typename T>
             std::shared_ptr<T> RegisterSystem() {
@@ -44,8 +50,9 @@ namespace ECS {
             void AddComponent(std::size_t entity, T component)
             {
                 auto signature = _entityManager->GetSignature(entity);
-                std::cout << "signature in add compo in core : " << signature << std::endl;
-                //signature.set(typeid(T), true);
+
+                signature.set(
+                    ComponentManager::ComponentTypeRegistry::getTypeId<T>(), true);
                 _entityManager->SetSignature(entity, signature);
                 _systemManager->EntitySignatureChanged(entity, signature);
                 _componentManager->getComponents<T>().insertAt(entity, component);

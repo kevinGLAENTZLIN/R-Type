@@ -4,21 +4,23 @@
 ** File description:
 ** EntityManeger class
 */
+#pragma once
 
 #include <cstddef>
 #include <iostream>
 
-class Missile {
+namespace ECS {
+    namespace Entities {
+        class Missile {
 
-    public:
-        Missile(std::size_t id);
-        ~Missile() = default;
+        public:
+            Missile(std::size_t id);
+            ~Missile() = default;
 
-        std::size_t getId() const;
+            std::size_t getId() const;
 
-    protected:
-
-    private:
-        std::size_t _id;
-
-};
+        private:
+            std::size_t _id;
+        };
+    }
+}

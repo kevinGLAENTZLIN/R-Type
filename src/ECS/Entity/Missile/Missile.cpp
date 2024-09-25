@@ -7,11 +7,11 @@
 
 #include "Missile.hh"
 
-Missile::Missile(std::size_t id):
+ECS::Entities::Missile::Missile(std::size_t id):
     _id(id)
 {}
 
-std::size_t Missile::getId() const
+std::size_t ECS::Entities::Missile::getId() const
 {
     return _id;
 }

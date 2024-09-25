@@ -10,9 +10,9 @@ set(LIB_SOURCES
     Entity/Player/Player.cpp
     Component/Position/Position.cpp
     Component/Velocity/Velocity.cpp
-    System/SystemVelocity/SystemVelocity.cpp
+    System/Velocity/Velocity.cpp
 )
-
+find_package(raylib CONFIG REQUIRED)
 # Créer la bibliothèque
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
@@ -23,7 +23,7 @@ set_target_properties(${NAME_LIB} PROPERTIES
     OUTPUT_NAME ${NAME_LIB}
     SUFFIX ".a"
 )
-
+target_link_libraries(${NAME_LIB} PRIVATE raylib)
 # Inclure les répertoires des headers
 target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -39,7 +39,7 @@ target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/System
     ${CMAKE_CURRENT_SOURCE_DIR}/System/System
     ${CMAKE_CURRENT_SOURCE_DIR}/System/SystemManager
-    ${CMAKE_CURRENT_SOURCE_DIR}/System/SystemVelocity
+    ${CMAKE_CURRENT_SOURCE_DIR}/System/Velocity
 )
 
 # Compiler le main.cpp seulement en mode Debug

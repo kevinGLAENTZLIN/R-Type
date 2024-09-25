@@ -4,21 +4,23 @@
 ** File description:
 ** Enemy class
 */
+#pragma once
 
 #include <cstddef>
 #include <iostream>
 
-class Enemy {
+namespace ECS {
+    namespace Entities {
+        class Enemy {
 
-    public:
-        Enemy(std::size_t id);
-        ~Enemy() = default;
+        public:
+            Enemy(std::size_t id);
+            ~Enemy() = default;
 
-        std::size_t getId() const;
+            std::size_t getId() const;
 
-    protected:
-
-    private:
-        std::size_t _id;
-
-};
+        private:
+            std::size_t _id;
+        };
+    }
+}

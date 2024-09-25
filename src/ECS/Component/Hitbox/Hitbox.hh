@@ -4,13 +4,14 @@
 ** File description:
 ** Hitbox Component
 */
-
 #pragma once
+
 #include <iostream>
 
-namespace Components {
+namespace ECS {
+    namespace Components {
 
-    class Hitbox {
+        class Hitbox {
         public:
             Hitbox(float width, float height);
             ~Hitbox() = default;
@@ -24,5 +25,6 @@ namespace Components {
         private:
             float _width;
             float _height;
-    };
-};
+        };
+    }
+}

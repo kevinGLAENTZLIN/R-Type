@@ -4,14 +4,13 @@
 ** File description:
 ** Enemy class
 */
-
 #include "Enemy.hh"
 
-Enemy::Enemy(std::size_t id):
+ECS::Entities::Enemy::Enemy(std::size_t id):
     _id(id)
 {}
 
-std::size_t Enemy::getId() const
+std::size_t ECS::Entities::Enemy::getId() const
 {
     return _id;
 }

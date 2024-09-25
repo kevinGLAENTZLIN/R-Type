@@ -1,59 +1,58 @@
 /*
 ** EPITECH PROJECT, 2024
-** EntityManeger.hh
+** EntityManager.hh
 ** File description:
-** EntityManeger class
+** EntityManager class
 */
-
 #include "EntityManager.hh"
 
-EntityManager::EntityManager():
-    mLivingEntityCount(0)
+ECS::EntityManager::EntityManager::EntityManager():
+    _mLivingEntityCount(0)
 {
     for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
-        mAvailableEntities.push(entity);
+        _mAvailableEntities.push(entity);
     }
 }
 
-std::size_t EntityManager::CreateEntity()
+std::size_t ECS::EntityManager::EntityManager::createEntity()
 {
-    if (mLivingEntityCount > MAX_ENTITIES)
+    if (_mLivingEntityCount > MAX_ENTITIES)
         return MAX_ENTITIES;
-    std::size_t id = mAvailableEntities.front();
-    mAvailableEntities.pop();
-    ++mLivingEntityCount;
+    std::size_t id = _mAvailableEntities.front();
+    _mAvailableEntities.pop();
+    ++_mLivingEntityCount;
     return id;
 }
 
-void EntityManager::DestroyEntity(std::size_t entity)
+void ECS::EntityManager::EntityManager::destroyEntity(std::size_t entity)
 {
-    mSignatures[entity].reset();
-    mAvailableEntities.push(entity);
-    --mLivingEntityCount;
+    _mSignatures[entity].reset();
+    _mAvailableEntities.push(entity);
+    --_mLivingEntityCount;
 }
 
-void EntityManager::SetSignature(std::size_t entity, Signature signature)
+void ECS::EntityManager::EntityManager::setSignature(std::size_t entity, Signature signature)
 {
     if (entity >= MAX_ENTITIES) {
         return;
     }
-    mSignatures[entity] = signature;
+    _mSignatures[entity] = signature;
 }
 
-Signature EntityManager::GetSignature(std::size_t entity) const
+Signature ECS::EntityManager::EntityManager::getSignature(std::size_t entity) const
 {
     if (entity >= MAX_ENTITIES) {
         return Signature();
     }
-    return mSignatures[entity];
+    return _mSignatures[entity];
 }
 
-std::vector<std::size_t> EntityManager::GetEntities() const
+std::vector<std::size_t> ECS::EntityManager::EntityManager::getEntities() const
 {
     std::vector<std::size_t> activeEntities;
 
     for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
-        if (mSignatures[entity].any()) {
+        if (_mSignatures[entity].any()) {
             activeEntities.push_back(entity);
         }
     }

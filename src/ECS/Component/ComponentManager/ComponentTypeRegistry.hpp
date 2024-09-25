@@ -8,17 +8,19 @@
 
 #include <iostream>
 
-namespace ComponentManager {
+namespace ECS {
+    namespace ComponentManager {
     
-    class ComponentTypeRegistry {
-    public:
-        template <typename Component>
-        static std::size_t getTypeId() {
-            static std::size_t index = nextTypeIndex++;
-            return index;
-        }
+        class ComponentTypeRegistry {
+        public:
+            template <typename Component>
+            static std::size_t getTypeId() {
+                static std::size_t index = nextTypeIndex++;
+                return index;
+            }
         
-    private:
-        static std::size_t nextTypeIndex;
-    };
+        private:
+            static std::size_t nextTypeIndex;
+        };
+    }
 }

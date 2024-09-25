@@ -9,9 +9,10 @@
 #include <iostream>
 #include <raylib.h>
 
-namespace Components {
+namespace ECS {
+    namespace Components {
 
-    class Render {
+        class Render {
         public:
             Render(std::string textureFilePath, float rotation = 0.0f, float scale = 1.0f);
             ~Render() = default;
@@ -27,5 +28,6 @@ namespace Components {
             Texture2D _texture;
             float _rotation;
             float _scale;
-    };
+        };
+    }
 }

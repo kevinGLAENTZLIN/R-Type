@@ -4,22 +4,24 @@
 ** File description:
 ** Health Component
 */
-
 #pragma once
+
 #include <iostream>
 
-namespace Components {
+namespace ECS {
+    namespace Components {
 
-    class Health {
+        class Health {
         public:
             Health(int health);
             ~Health() = default;
-            int GetHealth() const;
-            void SetHealth(int health);
+            int getHealth() const;
+            void setHealth(int health);
 
         protected:
 
         private:
             int _health;
-    };
-};
+        };
+    }
+}

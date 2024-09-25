@@ -4,29 +4,31 @@
 ** File description:
 ** Velocity Component
 */
-
 #pragma once
+
 #include <iostream>
 
-namespace Components {
+namespace ECS {
+    namespace Components {
 
-    class Velocity {
-    public:
-        Velocity(float x, float y);
-        Velocity(std::pair<float, float> vel);
-        ~Velocity() = default;
+        class Velocity {
+        public:
+            Velocity(float x, float y);
+            Velocity(std::pair<float, float> vel);
+            ~Velocity() = default;
 
-        float getX() const;
-        float getY() const;
-        std::pair<float, float> getVelPair() const;
+            float getX() const;
+            float getY() const;
+            std::pair<float, float> getVelPair() const;
 
-    private:
-        float _x;
-        float _y;
-    };
+        private:
+            float _x;
+            float _y;
+        };
 
-    inline std::ostream & operator<< (std::ostream & stream, const Components::Velocity & velocity) {
-        stream << "(" << velocity.getX() << ", " << velocity.getY() << ")";
-        return stream;
+        inline std::ostream & operator<< (std::ostream & stream, const Components::Velocity & velocity) {
+            stream << "(" << velocity.getX() << ", " << velocity.getY() << ")";
+            return stream;
+        }
     }
 }

@@ -7,26 +7,26 @@
 
 #include "Hitbox.hh"
 
-Components::Hitbox::Hitbox(float width, float height):
+ECS::Components::Hitbox::Hitbox(float width, float height):
     _width(width), _height(height)
 {}
 
-float Components::Hitbox::getWidth() const
+float ECS::Components::Hitbox::getWidth() const
 {
     return _width;
 }
 
-float Components::Hitbox::getHeight() const
+float ECS::Components::Hitbox::getHeight() const
 {
     return _height;
 }
 
-void Components::Hitbox::setWidth(float width)
+void ECS::Components::Hitbox::setWidth(float width)
 {
     _width = width;
 }
 
-void Components::Hitbox::setHeight(float height)
+void ECS::Components::Hitbox::setHeight(float height)
 {
     _height = height;
 }

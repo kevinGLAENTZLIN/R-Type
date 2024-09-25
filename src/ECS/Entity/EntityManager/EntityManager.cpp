@@ -7,7 +7,8 @@
 
 #include "EntityManager.hh"
 
-EntityManager::EntityManager()
+EntityManager::EntityManager():
+    mLivingEntityCount(0)
 {
     for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
         mAvailableEntities.push(entity);
@@ -16,7 +17,7 @@ EntityManager::EntityManager()
 
 std::size_t EntityManager::CreateEntity()
 {
-    if (mLivingEntityCount < MAX_ENTITIES)
+    if (mLivingEntityCount > MAX_ENTITIES)
         return MAX_ENTITIES;
     std::size_t id = mAvailableEntities.front();
     mAvailableEntities.pop();
@@ -45,4 +46,16 @@ Signature EntityManager::GetSignature(std::size_t entity) const
         return Signature();
     }
     return mSignatures[entity];
+}
+
+std::vector<std::size_t> EntityManager::GetEntities() const
+{
+    std::vector<std::size_t> activeEntities;
+
+    for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
+        if (mSignatures[entity].any()) {
+            activeEntities.push_back(entity);
+        }
+    }
+    return activeEntities;
 }

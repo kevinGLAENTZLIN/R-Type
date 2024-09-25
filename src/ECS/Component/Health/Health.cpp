@@ -7,16 +7,16 @@
 
 #include "Health.hh"
 
-Health::Health(int health):
+Components::Health::Health(int health):
     _health(health)
 {}
 
-int Health::getHealth() const
+int Components::Health::GetHealth() const
 {
     return _health;
 }
 
-void Health::setHealth(int health)
+void Components::Health::SetHealth(int health)
 {
     _health = health;
 }

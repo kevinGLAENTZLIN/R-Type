@@ -2,70 +2,74 @@
 ** EPITECH PROJECT, 2024
 ** main.cpp
 ** File description:
-** main to test
+** main to test ECS Core
 */
-
-#include "Entity/EntityManager/EntityManager.hh"
+#include "Component/Health/Health.hh"
+#include "Core/Core.hpp"
+#include "Component/Position/Position.hpp"
+#include "Component/Velocity/Velocity.hh"
+#include "Component/Health/Health.hh"
 #include "System/SystemVelocity/SystemVelocity.hpp"
-#include "System/SystemManager/SystemManager.hpp"
+
+std::size_t ComponentManager::ComponentTypeRegistry::nextTypeIndex = 0;
 
 int main(void)
 {
-    EntityManager em;
-    SystemManager systemManager;
+    ECS::Core core;
 
-    auto velocitySystem = systemManager.RegisterSystem<SystemVelocity>();
+    core.RegisterComponent<Components::Position>();
+    core.RegisterComponent<Components::Velocity>();
+    core.RegisterComponent<Components::Health>();
+
+    auto velocitySystem = core.RegisterSystem<Systems::SystemVelocity>();
 
     Signature velocitySystemSignature;
-    velocitySystemSignature.set(1);
-    velocitySystemSignature.set(2);
-    systemManager.SetSignature<SystemVelocity>(velocitySystemSignature);
+    velocitySystemSignature.set(ComponentManager::ComponentTypeRegistry::getTypeId<Components::Position>());
+    velocitySystemSignature.set(ComponentManager::ComponentTypeRegistry::getTypeId<Components::Velocity>());
+    velocitySystemSignature.set(ComponentManager::ComponentTypeRegistry::getTypeId<Components::Health>());
+    core.SetSystemSignature<Systems::SystemVelocity>(velocitySystemSignature);
+
     std::cout << "-----------------------------------\n";
 
-    std::string systemTypeName = typeid(SystemVelocity).name();
-    std::cout << "Velocity System Type Name: " << systemTypeName << std::endl;
-
-    std::size_t entity1 = em.CreateEntity();
-    std::size_t entity2 = em.CreateEntity();
+    std::size_t entity1 = core.createEntity();
+    std::size_t entity2 = core.createEntity();
 
     std::cout << "Entity 1: " << entity1 << std::endl;
     std::cout << "Entity 2: " << entity2 << std::endl;
 
-    ComponentManager::SparseArray<Components::Position> positionArray;
-    ComponentManager::SparseArray<Components::Velocity> velocityArray;
+    core.AddComponent(entity1, Components::Position{4.4f, 5.7f});
+    core.AddComponent(entity1, Components::Velocity{49.0f, 90.0f});
+    core.AddComponent(entity2, Components::Position{84.0f, 42.0f});
+    core.AddComponent(entity2, Components::Velocity{0.5f, 0.5f});
 
-    Signature entity1Signature;
-    entity1Signature.set(1);
-    em.SetSignature(entity1, entity1Signature);
-
-    Signature entity2Signature;
-    entity2Signature.set(1);
-    entity2Signature.set(2);
-    em.SetSignature(entity2, entity2Signature);
+    std::cout << "-----------------------------------" << std::endl;
+    std::cout << "entity1 signature:" << core.getSignature(entity1) << std::endl;
+    std::cout << "entity2 signature:" << core.getSignature(entity2) << std::endl;
 
     std::cout << "-----------------------------------\n";
 
-    std::cout << "Entity 1 Signature: " << em.GetSignature(entity1) << std::endl;
-    std::cout << "Entity 2 Signature: " << em.GetSignature(entity2) << std::endl;
+    std::cout << "Signature system: " << velocitySystemSignature << std::endl;
+
+    std::cout << "-----------------------------------\n";
+    std::cout << "Initial Entity 1 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity1) << std::endl;
+    std::cout << "-----------------------------------\n";
+    std::cout << "Initial Entity 2 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity2) << std::endl;
+    std::cout << "Initial Entity 2 Velocity: ";
+    std::cout << core.GetComponent<Components::Velocity>(entity2) << std::endl;
 
     std::cout << "-----------------------------------\n";
 
-    positionArray.insertAt(entity1, Components::Position{1.0f, 2.0f});
-    positionArray.insertAt(entity2, Components::Position{4.4f, 5.7f});
-    velocityArray.insertAt(entity2, Components::Velocity{0.5f, 0.5f});
+    std::vector<std::size_t> entities = core.getEntitiesWithSignature(velocitySystemSignature);
+    velocitySystem->update(core.GetComponents<Components::Position>(),
+                           core.GetComponents<Components::Velocity>(),
+                           entities);
 
-    systemManager.EntitySignatureChanged(entity1, entity1Signature);
-    systemManager.EntitySignatureChanged(entity2, entity2Signature);
-    std::cout << "Initial Entity 1 Position: " << positionArray[entity1].value() << std::endl;
-    std::cout << "Initial Entity 2 Position: " << positionArray[entity2].value() << std::endl;
+    std::cout << "Updated Entity 1 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity1) << std::endl;
+    std::cout << "Updated Entity 2 Position: ";
+    std::cout << core.GetComponent<Components::Position>(entity2) << std::endl;
 
-    std::cout << "-----------------------------------\n";
-
-    std::vector<std::size_t> entiti;
-    entiti = {entity1, entity2};
-    velocitySystem->update(positionArray, velocityArray, entiti);
-
-    std::cout << "Updated Entity 1 Position: " << positionArray[entity1].value() << std::endl;
-    std::cout << "Updated Entity 2 Position: " << positionArray[entity2].value() << std::endl;
     return 0;
 }

@@ -4,17 +4,17 @@
 ** File description:
 ** EntityManeger class
 */
-
 #pragma once
+
 #include <cstddef>
 #include <vector>
 #include <iostream>
 #include <queue>
 #include <array>
 #include <bitset>
-#define MAX_ENTITIES 10000
 #include <cstdint>
 
+#define MAX_ENTITIES 10000
 
 using ComponentType = std::uint8_t;
 const ComponentType MAX_COMPONENTS = 32;
@@ -26,9 +26,11 @@ class EntityManager {
         ~EntityManager() = default;
 
         std::size_t CreateEntity();
+
         void DestroyEntity(std::size_t entity);
         void SetSignature(std::size_t entity, Signature signature);
         Signature GetSignature(std::size_t entity) const;
+        std::vector<std::size_t> GetEntities() const;
 
         private:
             std::queue<std::size_t> mAvailableEntities;

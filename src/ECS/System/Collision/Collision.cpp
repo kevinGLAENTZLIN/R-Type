@@ -5,9 +5,9 @@
 ** System hitbox class
 */
 
-#include "Hitbox.hh"
+#include "Collision.hh"
 
-void ECS::Systems::Hitbox::isHit(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
+void ECS::Systems::Collision::isHit(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
                             ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> &hitboxes,
                             std::vector<std::size_t> &entities)
 {
@@ -33,7 +33,7 @@ void ECS::Systems::Hitbox::isHit(ECS::ComponentManager::SparseArray<ECS::Compone
     }
 }
 
-bool ECS::Systems::Hitbox::checkCollision(const ECS::Components::Position &posA, const ECS::Components::Hitbox &hitboxA,
+bool ECS::Systems::Collision::checkCollision(const ECS::Components::Position &posA, const ECS::Components::Hitbox &hitboxA,
                                      const ECS::Components::Position &posB, const ECS::Components::Hitbox &hitboxB)
 {
     float coucou = hitboxB.getWidth();

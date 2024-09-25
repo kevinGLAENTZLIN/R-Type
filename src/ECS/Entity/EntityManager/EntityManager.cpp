@@ -46,3 +46,15 @@ Signature ECS::EntityManager::EntityManager::getSignature(std::size_t entity) co
     }
     return _mSignatures[entity];
 }
+
+std::vector<std::size_t> ECS::EntityManager::EntityManager::getEntities() const
+{
+    std::vector<std::size_t> activeEntities;
+
+    for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
+        if (_mSignatures[entity].any()) {
+            activeEntities.push_back(entity);
+        }
+    }
+    return activeEntities;
+}

@@ -31,6 +31,7 @@ namespace ECS {
             void destroyEntity(std::size_t entity);
             void setSignature(std::size_t entity, Signature signature);
             Signature getSignature(std::size_t entity) const;
+            std::vector<std::size_t> getEntities() const;
 
         private:
             std::queue<std::size_t> _mAvailableEntities;

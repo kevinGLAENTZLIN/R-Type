@@ -1,59 +1,65 @@
-#include "./udp_client.hh"
-#include "./socket.hh"
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** new_udp_client
+*/
 
-udpSocket::udpSocket(char *inServer, int inPort) : _port(inPort), _sByte(0), _rByte(0), _server(inServer)
+#include "./new_udp_client.hh"
+
+udpClient::udpClient(const std::string serverAddr, const int serverPort)
+    : _id(-1), _ioContext(), _socket(_ioContext, udp::endpoint(udp::v4(), 0)),
+      _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort)
 {
+    client_loop();
+    std::thread([this]() { _ioContext.run(); }).detach();
 }
 
-udpSocket::~udpSocket()
+udpClient::~udpClient()
 {
+    _ioContext.stop();
 }
 
-ssize_t udpSocket::sendRecv(char *inMsg)
+void udpClient::send_data(const std::string data)
 {
-    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    struct sockaddr_in servAddr;
-    struct sockaddr_in  cliAddr;
-    socklen_t cLen = sizeof(cliAddr);
-    socklen_t sLen = sizeof(servAddr);
+    std::string message = std::to_string(_id) + ":" + data;
 
-    servAddr.sin_family = AF_INET;
-    servAddr.sin_port = Encapsulation::c_socket::my_htons(_port);
-    servAddr.sin_addr.s_addr = Encapsulation::c_socket::my_inet_addr(_server);
-    _bufferSend = inMsg;
-    _sByte = Encapsulation::c_socket::my_sendto(sockfd, _bufferSend,0,(struct sockaddr * )&servAddr,sLen);
-    std::cout << "[" << _sByte << "] Bytes Sent : " << std::endl;
-    _rByte = Encapsulation::c_socket::my_recvfrom(sockfd, _bufferRecv,0,(struct sockaddr *)&cliAddr,&cLen);
-    close(sockfd);
-    return _sByte;
+    _socket.async_send_to(boost::asio::buffer(message), _serverEndpoint,
+    [](const boost::system::error_code& error, std::size_t bytes_transferred) {
+        if (error) {
+            std::cerr << "Send failed: " << error.message() << std::endl;
+        } else {
+            std::cout << "Sent " << bytes_transferred << " bytes" << std::endl;
+        }
+    });
 }
 
-void  udpSocket::printMsg() 
+void udpClient::recept_data()
 {
-    std::cout << "[" << _rByte << "] Bytes Rcvd : " << _bufferRecv << std::endl;
+    udp::endpoint sender_endpoint;
+
+    _socket.async_receive_from(boost::asio::buffer(_recv_buffer), sender_endpoint,
+    [this](const boost::system::error_code& error, std::size_t bytes_recv) {
+        if (!error && bytes_recv > 0) {
+            std::cout << "Received from server: [" << std::string(_recv_buffer.data(), bytes_recv) << "]" << std::endl;
+        }
+        client_loop();
+    });
 }
 
-std::string udpSocket::getRecvMsg()
+void udpClient::client_loop()
 {
-    return _bufferRecv;
-}
-
-ssize_t udpSocket::getRecvBytes()
-{
-    return _rByte;
+    recept_data();
 }
 
 int main(int argc, char **argv)
 {
-    if ( argc != 4 ) {
-        std::cout << "Usage:udp_client [server] [_port] [Message]" << std::endl;
+    if (argc != 4) {
+        std::cout << "Usage: udp_client [server] [port] [Message]" << std::endl;
         exit(84);
     }
-    udpSocket mUDP(argv[1], std::stoi(argv[2]));
-    if ( mUDP.sendRecv(argv[3]) > 0 ) {
-        std::cout << "[" << mUDP.getRecvBytes() << "] " << mUDP.getRecvMsg() << std::endl;
-    }
+    udpClient client(argv[1], std::stoi(argv[2]));
 
-    exit(0);
+    client.send_data(argv[3]);
+    return 0;
 }
- 

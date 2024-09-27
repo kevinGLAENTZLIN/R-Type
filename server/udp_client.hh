@@ -1,32 +1,35 @@
-#include<iostream>
-#include<arpa/inet.h>
-#include<unistd.h>
-#include<sys/socket.h>
-#include<sys/types.h>
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** temp
+*/
 
 #pragma once
 
-using namespace std;
+#include <boost/asio.hpp>
+#include <iostream>
+#include <thread>
+#include <vector>
+#include <array>
 
-class udpSocket {
+using boost::asio::ip::udp;
 
+class udpClient
+{
     public:
-        udpSocket(char *inServer, int inPort);
-        ~udpSocket();
+        udpClient(const std::string serverAddr, const int serverPort);
+        ~udpClient();
 
-        ssize_t sendRecv(char *inMsg);
-        void  printMsg();
-        std::string getRecvMsg();
-        ssize_t getRecvBytes();
+        void send_data(const std::string data);
 
     private:
-        int     _port;
-        ssize_t _sByte;
-        ssize_t _rByte;
-        std::string _server;
-        std::string _bufferSend;
-        std::string _bufferRecv;
+        void recept_data();
+        void client_loop();
+
+        int _id;
+        boost::asio::io_context _ioContext;
+        udp::socket _socket;
+        udp::endpoint _serverEndpoint;
+        std::array<char, 1024> _recv_buffer;
 };

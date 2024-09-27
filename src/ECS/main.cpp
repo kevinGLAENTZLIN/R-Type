@@ -11,7 +11,7 @@
 
 #include "System/Velocity/Velocity.hpp"
 #include "System/Collision/Collision.hh"
-#include "System/buttonClick/buttonClick.hpp"
+#include "System/ButtonClick/ButtonClick.hpp"
 
 #include "Entity/Button/Button.hh"
 

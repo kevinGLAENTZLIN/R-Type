@@ -1,72 +1,130 @@
-/*
-** EPITECH PROJECT, 2024
-** main.cpp
-** File description:
-** main to test ECS Core
-*/
-#include "Component/Health/Health.hh"
+#include <SFML/Graphics.hpp>
+#include <SFML/Window/Mouse.hpp>
+
 #include "Core/Core.hpp"
+
+#include "Component/Health/Health.hh"
 #include "Component/Position/Position.hpp"
 #include "Component/Velocity/Velocity.hh"
-#include "Component/Health/Health.hh"
-#include "System/Velocity/Velocity.hpp"
+#include "Component/Hitbox/Hitbox.hh"
+#include "Component/Text/Text.hh"
 
-std::size_t ECS::ComponentManager::ComponentTypeRegistry::nextTypeIndex = 0;
+#include "System/Velocity/Velocity.hpp"
+#include "System/Collision/Collision.hh"
+#include "System/ButtonClick/ButtonClick.hpp"
+
+#include "Entity/Button/Button.hh"
+
+std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 
 int main(void)
 {
-    ECS::Core::Core core;
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ECS - Moving Squares");
 
+    ECS::Core::Core core;
     core.registerComponent<ECS::Components::Position>();
     core.registerComponent<ECS::Components::Velocity>();
     core.registerComponent<ECS::Components::Health>();
+    core.registerComponent<ECS::Components::Hitbox>();
+    core.registerComponent<ECS::Components::Text>();
 
     auto velocitySystem = core.registerSystem<ECS::Systems::SystemVelocity>();
+    auto collisionSystem = core.registerSystem<ECS::Systems::Collision>();
+    auto buttonClickSystem = core.registerSystem<ECS::Systems::ButtonClick>();
 
     Signature velocitySystemSignature;
-    velocitySystemSignature.set(ECS::ComponentManager::ComponentTypeRegistry::getTypeId<ECS::Components::Position>());
-    velocitySystemSignature.set(ECS::ComponentManager::ComponentTypeRegistry::getTypeId<ECS::Components::Velocity>());
-    velocitySystemSignature.set(ECS::ComponentManager::ComponentTypeRegistry::getTypeId<ECS::Components::Health>());
+    velocitySystemSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    velocitySystemSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
     core.setSystemSignature<ECS::Systems::SystemVelocity>(velocitySystemSignature);
 
-    std::cout << "-----------------------------------\n";
+    Signature collisionSystemSignature;
+    collisionSystemSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    collisionSystemSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
+    core.setSystemSignature<ECS::Systems::Collision>(collisionSystemSignature);
 
+    Signature buttonSystemSignature;
+    buttonSystemSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    buttonSystemSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
+    buttonSystemSignature.set(ECS::CTypeRegistry::getTypeId<ECS::Components::Text>());
+    core.setSystemSignature<ECS::Systems::ButtonClick>(buttonSystemSignature);
+    
     std::size_t entity1 = core.createEntity();
     std::size_t entity2 = core.createEntity();
+    ECS::Entities::Button buttonEntity1(core.createEntity());
 
-    std::cout << "Entity 1: " << entity1 << std::endl;
-    std::cout << "Entity 2: " << entity2 << std::endl;
+    core.addComponent(entity1, ECS::Components::Position{400.0f, 100.0f});
+    core.addComponent(entity1, ECS::Components::Velocity{0.001f, 0.001f});
+    core.addComponent(entity1, ECS::Components::Hitbox{50, 50});
+
+    core.addComponent(entity2, ECS::Components::Position{400.0f, 100.0f});
+    core.addComponent(entity2, ECS::Components::Velocity{0.001f, -0.001f});
+    core.addComponent(entity2, ECS::Components::Hitbox{50, 50});
+
+    core.addComponent(buttonEntity1, ECS::Components::Position{12.0f, 12.0f});
+    core.addComponent(buttonEntity1, ECS::Components::Hitbox{50, 50});
+    core.addComponent(buttonEntity1, ECS::Components::Text{"Bouton Chef"});
+
+    sf::RectangleShape square1(sf::Vector2f(50.0f, 50.0f));
+    square1.setFillColor(sf::Color::Red);
+
+    sf::RectangleShape square2(sf::Vector2f(50.0f, 50.0f));
+    square2.setFillColor(sf::Color::Blue);
     
-    core.addComponent(entity1, ECS::Components::Position{4.4f, 5.7f});
-    core.addComponent(entity2, ECS::Components::Position{84.0f, 42.0f});
-    core.addComponent(entity2, ECS::Components::Velocity{0.5f, 0.5f});
+    sf::RectangleShape button1(sf::Vector2f(50.0f, 50.0f));
+    square2.setFillColor(sf::Color::Green);
 
-    core.addComponent(entity1, ECS::Components::Position{4.4f, 5.7f});
-    core.addComponent(entity1, ECS::Components::Velocity{49.0f, 90.0f});
-    core.addComponent(entity2, ECS::Components::Position{84.0f, 42.0f});
-    core.addComponent(entity2, ECS::Components::Velocity{0.5f, 0.5f});
+    while (window.isOpen()) {
+        sf::Event event;
+        std::vector<std::size_t> velocitySystemEntities =
+            core.getEntitiesWithSignature(velocitySystemSignature);
+        std::vector<std::size_t> collisionSystemEntities =
+            core.getEntitiesWithSignature(collisionSystemSignature);
+        std::vector<std::size_t> buttonSystemEntities =
+            core.getEntitiesWithSignature(buttonSystemSignature);
 
-    std::cout << "-----------------------------------" << std::endl;
-    std::cout << "entity1 signature:" << core.getSignature(entity1) << std::endl;
-    std::cout << "entity2 signature:" << core.getSignature(entity2) << std::endl;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+            if (event.type == sf::Event::MouseButtonPressed &&
+                sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                buttonClickSystem->onClick(
+                    core.getComponents<ECS::Components::Position>(),
+                    core.getComponents<ECS::Components::Hitbox>(),
+                    sf::Mouse::getPosition(window), buttonSystemEntities);
+            }
+        }
 
-    std::cout << "-----------------------------------\n";
+        velocitySystem->update(core.getComponents<ECS::Components::Position>(),
+                               core.getComponents<ECS::Components::Velocity>(),
+                               velocitySystemEntities);
+        collisionSystem->isHit(core.getComponents<ECS::Components::Position>(),
+                               core.getComponents<ECS::Components::Hitbox>(),
+                               velocitySystemEntities);
 
-    std::cout << "Signature system: " << velocitySystemSignature << std::endl;
+        auto &pos1 = core.getComponent<ECS::Components::Position>(entity1);
+        square1.setPosition(pos1.getX(), pos1.getY());
 
-    std::cout << "-----------------------------------\n";
-    std::cout << "Initial Entity 1 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity1) << std::endl;
-    std::cout << "-----------------------------------\n";
-    std::cout << "Initial Entity 2 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity2) << std::endl;
-    std::cout << "Initial Entity 2 Velocity: ";
-    std::cout << core.getComponent<ECS::Components::Velocity>(entity2) << std::endl;
+        auto &pos2 = core.getComponent<ECS::Components::Position>(entity2);
+        square2.setPosition(pos2.getX(), pos2.getY());
 
-    std::cout << "Updated Entity 1 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity1) << std::endl;
-    std::cout << "Updated Entity 2 Position: ";
-    std::cout << core.getComponent<ECS::Components::Position>(entity2) << std::endl;
+        auto &pos3 = core.getComponent<ECS::Components::Position>(buttonEntity1);
+        button1.setPosition(pos3.getX(), pos3.getY());
+
+        window.clear();
+
+        window.draw(square1);
+        window.draw(square2);
+        window.draw(button1);
+
+        window.display();
+    }
 
     return 0;
 }

@@ -14,14 +14,14 @@
 
 namespace ECS {
     namespace Systems {
-        
+
         class SystemVelocity : public System {
         public:
             SystemVelocity() = default;
             ~SystemVelocity() = default;
-        
-            void update(ComponentManager::SparseArray<Components::Position> &positions,
-                        ComponentManager::SparseArray<Components::Velocity> &velocities,
+
+            void update(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
+                        ECS::ComponentManager::SparseArray<ECS::Components::Velocity> &velocities,
                         std::vector<std::size_t> &entities);
         };
     }

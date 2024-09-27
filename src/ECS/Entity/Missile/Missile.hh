@@ -17,6 +17,7 @@ namespace ECS {
             Missile(std::size_t id);
             ~Missile() = default;
 
+            operator std::size_t() const;
             std::size_t getId() const;
 
         private:

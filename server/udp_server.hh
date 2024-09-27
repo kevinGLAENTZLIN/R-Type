@@ -3,23 +3,23 @@
 #include <cstdlib>
 #include <iostream>
 #include <boost/asio.hpp>
-#include <stdio.h>
-#include <string.h>
 
-/*
- * https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio.html
- */
+extern "C" {
+    #include <stdio.h>
+    #include <string.h>
+}
 
 using boost::asio::ip::udp;
-
 
 class udpServer
 {
     public:
         udpServer(boost::asio::io_service& io_service, short port);
 
-        void my_udp_receive();
-        void my_udp_send_back();
+        void read_clients();
+        void send_back_to_client();
+        void received_data_handler(std::size_t recvd_bytes);
+        bool check_ACK();
 
     private:
         udp::socket _socket;

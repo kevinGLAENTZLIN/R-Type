@@ -7,9 +7,10 @@
 
 #include "Collision.hh"
 
-void ECS::Systems::Collision::isHit(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
-                            ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> &hitboxes,
-                            std::vector<std::size_t> &entities)
+void ECS::Systems::Collision::isHit(
+    ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
+    ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> &hitboxes,
+    std::vector<std::size_t> &entities)
 {
     for (std::size_t i = 0; i < entities.size(); ++i) {
         for (std::size_t j = i + 1; j < entities.size(); ++j) {
@@ -33,8 +34,9 @@ void ECS::Systems::Collision::isHit(ECS::ComponentManager::SparseArray<ECS::Comp
     }
 }
 
-bool ECS::Systems::Collision::checkCollision(const ECS::Components::Position &posA, const ECS::Components::Hitbox &hitboxA,
-                                     const ECS::Components::Position &posB, const ECS::Components::Hitbox &hitboxB)
+bool ECS::Systems::Collision::checkCollision(
+    const ECS::Components::Position &posA, const ECS::Components::Hitbox &hitboxA,
+    const ECS::Components::Position &posB, const ECS::Components::Hitbox &hitboxB)
 {
     float coucou = hitboxB.getWidth();
 

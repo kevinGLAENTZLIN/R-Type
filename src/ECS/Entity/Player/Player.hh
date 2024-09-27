@@ -4,8 +4,9 @@
 ** File description:
 ** Player class
 */
-#include <cstddef>
+#pragma once
 
+#include <cstddef>
 #include <iostream>
 
 namespace ECS {
@@ -16,6 +17,7 @@ namespace ECS {
             Player(std::size_t id);
             ~Player() = default;
 
+            operator std::size_t() const;
             std::size_t getId() const;
 
         private:

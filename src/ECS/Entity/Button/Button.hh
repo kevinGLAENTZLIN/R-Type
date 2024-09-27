@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2024
-** Enemy.hh
+** Button.hh
 ** File description:
-** Enemy class
+** Button entity class
 */
 #pragma once
 
@@ -11,11 +11,11 @@
 
 namespace ECS {
     namespace Entities {
-        class Enemy {
+        class Button {
 
         public:
-            Enemy(std::size_t id);
-            ~Enemy() = default;
+            Button(std::size_t id);
+            ~Button() = default;
 
             operator std::size_t() const;
             std::size_t getId() const;

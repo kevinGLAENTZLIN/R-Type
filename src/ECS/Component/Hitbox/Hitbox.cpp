@@ -7,6 +7,13 @@
 
 #include "Hitbox.hh"
 
+/**
+ * @brief Constructor of Hitbox component.
+ *
+ * @tparam float width that represents width of an hitbox entity.
+ * @tparam float height that represents height of an hitbox entity.
+ * @return void.
+ */
 ECS::Components::Hitbox::Hitbox(float width, float height):
     _width(width), _height(height)
 {}

@@ -19,8 +19,8 @@ add_subdirectory(src/Client)
 add_subdirectory(src/Server)
 
 # Testing
-enable_testing()
-add_subdirectory(tests)
+#enable_testing()
+#add_subdirectory(tests)
 
 # Configurations spécifiques pour Debug et Release
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Werror")

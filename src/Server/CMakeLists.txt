@@ -23,4 +23,3 @@ else()
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
     target_link_libraries(${NAME_CLIENT} PRIVATE Boost::asio)
 endif()
-

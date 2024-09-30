@@ -57,7 +57,7 @@ set_target_properties(${NAME_LIB} PROPERTIES
     OUTPUT_NAME ${NAME_LIB}
     SUFFIX ".a"
 )
-target_link_libraries(${NAME_LIB} PRIVATE raylib raylib-cpp)
+target_link_libraries(${NAME_LIB} PUBLIC raylib raylib-cpp)
 # Inclure les répertoires des headers
 target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Core

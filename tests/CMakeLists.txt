@@ -6,9 +6,8 @@ set(TEST_NAME "r-type_tests")
 
 # List the test source files
 set(TEST_SOURCES
-    MainTest.cpp  # Main test source
-    EntityManager.cpp   # Additional source needed for the tests
-)
+    MainTest.cpp
+    EntityManager.cpp
 
 # Create the test executable from the sources
 add_executable(${TEST_NAME} ${TEST_SOURCES})

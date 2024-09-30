@@ -8,6 +8,7 @@ set(TEST_NAME "r-type_tests")
 set(TEST_SOURCES
     MainTest.cpp
     EntityManager.cpp
+)
 
 # Create the test executable from the sources
 add_executable(${TEST_NAME} ${TEST_SOURCES})

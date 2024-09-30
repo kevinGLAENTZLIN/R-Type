@@ -1,4 +1,5 @@
-project(R-Type-ECS)
+project(R-Type-Client)
+
 
 find_package(raylib QUIET)
 if (NOT raylib_FOUND)
@@ -37,7 +38,22 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
 
 set(CMAKE_RUNTIME_OUPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${NAME_CLIENT} PUBLIC raylib raylib_cpp)
+
+# Lier votre bibliothèque
+target_link_libraries(${NAME_CLIENT} PUBLIC raylib raylib_cpp ${R_TYPE_LIB})
+
+# Configuration spécifique à la plateforme
+if(WIN32)
+    # Configuration pour Windows
+    target_link_libraries(${NAME_CLIENT} PRIVATE winmm)
+elseif(APPLE)
+    # Configuration pour macOS
+    target_link_libraries(${NAME_CLIENT} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+elseif(UNIX AND NOT APPLE)
+    # Configuration pour Linux
+    target_link_libraries(${NAME_CLIENT} PRIVATE m pthread dl rt X11)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Configuration de débogage si nécessaire
 endif()

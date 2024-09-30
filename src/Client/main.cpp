@@ -1,6 +1,5 @@
 #include <iostream>
 #include "raylib-cpp.hpp"
-
 int main(void)
 {
     int screenWidth = 800;

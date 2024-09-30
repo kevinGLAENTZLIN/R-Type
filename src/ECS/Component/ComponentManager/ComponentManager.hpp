@@ -14,8 +14,24 @@
 namespace ECS{
     namespace ComponentManager {
 
+        /**
+         * @brief This class handles the creation and indexing of the differents SparseArrays.
+         *
+         * Using its registerComponent with a given type,  one can create a SparseArray and index it to the type.
+         */
         class ComponentManager {
         public:
+
+            /**
+             * @brief Create and add to the map a SparseArray of the given type
+             *
+             * Construct a SparseArray of the given Component type if it hasn't been mapped already.
+             * If an already mapped type is given, an exception is raised.
+             * Once the SparseArray is created, this function maps it to the given type ID using getTypeId().
+             *
+             * @tparam Component Component type of the sparseArray to be created and added to the map. 
+             * @return Reference to the created SparseArray in the map.
+             */
             template <class Component>
             SparseArray<Component> &registerComponent() {
                 if (_sparseArrays.count(std::type_index(typeid(Component))) != 0) {
@@ -26,17 +42,40 @@ namespace ECS{
                 return std::any_cast<SparseArray<Component>&>(_sparseArrays[std::type_index(typeid(Component))]);
             };
 
+            /**
+             * @brief Gets the sparseArray corresponding to the given type.
+             *
+             * Gets the SparseArray corresponding to the component type given in the parameters.
+             *
+             * @tparam Component Component type of the sparseArray to get.
+             * @return The SparseArray corresponding to the given Component type.
+             */
             template <class Component>
             SparseArray<Component> &getComponents(){
                 return std::any_cast<SparseArray<Component>&>(_sparseArrays.at(std::type_index(typeid(Component))));
             };
 
+            /**
+             * @brief Gets a const reference to the sparseArray corresponding to the given type.
+             *
+             * Gets a const reference to the SparseArray corresponding to the component type given in the parameters.
+             *
+             * @tparam Component Component type of the sparseArray to get.
+             * @return The const reference to the SparseArray corresponding to the given Component type.
+             */
             template <class Component>
             SparseArray<Component> const &getComponents() const{
                 return std::any_cast<const SparseArray<Component>&>(_sparseArrays.at(std::type_index(typeid(Component))));
             };
 
         private:
+
+            /**
+             * @brief Attribute that hold the different Components SparseArray mapped to their type
+             *
+             * _sparseArrays is an unordered map containing each type_index as a key and the corresponding SparseArray as data.
+             * The SparseArray are kept in a std::any container and it is the ComponentManager's responsability to cast it to the right type.
+             */
             std::unordered_map<std::type_index, std::any> _sparseArrays;
         };
     }

@@ -43,9 +43,22 @@ namespace ECS {
                 return this;
             };
 
+            /**
+             * @brief Encapsulated call to the class access operator.
+             *
+             * @param[in] idx Index of the object to be accessed
+             * @return The object at the given index.
+             */
             reference_type operator[](std::size_t idx) {
                 return _data[idx];
             };
+
+            /**
+             * @brief Encapsulated call to the class const access operator.
+             *
+             * @param[in] idx Index of the object to be accessed
+             * @return A const reference to the object at the given index.
+             */
             const_reference_type operator[](std::size_t idx) const{
                 return _data[idx];
             };
@@ -70,16 +83,36 @@ namespace ECS {
                 return _data.cend();
             };
 
+            /**
+             * @brief Encapsulated call to the class container.
+             *
+             * @return The size of the class container.
+             */
             size_type size() const {
                 return _data.size();
             };
 
+            /**
+             * @brief Assigns an object to an index in the class container.
+             *
+             * The class container will adapt its size to the given index.
+             *
+             * @return The reference to the created object in the class container.
+             */
             reference_type insertAt(size_type pos, Component const & component) {
                 if (pos >= size())
                     _data.resize(pos+ 1);
                 _data[pos] = component;
                 return _data[pos];
             };
+
+            /**
+             * @brief Moves an object to an index in the class container.
+             *
+             * The class container will adapt its size to the given index.
+             *
+             * @return The reference to the created object in the class container.
+             */
             reference_type insertAt(size_type pos, Component && component) {
                 if (pos >= size())
                     _data.resize(pos+ 1);
@@ -87,6 +120,14 @@ namespace ECS {
                 return _data[pos];
             };
 
+            /**
+             * @brief Constructs an object at the given index.
+             *
+             * The class container will adapt its size to the given index.
+             *
+             * @tparam Variadic templating to carry the objects constructor parameters.
+             * @return The reference to the created object in the class container.
+             */
             template <class... Params>
             reference_type emplaceAt(size_type pos, Params &&... args) {
                 if (pos >= size())
@@ -95,12 +136,20 @@ namespace ECS {
                 return _data[pos];
             };
 
+            /**
+             * @brief Destroys the object at the given index.
+             */
             void erase(size_type pos) {
                 if (pos > size())
                     return;
                 _data[pos].reset();
             };
 
+            /**
+             * @brief Returns the index of the given object.
+             *
+             * @return If the given toSearch object is found, its index is returned. If it is not found, size() is returned. 
+             */
             size_type getIndex(value_type const & toSearch) const {
                 for (size_type index = 0; index < size(); index++)
                     if (_data[index].has_value())
@@ -114,6 +163,15 @@ namespace ECS {
             container_t _data;
         };
 
+        /**
+         * @brief ostream operator overload.
+         *
+         * This is used to display the content of a SparseArray.
+         * If the type used in the SparseArray does not provide an ostream operator overload, an exception is raised.
+         *
+         * @tparam Component Compoennt type of the SparseArray to be displayed.
+         * @return The ostream used.
+         */
         template <typename Component>
         std::ostream & operator<<(std::ostream & stream, const SparseArray<Component> & array) {
             try {

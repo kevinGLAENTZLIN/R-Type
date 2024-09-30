@@ -23,7 +23,7 @@ class udpServer
 
     private:
         udp::socket _socket;
-        udp::endpoint _sender_endpoint;
+        udp::endpoint _senderEndpoint;
         enum { max_length = 1024 };
         char _data[max_length];
 };

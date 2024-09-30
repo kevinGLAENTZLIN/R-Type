@@ -17,7 +17,6 @@ file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 add_subdirectory(src/ECS)
 add_subdirectory(src/Client)
 add_subdirectory(src/Server)
-add_subdirectory(src/MyRaylib)
 
 # Testing
 enable_testing()
@@ -29,4 +28,3 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 # Afficher le type de build
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-

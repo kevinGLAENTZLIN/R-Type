@@ -15,6 +15,8 @@
 #include "../Component/Hitbox/Hitbox.hh"
 #include "../Component/Text/Text.hh"
 
+#include "../System/SystemManager/SystemManager.hpp"
+
 #include "../System/Velocity/Velocity.hpp"
 #include "../System/Collision/Collision.hh"
 #include "../Entity/Button/Button.hh"

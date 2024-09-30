@@ -16,7 +16,8 @@ Rtype::Game::Game()
 {
     _core = std::make_unique<ECS::Core::Core>();
 
-    _window = raylib::Window(1920, 1080, "R-Type Game");
+    _window.Init(1000, 800, "R-Type Game");
+    SetTargetFPS(60);
 
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
@@ -57,8 +58,7 @@ Rtype::Game::~Game()
 
 void Rtype::Game::run()
 {
-    std::cout << "Game is running" << std::endl;
-    while (_isRunning) {
+    while (!_window.ShouldClose() && _isRunning) {
         update();
         render();
     }
@@ -68,12 +68,8 @@ void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
 
-    std::cout << "Update" << std::endl;
-
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
-
-    std::cout << "Velocity entities: " << velocityEntities.size() << std::endl;
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
@@ -93,20 +89,27 @@ void Rtype::Game::render()
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
-    std::cerr << "Positions size: " << positions.size() << std::endl;
-    std::cerr << "Hitboxes size: " << hitboxes.size() << std::endl;
-
     for (std::size_t i = 0; i < positions.size(); ++i) {
         if (positions[i].has_value() && hitboxes[i].has_value()) {
             auto &pos = positions[i].value();
             auto &hitbox = hitboxes[i].value();
 
-            std::cerr << "Drawing rectangle at: " << pos.getX() << ", " << pos.getY()
-                      << " with size: " << hitbox.getWidth() << "x" << hitbox.getHeight() << std::endl;
+            if (hitbox.getWidth() <= 0 || hitbox.getHeight() <= 0) {
+                std::cerr << "Invalid hitbox dimensions!" << std::endl;
+                continue;
+            }
+
+            if (pos.getX() < 0 || pos.getY() < 0) {
+                std::cerr << "Invalid position!" << std::endl;
+                continue;
+            }
 
             raylib::Rectangle rect(pos.getX(), pos.getY(), hitbox.getWidth(), hitbox.getHeight());
             rect.Draw(DARKBLUE);
+        } else {
+            std::cerr << "Position or hitbox not set!" << std::endl;
         }
     }
+
     EndDrawing();
 }

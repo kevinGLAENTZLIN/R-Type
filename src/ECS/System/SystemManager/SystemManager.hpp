@@ -27,7 +27,7 @@ namespace ECS {
             template<typename T>
             std::shared_ptr<T> registerSystem() {
                 std::string typeName = typeid(T).name();
-                if (_mSystems.find(typeName) == _mSystems.end())
+                if (_mSystems.find(typeName) != _mSystems.end())
                     return nullptr;
                 auto system = std::make_shared<T>();
                 _mSystems[typeName] = system;

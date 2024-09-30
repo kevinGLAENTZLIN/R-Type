@@ -118,7 +118,7 @@ test_project() {
     cd .. || exit 1
     echo -e "${YELLOW}Testing project...${NC}"
     cd build || exit 1
-    ctest
+    ctest --rerun-failed --output-on-failure
     if [ $? -ne 0 ]; then
         echo -e "${RED}Error with testing !${NC}"
         exit 1

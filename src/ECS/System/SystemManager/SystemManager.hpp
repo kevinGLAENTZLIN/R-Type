@@ -23,11 +23,11 @@ namespace ECS {
 
         class SystemManager {
         public:
-            
+
             template<typename T>
             std::shared_ptr<T> registerSystem() {
                 std::string typeName = typeid(T).name();
-                if (_mSystems.find(typeName) == _mSystems.end())
+                if (_mSystems.find(typeName) != _mSystems.end())
                     return nullptr;
                 auto system = std::make_shared<T>();
                 _mSystems[typeName] = system;
@@ -61,6 +61,24 @@ namespace ECS {
                         system->_entities.erase(entity);
                     }
                 }
+            }
+
+            template<typename T>
+            Signature getSignature() {
+                std::string typeName = typeid(T).name();
+                if (_mSignatures.find(typeName) != _mSignatures.end()) {
+                    return _mSignatures[typeName];
+                }
+                return Signature();
+            }
+
+            template<typename T>
+            std::shared_ptr<T> getSystem() {
+                std::string typeName = typeid(T).name();
+                if (_mSystems.find(typeName) != _mSystems.end()) {
+                    return std::static_pointer_cast<T>(_mSystems[typeName]);
+                }
+                return nullptr;
             }
 
         private:

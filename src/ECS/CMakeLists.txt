@@ -41,6 +41,7 @@ set(LIB_SOURCES
     ./Entity/Player/Player.cpp
     ./Component/Position/Position.cpp
     ./Component/Health/Health.cpp
+    ./Component/Projectile/Projectile.cpp
     ./Component/Velocity/Velocity.cpp
     ./Component/Hitbox/Hitbox.cpp
     ./Component/Text/Text.cpp

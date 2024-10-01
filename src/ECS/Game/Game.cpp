@@ -7,6 +7,7 @@
 */
 
 #include "Game.hh"
+#include <cstddef>
 #include <cstdlib>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
@@ -23,6 +24,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
+    _core->registerComponent<ECS::Components::Projectile>();
 
     auto velocitySystem = _core->registerSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->registerSystem<ECS::Systems::Collision>();
@@ -61,14 +63,13 @@ Rtype::Game::Game()
 
     std::size_t enemy = _core->createEntity();
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
-    _core->addComponent(enemy, ECS::Components::Velocity{-1.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{50.0f, 50.0f});
 }
 
 Rtype::Game::~Game()
 {
     std::cout << "Game destroyed" << std::endl;
-
 }
 
 void Rtype::Game::run()
@@ -80,17 +81,33 @@ void Rtype::Game::run()
 }
 
 std::vector<std::size_t> getAllInputs() {
-    std::vector<std::size_t> jaj;
+    std::vector<std::size_t> vec;
     if (IsKeyDown(KEY_RIGHT))
-        jaj.push_back(1);
+        vec.push_back(1);
     if (IsKeyDown(KEY_UP))
-        jaj.push_back(2);
+        vec.push_back(2);
     if (IsKeyDown(KEY_LEFT))
-        jaj.push_back(3);
+        vec.push_back(3);
     if (IsKeyDown(KEY_DOWN))
-        jaj.push_back(4);
-    return jaj;
+        vec.push_back(4);
+    return vec;
 }
+
+void Rtype::Game::createProjectile(std::size_t entityID)
+{
+    auto &positions = _core->getComponents<ECS::Components::Position>();
+    if (!positions[entityID].has_value()) {
+        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+        return;
+    }
+    const ECS::Components::Position &entityPos = positions[entityID].value();
+    std::size_t projectile = _core->createEntity();
+    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + 60.0f, entityPos.getY() + 10.0f});
+    _core->addComponent(projectile, ECS::Components::Velocity{5.0f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Hitbox{10.0f, 5.0f});
+    _core->addComponent(projectile, ECS::Components::Projectile{});
+}
+
 
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
@@ -101,11 +118,12 @@ void Rtype::Game::update() {
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
 
-//    std::cout << inputEntities.size() << std::endl;
-    inputUpdatesSystem->updateInputs(getAllInputs(),
+    std::size_t entitesID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
 
+    if (entitesID <= 10000)
+        createProjectile(entitesID);
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);

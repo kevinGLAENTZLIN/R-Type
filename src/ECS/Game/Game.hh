@@ -19,6 +19,7 @@
 #include "../Component/Hitbox/Hitbox.hh"
 #include "../Component/Text/Text.hh"
 #include "../Component/Input/Input.hh"
+#include "../Component/Projectile/Projectile.hh"
 
 #include "../System/SystemManager/SystemManager.hpp"
 
@@ -39,6 +40,7 @@ namespace Rtype {
         void run();
 
     private:
+        void createProjectile(std::size_t entityID);
         void update();
         void render();
         bool _isRunning;

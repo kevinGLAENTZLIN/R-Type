@@ -11,6 +11,7 @@
 #include "../../Component/ComponentManager/SparseArray.hpp"
 #include "../../Component/Input/Input.hh"
 #include "../../Component/Velocity/Velocity.hh"
+#include <cstddef>
 
 namespace ECS {
     namespace Systems {
@@ -20,7 +21,7 @@ namespace ECS {
             InputUpdates() = default;
             ~InputUpdates() = default;
 
-            void updateInputs(const std::vector<std::size_t> & inputs,
+            std::size_t updateInputs(const std::vector<std::size_t> & inputs,
                               ECS::ComponentManager::SparseArray<ECS::Components::Input> & inputComponents,
                               std::vector<std::size_t> entities);
 
@@ -29,7 +30,7 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Velocity> & velocitites,
                 std::vector<std::size_t> entities);
 
-            
+
         };
     }
 }

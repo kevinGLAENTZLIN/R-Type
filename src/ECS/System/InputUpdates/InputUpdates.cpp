@@ -6,14 +6,21 @@
 */
 #include "InputUpdates.hh"
 #include "../../Component/Input/enumInput.hpp"
+#include <cstddef>
 
-void ECS::Systems::InputUpdates::updateInputs(
+std::size_t ECS::Systems::InputUpdates::updateInputs(
     const std::vector<std::size_t> & inputs,
     ECS::ComponentManager::SparseArray<ECS::Components::Input> & inputComponents,
     std::vector<std::size_t> entities)
 {
-    for (std::size_t i = 0; i < entities.size(); i++)
+    for (std::size_t i = 0; i < entities.size(); i++) {
         inputComponents[entities[i]]->setInputs(inputs);
+        if (IsKeyPressed(KEY_SPACE)) {
+            std::cout << "Projectile created!" << std::endl;
+            return entities[i];
+        }
+    }
+    return 10001;
 }
 
 void ECS::Systems::InputUpdates::updateInputedVelocity(

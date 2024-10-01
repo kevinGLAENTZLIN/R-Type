@@ -13,7 +13,7 @@ int main(int argc, char **argv)
         std::cout << "Usage: udp_client [server] [port] [Message]" << std::endl;
         return 1;
     }
-    udpClient client(argv[1], std::stoi(argv[2]));
+    Rtype::udpClient client(argv[1], std::stoi(argv[2]));
 
     for (int i = 0; i < 5; i++) {
         client.send_data(argv[3]);

@@ -40,7 +40,7 @@ set(CMAKE_RUNTIME_OUPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Lier votre bibliothèque
-target_link_libraries(${NAME_CLIENT} INTERFACE raylib raylib_cpp ${NAME_LIB})
+target_link_libraries(${NAME_CLIENT} PUBLIC raylib raylib_cpp ${NAME_LIB})
 
 # Configuration spécifique à la plateforme
 if(WIN32)

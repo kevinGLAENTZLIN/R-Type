@@ -159,6 +159,10 @@ namespace ECS {
                 return size();
             };
 
+            void clear() {
+                _data.clear();
+            };
+            
         private:
             container_t _data;
         };

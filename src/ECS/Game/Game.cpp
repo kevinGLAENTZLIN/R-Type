@@ -28,6 +28,7 @@ Rtype::Game::Game()
 
     auto velocitySystem = _core->registerSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->registerSystem<ECS::Systems::Collision>();
+    auto projectileCollisionSystem = _core->registerSystem<ECS::Systems::ProjectileCollision>();
     auto InputUpdatesSystem = _core->registerSystem<ECS::Systems::InputUpdates>();
 
     Signature velocitySystemSignature;
@@ -48,6 +49,17 @@ Rtype::Game::Game()
 
     std::cout << "collision sign " << collisionSignature << std::endl;
 
+    Signature projectileCollisionSignature;
+    projectileCollisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    projectileCollisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
+    projectileCollisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Projectile>());
+    _core->setSystemSignature<ECS::Systems::Collision>(projectileCollisionSignature);
+
+    std::cout << "projectileCollision sign " << projectileCollisionSignature << std::endl;
+    
     Signature inputUpdatesSignature;
     inputUpdatesSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Input>());
@@ -112,10 +124,12 @@ void Rtype::Game::createProjectile(std::size_t entityID)
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
+    auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
 
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
+    auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
 
     std::size_t entitesID = inputUpdatesSystem->updateInputs(getAllInputs(),
@@ -136,6 +150,11 @@ void Rtype::Game::update() {
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
 
+    projectileCollisionSystem->projectileIsHit(
+        _core->getComponents<ECS::Components::Position>(),
+        _core->getComponents<ECS::Components::Hitbox>(),
+        _core->getComponents<ECS::Components::Projectile>(),
+        projectileEntities, collisionEntities);
 }
 
 void Rtype::Game::render()

@@ -25,6 +25,7 @@
 
 #include "../System/Velocity/Velocity.hpp"
 #include "../System/Collision/Collision.hh"
+#include "../System/ProjectileCollision/ProjectileCollision.hh"
 #include "../System/InputUpdates/InputUpdates.hh"
 
 #include "raylib-cpp.hpp"

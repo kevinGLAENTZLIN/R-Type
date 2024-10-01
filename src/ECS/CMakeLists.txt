@@ -49,6 +49,7 @@ set(LIB_SOURCES
     ./Component/Input/Input.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
+    ./System/ProjectileCollision/ProjectileCollision.cpp
     ./System/InputUpdates/InputUpdates.cpp
     ./Game/Game.cpp
     ./RessourcePool/RessourcePool.cpp
@@ -83,13 +84,14 @@ target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Hitbox
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Text
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Volume
-    ${CMAKE_CURRENT_SOURCE_DIR}Component/Input
+    ${CMAKE_CURRENT_SOURCE_DIR}Component/Projectile
     ${CMAKE_CURRENT_SOURCE_DIR}System
     ${CMAKE_CURRENT_SOURCE_DIR}System/ButtonClick
     ${CMAKE_CURRENT_SOURCE_DIR}System/SystemManager
     ${CMAKE_CURRENT_SOURCE_DIR}System/Velocity
     ${CMAKE_CURRENT_SOURCE_DIR}System/System
     ${CMAKE_CURRENT_SOURCE_DIR}System/Collision
+    ${CMAKE_CURRENT_SOURCE_DIR}System/ProjectileCollision
     ${CMAKE_CURRENT_SOURCE_DIR}System/InputUpdates
 )
 

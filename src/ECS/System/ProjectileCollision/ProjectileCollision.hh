@@ -12,26 +12,23 @@
 #include "../../Component/ComponentManager/SparseArray.hpp"
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/Hitbox/Hitbox.hh"
+#include "../../Component/Projectile/Projectile.hh"
 
 namespace ECS {
     namespace Systems {
 
-        class Collision : public System {
+        class ProjectileCollision : public System {
         public:
-            Collision() = default;
-            ~Collision() = default;
+            ProjectileCollision() = default;
+            ~ProjectileCollision() = default;
 
-            void isHit(
+            void projectileIsHit(
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
-                std::vector<std::size_t> & entities);
+                ECS::ComponentManager::SparseArray<ECS::Components::Projectile> & projectiles,
+                std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities);
 
-            static void projectileIsHit(
-                ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
-                ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
-                std::vector<std::size_t> & projectiles, std::vector<std::size_t> & entities);
-
-            bool checkCollision(
+            bool checkCollision2(
                 const ECS::Components::Position &posA,
                 const ECS::Components::Hitbox &hitboxA,
                 const ECS::Components::Position &posB,

@@ -7,10 +7,6 @@
       "name": "boost-asio",
       "version>=": "1.82.0"
     },
-    {
-      "name": "raylib",
-      "version>=": "4.5.0"
-    },
     "doctest"
   ]
 }

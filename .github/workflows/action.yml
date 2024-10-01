@@ -40,10 +40,6 @@ jobs:
 
       - name: Check Binaries
         run: |
-          if [ ! -f "/home/runner/work/R-Type/R-Type/lib/libmyraylib.a" ]; then
-            echo "libmyraylib.a not found"
-            exit 1
-          fi
           if [ ! -f "/home/runner/work/R-Type/R-Type/lib/libr-type.a" ]; then
             echo "r-type.a not found"
             exit 1

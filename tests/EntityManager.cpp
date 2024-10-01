@@ -1,4 +1,3 @@
-
 #include <doctest/doctest.h>
 #include "ECS/Entity/EntityManager/EntityManager.hh"
 

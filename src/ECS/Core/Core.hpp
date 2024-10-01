@@ -96,6 +96,24 @@ namespace ECS {
                 _componentManager->getComponents<T>().insertAt(entity, component);
             }
 
+
+            /**
+             * @brief Retrieves all entities with a matching signature.
+             *
+             * @param systemSignature The signature to match entities against.
+             * @return std::vector<std::size_t> A vector of entity IDs with the matching signature.
+             */
+            std::vector<std::size_t> getEntitiesWithSignature(Signature systemSignature) const {
+                std::vector<std::size_t> matchingEntities;
+                auto entities = _entityManager->getEntities();
+                    for (auto &entity : entities) {
+                        if ((getSignature(entity) & systemSignature) == systemSignature) {
+                            matchingEntities.push_back(entity);
+                        }
+                    }
+                return matchingEntities;
+            }
+
             /**
              * @brief Sets the signature for a specific system.
              *
@@ -120,13 +138,16 @@ namespace ECS {
                 _systemManager->entitySignatureChanged(entity, signature);
             }
 
-            /**
-             * @brief Retrieves all entities with a matching signature.
-             *
-             * @param systemSignature The signature to match entities against.
-             * @return std::vector<std::size_t> A vector of entity IDs with the matching signature.
-             */
-            std::vector<std::size_t> getEntitiesWithSignature(Signature systemSignature) const;
+            template<typename T>
+            Signature getSystemSignature() const {
+                return _systemManager->getSignature<T>();
+            }
+
+            template<typename T>
+            std::shared_ptr<T> getSystem() const {
+                return _systemManager->getSystem<T>();
+            }
+
 
         protected:
 

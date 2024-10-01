@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description: Server Class
+** udp_server
+*/
+
 #include "udp_server.hh"
 
 udpServer::udpServer(boost::asio::io_service& io_service, short port)
@@ -46,21 +53,4 @@ void udpServer::send_back_to_client()
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         read_clients();
     });
-}
-
-int main(int argc, char* argv[])
-{
-    if (argc != 2) {
-        std::cerr << "Usage: udp_server <port>\n";
-        return 1;
-    }
-    try {
-        boost::asio::io_service io_service;
-        udpServer server(io_service, std::atoi(argv[1]));
-        io_service.run();
-    }
-    catch (std::exception &error) {
-        std::cerr << "Exception: " << error.what() << "\n";
-    }
-    return 0;
 }

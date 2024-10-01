@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2024
 ** R-Type
-** File description:
-** new_udp_client
+** File description: Client Class
+** udp_client
 */
 
 #include "udp_client.hh"
@@ -56,19 +56,4 @@ void udpClient::handle_receive(const boost::system::error_code& error, std::size
         std::cout << "Received from server: [" << std::string(_receiverBuffer.data(), bytes_recv) << "]" << std::endl;
     }
     start_receive();
-}
-
-int main(int argc, char **argv)
-{
-    if (argc != 4) {
-        std::cout << "Usage: udp_client [server] [port] [Message]" << std::endl;
-        return 1;
-    }
-    udpClient client(argv[1], std::stoi(argv[2]));
-
-    for (int i = 0; i < 5; i++) {
-        client.send_data(argv[3]);
-    }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    return 0;
 }

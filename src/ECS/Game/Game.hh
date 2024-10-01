@@ -1,3 +1,4 @@
+
 /*
 ** EPITECH PROJECT, 2024
 ** R-Type - Game : Game
@@ -9,17 +10,21 @@
 #pragma once
 
 #include "../Core/Core.hpp"
+
+#include "../Entity/Button/Button.hh"
+
 #include "../Component/Health/Health.hh"
 #include "../Component/Position/Position.hpp"
 #include "../Component/Velocity/Velocity.hh"
 #include "../Component/Hitbox/Hitbox.hh"
 #include "../Component/Text/Text.hh"
+#include "../Component/Input/Input.hh"
 
 #include "../System/SystemManager/SystemManager.hpp"
 
 #include "../System/Velocity/Velocity.hpp"
 #include "../System/Collision/Collision.hh"
-#include "../Entity/Button/Button.hh"
+#include "../System/InputUpdates/InputUpdates.hh"
 
 #include "raylib-cpp.hpp"
 

@@ -36,14 +36,14 @@ Rtype::Game::Game()
     _core->setSystemSignature<ECS::Systems::SystemVelocity>(velocitySystemSignature);
 
     std::cout << "velocity sign " << velocitySystemSignature << std::endl;
-    
+
     Signature collisionSignature;
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
- 
+
     std::cout << "collision sign " << collisionSignature << std::endl;
 
     Signature inputUpdatesSignature;
@@ -52,7 +52,7 @@ Rtype::Game::Game()
     _core->setSystemSignature<ECS::Systems::InputUpdates>(inputUpdatesSignature);
 
     std::cout << "input sign " << inputUpdatesSignature << std::endl;
-    
+
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{200.0f, 300.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
@@ -68,6 +68,7 @@ Rtype::Game::Game()
 Rtype::Game::~Game()
 {
     std::cout << "Game destroyed" << std::endl;
+
 }
 
 void Rtype::Game::run()
@@ -104,7 +105,7 @@ void Rtype::Game::update() {
     inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
-    
+
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);

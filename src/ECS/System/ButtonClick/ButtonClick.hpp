@@ -38,14 +38,14 @@ namespace ECS {
                         mousePos.y < positions[entity]->getY() + hitboxes[entity]->getHeight())
                         std::cout << "OUAIS LE BOUTON DE ZINZIN" << std::endl;
                 }
-                std::cout << "clicked outside button" << std::endl;
+/*                std::cout << "clicked outside button" << std::endl;
                 std::cout << "______________________" << std::endl;
                 std::cout << "mouse X: " << mousePos.x << std::endl;
                 std::cout << "mouse Y: " << mousePos.y << std::endl;
                 std::cout << "button left X: " << positions[entity]->getX() << std::endl;
                 std::cout << "button right X: " << positions[entity]->getX() + hitboxes[entity]->getWidth() << std::endl;
                 std::cout << "button top Y: " << positions[entity]->getY() << std::endl;
-                std::cout << "button bottom Y: " << positions[entity]->getY() + hitboxes[entity]->getWidth() << std::endl;
+                std::cout << "button bottom Y: " << positions[entity]->getY() + hitboxes[entity]->getWidth() << std::endl;*/
             };
         };
     }

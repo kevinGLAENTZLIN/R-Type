@@ -1,5 +1,7 @@
 project(R-Type-ECS)
 
+include(FetchContent)
+
 find_package(raylib QUIET)
 if (NOT raylib_FOUND)
     include(FetchContent)
@@ -43,9 +45,12 @@ set(LIB_SOURCES
     ./Component/Hitbox/Hitbox.cpp
     ./Component/Text/Text.cpp
     ./Component/Volume/Volume.cpp
+    ./Component/Input/Input.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
+    ./System/InputUpdates/InputUpdates.cpp
     ./Game/Game.cpp
+    ./RessourcePool/RessourcePool.cpp
 
 )
 # Créer la bibliothèque
@@ -77,12 +82,14 @@ target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Hitbox
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Text
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Volume
+    ${CMAKE_CURRENT_SOURCE_DIR}Component/Input
     ${CMAKE_CURRENT_SOURCE_DIR}System
     ${CMAKE_CURRENT_SOURCE_DIR}System/ButtonClick
     ${CMAKE_CURRENT_SOURCE_DIR}System/SystemManager
     ${CMAKE_CURRENT_SOURCE_DIR}System/Velocity
     ${CMAKE_CURRENT_SOURCE_DIR}System/System
     ${CMAKE_CURRENT_SOURCE_DIR}System/Collision
+    ${CMAKE_CURRENT_SOURCE_DIR}System/InputUpdates
 )
 
 # Compiler le main.cpp seulement en mode Debug

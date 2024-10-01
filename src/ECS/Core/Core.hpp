@@ -94,6 +94,7 @@ namespace ECS {
                 _entityManager->setSignature(entity, signature);
                 _systemManager->entitySignatureChanged(entity, signature);
                 _componentManager->getComponents<T>().insertAt(entity, component);
+                std::cout << "in addComponent " << signature << std::endl;
             }
 
 

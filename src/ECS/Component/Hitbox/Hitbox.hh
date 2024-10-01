@@ -20,8 +20,6 @@ namespace ECS {
             void setWidth(float width);
             void setHeight(float height);
 
-        protected:
-
         private:
             float _width;
             float _height;

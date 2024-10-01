@@ -46,6 +46,7 @@ set(LIB_SOURCES
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
     ./Game/Game.cpp
+    ./RessourcePool/RessourcePool.cpp
 
 )
 # Créer la bibliothèque

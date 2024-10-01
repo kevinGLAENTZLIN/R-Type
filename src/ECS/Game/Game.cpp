@@ -56,7 +56,7 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
     projectileCollisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Projectile>());
-    _core->setSystemSignature<ECS::Systems::Collision>(projectileCollisionSignature);
+    _core->setSystemSignature<ECS::Systems::ProjectileCollision>(projectileCollisionSignature);
 
     std::cout << "projectileCollision sign " << projectileCollisionSignature << std::endl;
     
@@ -66,7 +66,7 @@ Rtype::Game::Game()
     _core->setSystemSignature<ECS::Systems::InputUpdates>(inputUpdatesSignature);
 
     std::cout << "input sign " << inputUpdatesSignature << std::endl;
-
+    
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{200.0f, 300.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});

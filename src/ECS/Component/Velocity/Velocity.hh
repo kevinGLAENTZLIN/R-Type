@@ -21,6 +21,8 @@ namespace ECS {
             float getY() const;
             std::pair<float, float> getVelPair() const;
 
+            void setVelPair(std::pair<float, float> vel);
+
         private:
             float _x;
             float _y;

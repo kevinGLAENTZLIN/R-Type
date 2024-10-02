@@ -9,16 +9,24 @@
 #pragma once
 
 #include "../Core/Core.hpp"
+
+#include "../Entity/Button/Button.hh"
+
 #include "../Component/Health/Health.hh"
 #include "../Component/Position/Position.hpp"
 #include "../Component/Velocity/Velocity.hh"
 #include "../Component/Hitbox/Hitbox.hh"
 #include "../Component/Text/Text.hh"
+#include "../Component/Input/Input.hh"
+
+#include "../System/SystemManager/SystemManager.hpp"
 
 #include "../System/Velocity/Velocity.hpp"
 #include "../System/Collision/Collision.hh"
-#include "../Entity/Button/Button.hh"
+#include "../System/InputUpdates/InputUpdates.hh"
+#include "../System/Render/Render.hh"
 
+#include "../RessourcePool/RessourcePool.hh"
 #include "raylib-cpp.hpp"
 
 #include <memory>
@@ -37,6 +45,7 @@ namespace Rtype {
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
-
+        raylib::Camera3D _camera;
+        ECS::RessourcePool _ressourcePool;
     };
 };

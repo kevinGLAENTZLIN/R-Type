@@ -59,3 +59,15 @@ std::pair<float, float> ECS::Components::Velocity::getVelPair() const
 {
     return std::make_pair(_x, _y);
 }
+
+/**
+ * @brief Getter _x and _y of Velocity component.
+ *
+ * @tparam void.
+ * @return std::pair<float, float> _x and _y.
+*/
+void ECS::Components::Velocity::setVelPair(std::pair<float, float> vel)
+{
+    _x = vel.first;
+    _y = vel.second;
+}

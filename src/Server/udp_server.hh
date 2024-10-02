@@ -14,9 +14,12 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <map>
+#include <string>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::udp;
+using boost::asio::ip::address;
 
 namespace Rtype {
     /**
@@ -39,11 +42,6 @@ namespace Rtype {
             void read_clients();
 
             /**
-             * @brief Sends a response back to the client.
-             */
-            void send_back_to_client();
-
-            /**
              * @brief Handles the received data from clients.
              * @param recvd_bytes Number of bytes received.
              */
@@ -56,9 +54,24 @@ namespace Rtype {
             bool check_ACK();
 
         private:
+            int get_sender_id();
+            int get_available_client_id();
+            int get_client_id_by_addr(std::string addr, int port);
+            bool is_client_by_addr(std::string addr, int port);
+
+            void disconnect_client(int client_id);
+
+            void send_to_client(std::string msg);
+            void send_to_client(std::string addr_ip, int port, std::string msg);
+            void send_to_client(std::pair<std::string, int> addr, std::string msg);
+            void send_to_clients(std::string msg);
+
+
             udp::socket _socket;
             udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
+            std::map<int, std::pair<std::string, int>> _clientsAddr;
+
     };
 }

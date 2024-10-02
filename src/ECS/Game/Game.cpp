@@ -25,12 +25,13 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
     _core->registerComponent<ECS::Components::Projectile>();
+    _core->registerComponent<ECS::Components::Background>();
 
-    auto velocitySystem = _core->registerSystem<ECS::Systems::SystemVelocity>();
-    auto collisionSystem = _core->registerSystem<ECS::Systems::Collision>();
-    auto projectileCollisionSystem = _core->registerSystem<ECS::Systems::ProjectileCollision>();
-    auto InputUpdatesSystem = _core->registerSystem<ECS::Systems::InputUpdates>();
-
+    _core->registerSystem<ECS::Systems::SystemVelocity>();
+    _core->registerSystem<ECS::Systems::Collision>();
+    _core->registerSystem<ECS::Systems::ProjectileCollision>();
+    _core->registerSystem<ECS::Systems::InputUpdates>();
+    
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
@@ -77,10 +78,18 @@ Rtype::Game::Game()
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{50.0f, 50.0f});
+
+    std::size_t background = _core->createEntity();
+    _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Velocity{10.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Background{});
+
+    _backgroundTexture = LoadTexture("backgroundTest.png");
 }
 
 Rtype::Game::~Game()
 {
+    UnloadTexture(_backgroundTexture);
     std::cout << "Game destroyed" << std::endl;
 }
 
@@ -132,6 +141,8 @@ void Rtype::Game::update() {
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
 
+    std::cout << "jajouj" << velocityEntities.size() << std::endl;
+    
     std::size_t entitesID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
@@ -153,7 +164,6 @@ void Rtype::Game::update() {
     projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
         _core->getComponents<ECS::Components::Hitbox>(),
-        _core->getComponents<ECS::Components::Projectile>(),
         projectileEntities, collisionEntities);
 }
 
@@ -164,27 +174,30 @@ void Rtype::Game::render()
 
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
+    auto &velocities = _core->getComponents<ECS::Components::Velocity>();
 
-    for (std::size_t i = 0; i < positions.size(); ++i) {
-        if (positions[i].has_value() && hitboxes[i].has_value()) {
-            auto &pos = positions[i].value();
-            auto &hitbox = hitboxes[i].value();
+    auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
+    auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
-            if (hitbox.getWidth() <= 0 || hitbox.getHeight() <= 0) {
-                std::cerr << "Invalid hitbox dimensions!" << std::endl;
-                continue;
-            }
+    DrawTexture(_backgroundTexture, velocities[backgrounds[0]]->getX(),
+                velocities[backgrounds[0]]->getY(), WHITE);
 
-            if (pos.getX() < 0 || pos.getY() < 0) {
-                std::cerr << "Invalid position!" << std::endl;
-                continue;
-            }
+    for (std::size_t i = 0; i < toDraw.size(); ++i) {
+        auto &pos = positions[toDraw[i]].value();
+        auto &hitbox = hitboxes[toDraw[i]].value();
 
-            raylib::Rectangle rect(pos.getX(), pos.getY(), hitbox.getWidth(), hitbox.getHeight());
-            rect.Draw(DARKBLUE);
-        } else {
-            std::cerr << "Position or hitbox not set!" << std::endl;
+        if (hitbox.getWidth() <= 0 || hitbox.getHeight() <= 0) {
+            std::cerr << "Invalid hitbox dimensions!" << std::endl;
+            continue;
         }
+
+        if (pos.getX() < 0 || pos.getY() < 0) {
+            std::cerr << "Invalid position!" << std::endl;
+            continue;
+        }
+
+        raylib::Rectangle rect(pos.getX(), pos.getY(), hitbox.getWidth(), hitbox.getHeight());
+        rect.Draw(DARKBLUE);
     }
 
     EndDrawing();

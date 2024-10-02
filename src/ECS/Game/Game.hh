@@ -20,6 +20,7 @@
 #include "../Component/Text/Text.hh"
 #include "../Component/Input/Input.hh"
 #include "../Component/Projectile/Projectile.hh"
+#include "../Component/Background/Background.hpp"
 
 #include "../System/SystemManager/SystemManager.hpp"
 
@@ -47,6 +48,6 @@ namespace Rtype {
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
-
+        Texture2D _backgroundTexture;
     };
 };

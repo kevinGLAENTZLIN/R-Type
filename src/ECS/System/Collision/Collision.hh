@@ -30,12 +30,6 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
                 std::vector<std::size_t> & projectiles, std::vector<std::size_t> & entities);
-
-            bool checkCollision(
-                const ECS::Components::Position &posA,
-                const ECS::Components::Hitbox &hitboxA,
-                const ECS::Components::Position &posB,
-                const ECS::Components::Hitbox &hitboxB);
         };
     }
 }

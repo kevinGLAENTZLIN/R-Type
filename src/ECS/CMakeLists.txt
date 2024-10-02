@@ -34,6 +34,7 @@ set(NAME_DEBUG_EXE "${RTYPE}-ECS-Debug")
 
 set(LIB_SOURCES
     ./Core/Core.cpp
+    ./Utils/Utils.cpp
     ./Entity/Missile/Missile.cpp
     ./Entity/Enemy/Enemy.cpp
     ./Entity/EntityManager/EntityManager.cpp
@@ -69,6 +70,7 @@ target_link_libraries(${NAME_LIB} PUBLIC raylib raylib_cpp)
 # Inclure les répertoires des headers
 target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Core
+    ${CMAKE_CURRENT_SOURCE_DIR}Utils
     ${CMAKE_CURRENT_SOURCE_DIR}Entity
     ${CMAKE_CURRENT_SOURCE_DIR}Entity/Missile
     ${CMAKE_CURRENT_SOURCE_DIR}Entity/Enemy

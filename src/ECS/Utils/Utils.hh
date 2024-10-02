@@ -12,7 +12,9 @@
 #include "../Component/Hitbox/Hitbox.hh"
 
 namespace ECS {
+    
     class Utils {
+    public:
         static bool checkCollision(
             const ECS::Components::Position &posA,
             const ECS::Components::Hitbox &hitboxA,

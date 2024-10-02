@@ -25,14 +25,7 @@ namespace ECS {
             void projectileIsHit(
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
-                ECS::ComponentManager::SparseArray<ECS::Components::Projectile> & projectiles,
                 std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities);
-
-            bool checkCollision2(
-                const ECS::Components::Position &posA,
-                const ECS::Components::Hitbox &hitboxA,
-                const ECS::Components::Position &posB,
-                const ECS::Components::Hitbox &hitboxB);
         };
     }
 }

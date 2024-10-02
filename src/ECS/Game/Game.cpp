@@ -17,6 +17,7 @@ Rtype::Game::Game()
 {
     _core = std::make_unique<ECS::Core::Core>();
 
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     _window.Init(1000, 800, "R-Type Game");
     SetTargetFPS(60);
     _backgroundTexture = LoadTexture("ha.png");
@@ -104,8 +105,6 @@ void Rtype::Game::initEntities()
 
 void Rtype::Game::run()
 {
-    std::cout << "width _bg texture: " << _backgroundTexture.width << std::endl;
-    std::cout << "height _bg texture: " << _backgroundTexture.height << std::endl;
     while (!_window.ShouldClose() && _isRunning) {
         update();
         render();
@@ -176,6 +175,18 @@ void Rtype::Game::update() {
         projectileEntities, collisionEntities);
 }
 
+void Rtype::Game::renderBackground(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions)
+{
+    auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
+
+    for (size_t i = 0; i < backgrounds.size(); i++) {
+        if (positions[backgrounds[i]]->getX() == - (_backgroundTexture.width))
+            positions[backgrounds[i]]->setX(_backgroundTexture.width);
+        DrawTexture(_backgroundTexture, positions[backgrounds[i]]->getX(),
+                    positions[backgrounds[i]]->getY(), WHITE);
+    }
+}
+
 void Rtype::Game::render()
 {
     BeginDrawing();
@@ -188,12 +199,7 @@ void Rtype::Game::render()
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
-    for (size_t i = 0; i < backgrounds.size(); i++) {
-        if (positions[backgrounds[i]]->getX() == - (_backgroundTexture.width))
-            positions[backgrounds[i]]->setX(_backgroundTexture.width);
-        DrawTexture(_backgroundTexture, positions[backgrounds[i]]->getX(),
-                    positions[backgrounds[i]]->getY(), WHITE);
-    }
+    renderBackground(positions);
 
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();

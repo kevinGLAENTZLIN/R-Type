@@ -22,7 +22,7 @@ Rtype::Game::Game()
     initComponents();
     initSystems();
     initEntities();
-    _backgroundTexture = LoadTexture("backgroundTest.png");
+    _backgroundTexture = LoadTexture("ha.png");
 }
 
 Rtype::Game::~Game()
@@ -92,12 +92,20 @@ void Rtype::Game::initEntities()
 
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    _core->addComponent(background, ECS::Components::Velocity{-1.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Velocity{-2.0f, 0.0f});
     _core->addComponent(background, ECS::Components::Background{});
+
+    std::size_t background2 = _core->createEntity();
+    float oui = _backgroundTexture.width;
+    _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
+    _core->addComponent(background2, ECS::Components::Velocity{-2.0f, 0.0f});
+    _core->addComponent(background2, ECS::Components::Background{});
 }
 
 void Rtype::Game::run()
 {
+    std::cout << "width _bg texture: " << _backgroundTexture.width << std::endl;
+    std::cout << "height _bg texture: " << _backgroundTexture.height << std::endl;
     while (!_window.ShouldClose() && _isRunning) {
         update();
         render();
@@ -132,7 +140,6 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Hitbox{10.0f, 5.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
 }
-
 
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
@@ -181,8 +188,12 @@ void Rtype::Game::render()
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
+    if (positions[backgrounds[0]]->getX() == - (_backgroundTexture.width))
+            positions[backgrounds[0]]->setX(_backgroundTexture.width);
     DrawTexture(_backgroundTexture, positions[backgrounds[0]]->getX(),
                     positions[backgrounds[0]]->getY(), WHITE);
+    DrawTexture(_backgroundTexture, positions[backgrounds[1]]->getX(),
+                    positions[backgrounds[1]]->getY(), WHITE);
 
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();

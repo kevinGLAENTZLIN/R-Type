@@ -19,19 +19,35 @@ Rtype::Game::Game()
 
     _window.Init(1000, 800, "R-Type Game");
     SetTargetFPS(60);
+    initComponents();
+    initSystems();
+    initEntities();
+    _backgroundTexture = LoadTexture("backgroundTest.png");
+}
 
+Rtype::Game::~Game()
+{
+    UnloadTexture(_backgroundTexture);
+    std::cout << "Game destroyed" << std::endl;
+}
+
+void Rtype::Game::initComponents()
+{
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
     _core->registerComponent<ECS::Components::Projectile>();
     _core->registerComponent<ECS::Components::Background>();
+}
 
+void Rtype::Game::initSystems()
+{
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
     _core->registerSystem<ECS::Systems::ProjectileCollision>();
     _core->registerSystem<ECS::Systems::InputUpdates>();
-    
+
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
@@ -39,16 +55,12 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
     _core->setSystemSignature<ECS::Systems::SystemVelocity>(velocitySystemSignature);
 
-    std::cout << "velocity sign " << velocitySystemSignature << std::endl;
-
     Signature collisionSignature;
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
-
-    std::cout << "collision sign " << collisionSignature << std::endl;
 
     Signature projectileCollisionSignature;
     projectileCollisionSignature.set(
@@ -59,15 +71,14 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Projectile>());
     _core->setSystemSignature<ECS::Systems::ProjectileCollision>(projectileCollisionSignature);
 
-    std::cout << "projectileCollision sign " << projectileCollisionSignature << std::endl;
-    
     Signature inputUpdatesSignature;
     inputUpdatesSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Input>());
     _core->setSystemSignature<ECS::Systems::InputUpdates>(inputUpdatesSignature);
+}
 
-    std::cout << "input sign " << inputUpdatesSignature << std::endl;
-    
+void Rtype::Game::initEntities()
+{
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{200.0f, 300.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
@@ -81,16 +92,8 @@ Rtype::Game::Game()
 
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    _core->addComponent(background, ECS::Components::Velocity{10.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Velocity{-1.0f, 0.0f});
     _core->addComponent(background, ECS::Components::Background{});
-
-    _backgroundTexture = LoadTexture("backgroundTest.png");
-}
-
-Rtype::Game::~Game()
-{
-    UnloadTexture(_backgroundTexture);
-    std::cout << "Game destroyed" << std::endl;
 }
 
 void Rtype::Game::run()
@@ -117,6 +120,7 @@ std::vector<std::size_t> getAllInputs() {
 void Rtype::Game::createProjectile(std::size_t entityID)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
+
     if (!positions[entityID].has_value()) {
         std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
         return;
@@ -141,8 +145,6 @@ void Rtype::Game::update() {
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
 
-    std::cout << "jajouj" << velocityEntities.size() << std::endl;
-    
     std::size_t entitesID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
@@ -179,8 +181,8 @@ void Rtype::Game::render()
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
-    DrawTexture(_backgroundTexture, velocities[backgrounds[0]]->getX(),
-                velocities[backgrounds[0]]->getY(), WHITE);
+    DrawTexture(_backgroundTexture, positions[backgrounds[0]]->getX(),
+                    positions[backgrounds[0]]->getY(), WHITE);
 
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();

@@ -19,10 +19,10 @@ Rtype::Game::Game()
 
     _window.Init(1000, 800, "R-Type Game");
     SetTargetFPS(60);
+    _backgroundTexture = LoadTexture("ha.png");
     initComponents();
     initSystems();
     initEntities();
-    _backgroundTexture = LoadTexture("ha.png");
 }
 
 Rtype::Game::~Game()
@@ -188,12 +188,12 @@ void Rtype::Game::render()
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
-    if (positions[backgrounds[0]]->getX() == - (_backgroundTexture.width))
-            positions[backgrounds[0]]->setX(_backgroundTexture.width);
-    DrawTexture(_backgroundTexture, positions[backgrounds[0]]->getX(),
-                    positions[backgrounds[0]]->getY(), WHITE);
-    DrawTexture(_backgroundTexture, positions[backgrounds[1]]->getX(),
-                    positions[backgrounds[1]]->getY(), WHITE);
+    for (size_t i = 0; i < backgrounds.size(); i++) {
+        if (positions[backgrounds[i]]->getX() == - (_backgroundTexture.width))
+            positions[backgrounds[i]]->setX(_backgroundTexture.width);
+        DrawTexture(_backgroundTexture, positions[backgrounds[i]]->getX(),
+                    positions[backgrounds[i]]->getY(), WHITE);
+    }
 
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();

@@ -19,11 +19,14 @@
 #include "../Component/Hitbox/Hitbox.hh"
 #include "../Component/Text/Text.hh"
 #include "../Component/Input/Input.hh"
+#include "../Component/Projectile/Projectile.hh"
+#include "../Component/Background/Background.hpp"
 
 #include "../System/SystemManager/SystemManager.hpp"
 
 #include "../System/Velocity/Velocity.hpp"
 #include "../System/Collision/Collision.hh"
+#include "../System/ProjectileCollision/ProjectileCollision.hh"
 #include "../System/InputUpdates/InputUpdates.hh"
 
 #include "raylib-cpp.hpp"
@@ -39,11 +42,12 @@ namespace Rtype {
         void run();
 
     private:
+        void createProjectile(std::size_t entityID);
         void update();
         void render();
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
-
+        Texture2D _backgroundTexture;
     };
 };

@@ -15,7 +15,7 @@ add_executable(${TEST_NAME} ${TEST_SOURCES})
 
 # Link the Doctest library to the test executable
 target_link_libraries(${TEST_NAME} PRIVATE doctest::doctest)
-target_link_libraries(${TEST_NAME} PRIVATE ${RTYPE})
+target_link_libraries(${TEST_NAME} PUBLIC ${RTYPE})
 
 # Add the tests to CTest for integration with the testing framework
 add_test(NAME RTypeTests COMMAND ${TEST_NAME})

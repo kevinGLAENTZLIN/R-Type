@@ -1,32 +1,56 @@
-#include <iostream>
-#include "raylib-cpp.hpp"
-int main(void)
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description: Main of the Client
+** main
+*/
+
+#include "udp_client.hh"
+// #include <iostream>
+// #include "raylib-cpp.hpp"
+
+int main(int argc, char **argv)
 {
-    int screenWidth = 800;
-    int screenHeight = 450;
-    raylib::Color textColor = raylib::Color::LightGray();
-    raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
-
-    SetTargetFPS(60);
-    //--------------------------------------------------------------------------------------
-
-    // Main game loop
-    while (!window.ShouldClose()) {   // Detect window close button or ESC key
-        // Update
-        //----------------------------------------------------------------------------------
-        // Update your variables here
-        //----------------------------------------------------------------------------------
-
-        // Draw
-        //----------------------------------------------------------------------------------
-        BeginDrawing();
-        {
-            window.ClearBackground(RAYWHITE);
-            textColor.DrawText("Congrats! You created your first window!", 190, 200, 20);
-        }
-        EndDrawing();
-        //----------------------------------------------------------------------------------
+    if (argc != 4) {
+        std::cout << "Usage: udp_client [server] [port] [Message]" << std::endl;
+        return 1;
     }
+    Rtype::udpClient client(argv[1], std::stoi(argv[2]));
 
+    for (int i = 0; i < 5; i++) {
+        client.send_data(argv[3]);
+    }
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     return 0;
 }
+
+// int main(void)
+// {
+//     int screenWidth = 800;
+//     int screenHeight = 450;
+//     raylib::Color textColor = raylib::Color::LightGray();
+//     raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
+
+//     SetTargetFPS(60);
+//     //--------------------------------------------------------------------------------------
+
+//     // Main game loop
+//     while (!window.ShouldClose()) {   // Detect window close button or ESC key
+//         // Update
+//         //----------------------------------------------------------------------------------
+//         // Update your variables here
+//         //----------------------------------------------------------------------------------
+
+//         // Draw
+//         //----------------------------------------------------------------------------------
+//         BeginDrawing();
+//         {
+//             window.ClearBackground(RAYWHITE);
+//             textColor.DrawText("Congrats! You created your first window!", 190, 200, 20);
+//         }
+//         EndDrawing();
+//         //----------------------------------------------------------------------------------
+//     }
+//     return 0;
+// }
+

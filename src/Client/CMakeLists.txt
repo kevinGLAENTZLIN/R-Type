@@ -31,6 +31,7 @@ endif()
 set(NAME_CLIENT "${RTYPE}_client")
 set(CLIENT_SOURCES
     ./main.cpp
+    ./udp_client.cpp
 )
 
 add_executable(${NAME_CLIENT} ${CLIENT_SOURCES})

@@ -1,7 +1,25 @@
-#include <iostream>
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description: Main of the Server
+** main
+*/
 
-int main(void)
+#include "udp_server.hh"
+
+int main(int argc, char* argv[])
 {
-    std::cout << "Salut C moi LE SERVER!" << std::endl;
+    if (argc != 2) {
+        std::cerr << "Usage: udp_server <port>\n";
+        return 1;
+    }
+    try {
+        boost::asio::io_service io_service;
+        Rtype::udpServer server(io_service, std::atoi(argv[1]));
+        io_service.run();
+    }
+    catch (std::exception &error) {
+        std::cerr << "Exception: " << error.what() << "\n";
+    }
     return 0;
 }

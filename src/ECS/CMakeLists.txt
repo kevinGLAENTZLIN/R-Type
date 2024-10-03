@@ -53,6 +53,8 @@ set(LIB_SOURCES
     ./System/ProjectileCollision/ProjectileCollision.cpp
     ./System/InputUpdates/InputUpdates.cpp
     ./Game/Game.cpp
+    ./Component/Render/Render.cpp
+    ./System/Render/Render.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )

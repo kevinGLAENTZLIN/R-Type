@@ -9,7 +9,8 @@
 #include "RessourcePool.hh"
 
 ECS::RessourcePool::RessourcePool()
-{}
+{
+}
 
 ECS::RessourcePool::~RessourcePool()
 {
@@ -31,4 +32,14 @@ raylib::Model& ECS::RessourcePool::getModel(std::string modelPath) {
         std::cout << "Loaded model: " << modelPath << std::endl;
     }
     return _models[modelPath];
+}
+
+void ECS::RessourcePool::addModel(const std::string &modelPath) {
+    std::string pngTexturePath = modelPath.substr(0, modelPath.find_last_of('.')) + ".png";
+    raylib::Texture texture = LoadTexture(pngTexturePath.c_str());
+    std::cout << "Loaded texture: " << pngTexturePath << std::endl;
+
+    raylib::Model defaultModel(modelPath);
+    //defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    _models.emplace(modelPath,std::move(defaultModel));
 }

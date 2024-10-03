@@ -1,4 +1,3 @@
-
 /*
 ** EPITECH PROJECT, 2024
 ** R-Type - Game : Game
@@ -28,7 +27,9 @@
 #include "../System/Collision/Collision.hh"
 #include "../System/ProjectileCollision/ProjectileCollision.hh"
 #include "../System/InputUpdates/InputUpdates.hh"
+#include "../System/Render/Render.hh"
 
+#include "../RessourcePool/RessourcePool.hh"
 #include "raylib-cpp.hpp"
 
 #include <memory>
@@ -48,6 +49,8 @@ namespace Rtype {
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
+        raylib::Camera3D _camera;
+        ECS::RessourcePool _ressourcePool;
         Texture2D _backgroundTexture;
     };
 };

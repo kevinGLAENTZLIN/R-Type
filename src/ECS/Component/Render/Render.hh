@@ -1,31 +1,25 @@
-/*
-** EPITECH PROJECT, 2024
-** R-Type - Components : Render
-** File description:
-** Render Component
-*/
-
 #pragma once
 #include <iostream>
-#include <raylib.h>
+#include <string>
+#include "raylib-cpp.hpp"
 
 namespace ECS {
     namespace Components {
 
         class Render {
         public:
-            Render(std::string textureFilePath, float rotation = 0.0f, float scale = 1.0f);
+            Render(const std::string path, float rotation = 0.0f, float scale = 1.0f);
+            Render(const Render& other);
+            Render& operator=(const Render& other);
             ~Render() = default;
 
-            const Texture2D& getTexture() const;
-            float getRotation() const;
-            float getScale() const;
-
-            void setRotation(float rotation);
-            void setScale(float scale);
-
+            void render(raylib::Model &model, raylib::Vector3 position);
+            const std::string getPath() const;
         private:
-            Texture2D _texture;
+            raylib::Model _model;
+            raylib::Texture _texture;
+            raylib::Color _color;
+            std::string _path;
             float _rotation;
             float _scale;
         };

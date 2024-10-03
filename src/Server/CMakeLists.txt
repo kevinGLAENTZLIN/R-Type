@@ -9,11 +9,11 @@ set(SERVER_SOURCES
 find_package(boost_asio CONFIG REQUIRED)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_executable(udp_server udp_server.cpp)
+    add_executable(${NAME_SERVER} ${SERVER_SOURCES})
 
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
     set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
-    target_link_libraries(udp_server PRIVATE Boost::asio)
+    target_link_libraries(${NAME_SERVER} PRIVATE Boost::asio)
 else()
     add_executable(${NAME_SERVER} ${SERVER_SOURCES})
 

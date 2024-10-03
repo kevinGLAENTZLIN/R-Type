@@ -14,9 +14,12 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <map>
+#include <string>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::udp;
+using boost::asio::ip::address;
 
 namespace Rtype {
     /**
@@ -39,11 +42,6 @@ namespace Rtype {
             void read_clients();
 
             /**
-             * @brief Sends a response back to the client.
-             */
-            void send_back_to_client();
-
-            /**
              * @brief Handles the received data from clients.
              * @param recvd_bytes Number of bytes received.
              */
@@ -56,9 +54,71 @@ namespace Rtype {
             bool check_ACK();
 
         private:
+            /**
+             * @brief Retrieves the ID of the sender.
+             * @return Sender's ID.
+             */
+            int get_sender_id();
+
+            /**
+             * @brief Finds an available client ID.
+             * @return Available client ID.
+             */
+            int get_available_client_id();
+
+            /**
+             * @brief Retrieves the client ID by its address.
+             * @param addr Client's IP address.
+             * @param port Client's port number.
+             * @return Client ID if found, -1 otherwise.
+             */
+            int get_client_id_by_addr(std::string addr, int port);
+
+            /**
+             * @brief Checks if a client exists by its address.
+             * @param addr Client's IP address.
+             * @param port Client's port number.
+             * @return true if the client exists, false otherwise.
+             */
+            bool is_client_by_addr(std::string addr, int port);
+
+            /**
+             * @brief Disconnects a client by its ID.
+             * @param client_id Client's ID.
+             */
+            void disconnect_client(int client_id);
+
+            /**
+             * @brief Sends a message to a client.
+             * @param msg Message to send.
+             */
+            void send_to_client(std::string msg);
+
+            /**
+             * @brief Sends a message to a client identified by IP address and port.
+             * @param addr_ip Client's IP address.
+             * @param port Client's port number.
+             * @param msg Message to send.
+             */
+            void send_to_client(std::string addr_ip, int port, std::string msg);
+
+            /**
+             * @brief Sends a message to a client identified by address.
+             * @param addr Client's address as a pair of IP and port.
+             * @param msg Message to send.
+             */
+            void send_to_client(std::pair<std::string, int> addr, std::string msg);
+
+            /**
+             * @brief Sends a message to all clients.
+             * @param msg Message to send.
+             */
+            void send_to_clients(std::string msg);
+
             udp::socket _socket;
             udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
+            std::map<int, std::pair<std::string, int>> _clientsAddr;
     };
 }

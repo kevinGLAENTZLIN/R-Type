@@ -53,16 +53,15 @@ namespace Rtype {
 
         private:
             /**
-             * @brief Start receiving data from server.
+             * @brief Receiving data from server.
              */
-            void start_receive();
+            void read_server();
             
             /**
              * @brief Handle the received data from server.
-             * @param error Potential error code while receiving data from server.
              * @param bytes_recv Number of bytes received from server.
              */
-            void handle_receive(const boost::system::error_code &error, std::size_t bytes_recv);
+            void received_data_handler(std::size_t bytes_recv);
 
             int _id;
             boost::asio::io_context _ioContext;

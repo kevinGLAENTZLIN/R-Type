@@ -11,15 +11,15 @@
 
 int main(int argc, char **argv)
 {
-    if (argc != 4) {
-        std::cout << "Usage: udp_client [server] [port] [Message]" << std::endl;
+    if (argc < 3) {
+        std::cout << "Usage: udp_client [server] [port] <Message>" << std::endl;
         return 1;
     }
     Rtype::udpClient client(argv[1], std::stoi(argv[2]));
-
-    for (int i = 0; i < 5; i++) {
-        client.send_data(argv[3]);
-    }
+  
+    if (argv[3] != NULL)
+        for (int i = 0; i < 5; i++)
+            client.send_data(argv[3]);
     std::this_thread::sleep_for(std::chrono::seconds(3));
     return 0;
 }

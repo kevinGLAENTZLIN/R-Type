@@ -9,7 +9,9 @@
 #include "raylib-cpp.hpp"
 #include <map>
 #include <iostream>
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace ECS {
     class RessourcePool {
@@ -20,9 +22,11 @@ namespace ECS {
             void UnloadAll();
             raylib::Model &getModel(std::string modelPath);
 
+            void addModel(const std::string &modelPath);
         private:
 
-            void addModel(const std::string &modelPath);
             std::map<const std::string, raylib::Model> _models;
+            std::vector<std::unique_ptr<raylib::Model>> _pitier;
+            raylib::Model _defaultModel;
     };
 }

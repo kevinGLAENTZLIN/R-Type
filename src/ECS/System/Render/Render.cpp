@@ -20,7 +20,5 @@ void ECS::Systems::SystemRender::update(
             auto &render = renders[entity].value();
             raylib::Vector3 pos = Vector3(position.getX()/100, 0, position.getY()/100);
             render.render(ressourcePool.getModel(render.getPath()), pos);
-            std::cout << "Cordonnées : " << position.getX() << " " << position.getY() << std::endl;
-            std::cout << "rendering" << std::endl;
     }
 }

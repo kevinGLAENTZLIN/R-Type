@@ -14,8 +14,10 @@ ECS::Components::Render::Render(const std::string path, float rotation, float sc
 
 ECS::Components::Render::Render(const Render& other):
     _color(other._color),
+    _path(other._path),
     _rotation(other._rotation),
     _scale(other._scale)
+
 {
 
     //_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = _texture;
@@ -27,6 +29,7 @@ ECS::Components::Render& ECS::Components::Render::operator=(const Render& other)
         _color = other._color;
         _rotation = other._rotation;
         _scale = other._scale;
+        _path = other._path;
 
         // _model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = _texture;
     }
@@ -37,7 +40,7 @@ void ECS::Components::Render::render(raylib::Model &model, raylib::Vector3 posit
 {
     raylib::Vector3 rotation = {0.0f, 1.0f, 0.0f};
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
-    model.Draw(position, rotation, 45.0f, scale, _color);
+    model.Draw(position, rotation, 45.0f, scale, WHITE);
 }
 const std::string ECS::Components::Render::getPath() const
 {

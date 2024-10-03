@@ -16,13 +16,13 @@ Rtype::Game::Game()
 {
     _core = std::make_unique<ECS::Core::Core>();
 
-    _window.Init(1000, 800, "R-Type Game");
-    _camera = raylib::Camera3D({ 0.0f, 10.0f, 10.0f }, { 0.0f, 10.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 60.0f);
+    _window.Init(1290, 720, "R-Type Game");
+    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
 
-    Vector3 movement = { 0.0f, 0.0f, 0.0f };
-    Vector3 rotation = { .0f, 90.0f, 0.0f }; // Rotate 90 degrees around X-axis for top-down view
+
+    _ressourcePool.addModel("../../../resources/Disco.obj");
+
     float zoom = 1.0f;
-    _camera.Update(movement, rotation, zoom);
     SetTargetFPS(60);
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
@@ -152,7 +152,8 @@ void Rtype::Game::render()
                          _core->getComponents<ECS::Components::Render>(),
                          renderEntities,
                          _ressourcePool);
-        DrawGrid(1000, 0.1f);
+        DrawGrid(1000, 1.0f);
+
     }
     _camera.EndMode();
     for (std::size_t i = 0; i < positions.size(); ++i) {
@@ -174,10 +175,5 @@ void Rtype::Game::render()
             std::cerr << "Position or hitbox not set!" << std::endl;
         }
     }
-    DrawRectangle(10, 10, 300, 150, Fade(SKYBLUE, 0.5f));
-    DrawRectangleLines(10, 10, 300, 150, BLUE);
-    DrawText(TextFormat("Camera Position: (%.2f, %.2f, %.2f)", _camera.GetPosition().x, _camera.GetPosition().y, _camera.GetPosition().z), 20, 20, 10, BLACK);
-    DrawText(TextFormat("Camera Target: (%.2f, %.2f, %.2f)", _camera.GetTarget().x, _camera.GetTarget().y, _camera.GetTarget().z), 20, 40, 10, BLACK);
-    DrawText(TextFormat("Camera Up: (%.2f, %.2f, %.2f)", _camera.GetUp().x, _camera.GetUp().y, _camera.GetUp().z), 20, 60, 10, BLACK);
     EndDrawing();
 }

@@ -10,7 +10,6 @@
 
 ECS::RessourcePool::RessourcePool()
 {
-    addModel("../../../resources/Disco.obj");
 }
 
 ECS::RessourcePool::~RessourcePool()
@@ -36,14 +35,11 @@ raylib::Model& ECS::RessourcePool::getModel(std::string modelPath) {
 }
 
 void ECS::RessourcePool::addModel(const std::string &modelPath) {
-    if (_models.find(modelPath) == _models.end()) {
-        _models[modelPath] = LoadModel(modelPath.c_str());
-        std::cout << "Loaded model: " << modelPath << std::endl;
+    std::string pngTexturePath = modelPath.substr(0, modelPath.find_last_of('.')) + ".png";
+    raylib::Texture texture = LoadTexture(pngTexturePath.c_str());
+    std::cout << "Loaded texture: " << pngTexturePath << std::endl;
 
-        // std::string pngTexturePath = modelPath.substr(0, modelPath.find_last_of('.')) + ".png";
-        // raylib::Texture2D texture = LoadTexture(pngTexturePath.c_str());
-        // std::cout << "Loaded texture: " << pngTexturePath << std::endl;
-
-        // _models[modelPath].materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-    }
+    raylib::Model defaultModel(modelPath);
+    //defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    _models.emplace(modelPath,std::move(defaultModel));
 }

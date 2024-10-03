@@ -18,11 +18,14 @@
 #include "../Component/Hitbox/Hitbox.hh"
 #include "../Component/Text/Text.hh"
 #include "../Component/Input/Input.hh"
+#include "../Component/Projectile/Projectile.hh"
+#include "../Component/Background/Background.hpp"
 
 #include "../System/SystemManager/SystemManager.hpp"
 
 #include "../System/Velocity/Velocity.hpp"
 #include "../System/Collision/Collision.hh"
+#include "../System/ProjectileCollision/ProjectileCollision.hh"
 #include "../System/InputUpdates/InputUpdates.hh"
 #include "../System/Render/Render.hh"
 
@@ -40,6 +43,7 @@ namespace Rtype {
         void run();
 
     private:
+        void createProjectile(std::size_t entityID);
         void update();
         void render();
         bool _isRunning;
@@ -47,5 +51,6 @@ namespace Rtype {
         raylib::Window _window;
         raylib::Camera3D _camera;
         ECS::RessourcePool _ressourcePool;
+        Texture2D _backgroundTexture;
     };
 };

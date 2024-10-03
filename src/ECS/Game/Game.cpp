@@ -7,6 +7,7 @@
 */
 
 #include "Game.hh"
+#include <cstddef>
 #include <cstdlib>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
@@ -29,11 +30,14 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
     _core->registerComponent<ECS::Components::Render>();
+    _core->registerComponent<ECS::Components::Projectile>();
+    _core->registerComponent<ECS::Components::Background>();
 
-    auto velocitySystem = _core->registerSystem<ECS::Systems::SystemVelocity>();
-    auto collisionSystem = _core->registerSystem<ECS::Systems::Collision>();
-    auto InputUpdatesSystem = _core->registerSystem<ECS::Systems::InputUpdates>();
-    auto renderSystem = _core->registerSystem<ECS::Systems::SystemRender>();
+    _core->registerSystem<ECS::Systems::SystemVelocity>();
+    _core->registerSystem<ECS::Systems::Collision>();
+    _core->registerSystem<ECS::Systems::ProjectileCollision>();
+    _core->registerSystem<ECS::Systems::InputUpdates>();
+    _core->registerSystem<ECS::Systems::SystemRender>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -52,6 +56,17 @@ Rtype::Game::Game()
     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
 
     std::cout << "collision sign " << collisionSignature << std::endl;
+
+    Signature projectileCollisionSignature;
+    projectileCollisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    projectileCollisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
+    projectileCollisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Projectile>());
+    _core->setSystemSignature<ECS::Systems::ProjectileCollision>(projectileCollisionSignature);
+
+    std::cout << "projectileCollision sign " << projectileCollisionSignature << std::endl;
 
     Signature inputUpdatesSignature;
     inputUpdatesSignature.set(
@@ -79,12 +94,20 @@ Rtype::Game::Game()
 
     std::size_t enemy = _core->createEntity();
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
-    _core->addComponent(enemy, ECS::Components::Velocity{-1.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{50.0f, 50.0f});
+
+    std::size_t background = _core->createEntity();
+    _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Velocity{10.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Background{});
+
+    _backgroundTexture = LoadTexture("backgroundTest.png");
 }
 
 Rtype::Game::~Game()
 {
+    UnloadTexture(_backgroundTexture);
     std::cout << "Game destroyed" << std::endl;
 }
 
@@ -97,31 +120,53 @@ void Rtype::Game::run()
 }
 
 std::vector<std::size_t> getAllInputs() {
-    std::vector<std::size_t> jaj;
+    std::vector<std::size_t> vec;
     if (IsKeyDown(KEY_RIGHT))
-        jaj.push_back(1);
+        vec.push_back(1);
     if (IsKeyDown(KEY_UP))
-        jaj.push_back(2);
+        vec.push_back(2);
     if (IsKeyDown(KEY_LEFT))
-        jaj.push_back(3);
+        vec.push_back(3);
     if (IsKeyDown(KEY_DOWN))
-        jaj.push_back(4);
-    return jaj;
+        vec.push_back(4);
+    return vec;
 }
+
+void Rtype::Game::createProjectile(std::size_t entityID)
+{
+    auto &positions = _core->getComponents<ECS::Components::Position>();
+    if (!positions[entityID].has_value()) {
+        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+        return;
+    }
+    const ECS::Components::Position &entityPos = positions[entityID].value();
+    std::size_t projectile = _core->createEntity();
+    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + 60.0f, entityPos.getY() + 10.0f});
+    _core->addComponent(projectile, ECS::Components::Velocity{5.0f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Hitbox{10.0f, 5.0f});
+    _core->addComponent(projectile, ECS::Components::Projectile{});
+}
+
 
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
+    auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
 
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
+    auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
-//    std::cout << inputEntities.size() << std::endl;
-    inputUpdatesSystem->updateInputs(getAllInputs(),
+
+    std::cout << "jajouj" << velocityEntities.size() << std::endl;
+
+    std::size_t entitesID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
 
+    if (entitesID <= 10000)
+        createProjectile(entitesID);
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);
@@ -134,6 +179,11 @@ void Rtype::Game::update() {
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
     // Update the camera to achieve a top-down view
+
+    projectileCollisionSystem->projectileIsHit(
+        _core->getComponents<ECS::Components::Position>(),
+        _core->getComponents<ECS::Components::Hitbox>(),
+        projectileEntities, collisionEntities);
 }
 
 void Rtype::Game::render()
@@ -143,7 +193,10 @@ void Rtype::Game::render()
 
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
+    auto &velocities = _core->getComponents<ECS::Components::Velocity>();
 
+    auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
+    auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
     auto renderSystem = _core->getSystem<ECS::Systems::SystemRender>();
     auto renderEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender>());
     _camera.BeginMode();
@@ -153,27 +206,27 @@ void Rtype::Game::render()
                          renderEntities,
                          _ressourcePool);
         DrawGrid(1000, 1.0f);
-
     }
     _camera.EndMode();
-    for (std::size_t i = 0; i < positions.size(); ++i) {
-        if (positions[i].has_value() && hitboxes[i].has_value()) {
-            auto &pos = positions[i].value();
-            auto &hitbox = hitboxes[i].value();
+    DrawTexture(_backgroundTexture, velocities[backgrounds[0]]->getX(),
+                velocities[backgrounds[0]]->getY(), WHITE);
 
-            if (hitbox.getWidth() <= 0 || hitbox.getHeight() <= 0) {
-                std::cerr << "Invalid hitbox dimensions!" << std::endl;
-                continue;
-            }
+    for (std::size_t i = 0; i < toDraw.size(); ++i) {
+        auto &pos = positions[toDraw[i]].value();
+        auto &hitbox = hitboxes[toDraw[i]].value();
 
-            if (pos.getX() < 0 || pos.getY() < 0) {
-                std::cerr << "Invalid position!" << std::endl;
-                continue;
-            }
-
-        } else {
-            std::cerr << "Position or hitbox not set!" << std::endl;
+        if (hitbox.getWidth() <= 0 || hitbox.getHeight() <= 0) {
+            std::cerr << "Invalid hitbox dimensions!" << std::endl;
+            continue;
         }
+
+        if (pos.getX() < 0 || pos.getY() < 0) {
+            std::cerr << "Invalid position!" << std::endl;
+            continue;
+        }
+
+        raylib::Rectangle rect(pos.getX(), pos.getY(), hitbox.getWidth(), hitbox.getHeight());
+        rect.Draw(DARKBLUE);
     }
     EndDrawing();
 }

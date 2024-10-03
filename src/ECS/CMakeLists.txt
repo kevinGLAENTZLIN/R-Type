@@ -34,6 +34,7 @@ set(NAME_DEBUG_EXE "${RTYPE}-ECS-Debug")
 
 set(LIB_SOURCES
     ./Core/Core.cpp
+    ./Utils/Utils.cpp
     ./Entity/Missile/Missile.cpp
     ./Entity/Enemy/Enemy.cpp
     ./Entity/EntityManager/EntityManager.cpp
@@ -41,6 +42,7 @@ set(LIB_SOURCES
     ./Entity/Player/Player.cpp
     ./Component/Position/Position.cpp
     ./Component/Health/Health.cpp
+    ./Component/Projectile/Projectile.cpp
     ./Component/Velocity/Velocity.cpp
     ./Component/Hitbox/Hitbox.cpp
     ./Component/Text/Text.cpp
@@ -48,6 +50,7 @@ set(LIB_SOURCES
     ./Component/Input/Input.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
+    ./System/ProjectileCollision/ProjectileCollision.cpp
     ./System/InputUpdates/InputUpdates.cpp
     ./Game/Game.cpp
     ./Component/Render/Render.cpp
@@ -69,6 +72,7 @@ target_link_libraries(${NAME_LIB} PUBLIC raylib raylib_cpp)
 # Inclure les répertoires des headers
 target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Core
+    ${CMAKE_CURRENT_SOURCE_DIR}Utils
     ${CMAKE_CURRENT_SOURCE_DIR}Entity
     ${CMAKE_CURRENT_SOURCE_DIR}Entity/Missile
     ${CMAKE_CURRENT_SOURCE_DIR}Entity/Enemy
@@ -84,13 +88,14 @@ target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Hitbox
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Text
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Volume
-    ${CMAKE_CURRENT_SOURCE_DIR}Component/Input
+    ${CMAKE_CURRENT_SOURCE_DIR}Component/Projectile
     ${CMAKE_CURRENT_SOURCE_DIR}System
     ${CMAKE_CURRENT_SOURCE_DIR}System/ButtonClick
     ${CMAKE_CURRENT_SOURCE_DIR}System/SystemManager
     ${CMAKE_CURRENT_SOURCE_DIR}System/Velocity
     ${CMAKE_CURRENT_SOURCE_DIR}System/System
     ${CMAKE_CURRENT_SOURCE_DIR}System/Collision
+    ${CMAKE_CURRENT_SOURCE_DIR}System/ProjectileCollision
     ${CMAKE_CURRENT_SOURCE_DIR}System/InputUpdates
 )
 

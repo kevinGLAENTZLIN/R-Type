@@ -1,60 +1,61 @@
-#include "udp_server.hpp"
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description: Server Class
+** udp_server
+*/
 
-server::server(boost::asio::io_service& io_service, short port):
-    socket_(io_service, udp::endpoint(udp::v4(), port))
+/**
+ * @file udp_server.cpp
+ * @brief Implementation of the Rtype::udpServer class for UDP server communication.
+ */
+
+#include "udp_server.hh"
+
+Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port)
+: _socket(io_service, udp::endpoint(udp::v4(), port))
 {
-    my_udp_receive();
+    read_clients();
 }
 
-server::~server()
+void Rtype::udpServer::read_clients()
 {
-}
-
-void server::my_udp_receive()
-{
-    socket_.async_receive_from(boost::asio::buffer(data_, max_length), sender_endpoint_,
-    [this] (boost::system::error_code error, std::size_t recvd_bytes) {
-        if (!error && recvd_bytes > 0) {
-            std::cout << "[" << recvd_bytes << "] " << data_ << std::endl;
-            my_udp_send_back();
-        } else {
-            my_udp_receive();
-        }
-    }
-    );
-}
-
-void server::my_udp_send_back() {
-    std::string myStr = "Sender endpoint : ";
-    myStr += sender_endpoint_.address().to_string().c_str();
-    myStr += " port ";
-    myStr += std::to_string((int)sender_endpoint_.port());
-    myStr += " Message : ";
-    myStr += data_;
-    socket_.async_send_to(boost::asio::buffer(myStr.c_str(), myStr.length()), sender_endpoint_,
-    [this] (boost::system::error_code error, std::size_t recvd_bytes) {
-        my_udp_receive();
+    _socket.async_receive_from(boost::asio::buffer(_data, max_length), _senderEndpoint,
+    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+        if (!ec && recvd_bytes > 0)
+            received_data_handler(recvd_bytes);
+        else
+            read_clients();
     });
 }
 
-int main(int argc, char* argv[])
+void Rtype::udpServer::received_data_handler(std::size_t recvd_bytes)
 {
-    if (argc != 2) {
-        std::cerr << "Usage: udp_server <port>\n";
-        return 1;
+    if (check_ACK()) {
+        std::cout << "[" << recvd_bytes << "] " << _data << std::endl;
+        send_back_to_client();
+    } else {
+        read_clients();
     }
+}
 
-    try {
-        //! Important to understand :
-        // 1) instantiate io_service
-        // 2) make a customized server
-        // 3) start io_service
+bool Rtype::udpServer::check_ACK()
+{
+    return true;
+}
 
-        boost::asio::io_service io_service;
-        server udpServer(io_service, std::atoi(argv[1]));
-        io_service.run();
-    } catch (std::exception &error) {
-        std::cerr << "Exception: " << error.what() << "\n";
-    }
-    return 0;
+void Rtype::udpServer::send_back_to_client()
+{
+    std::string myStr = "Sender endpoint : ";
+    myStr += _senderEndpoint.address().to_string().c_str();
+    myStr += " port ";
+    myStr += std::to_string((int)_senderEndpoint.port());
+    myStr += " Message : ";
+    myStr += _data; 
+    std::cout << "Send back: [" << myStr << "]" << std::endl;
+
+    _socket.async_send_to(boost::asio::buffer(myStr), _senderEndpoint,
+    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+        read_clients();
+    });
 }

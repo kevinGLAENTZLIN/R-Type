@@ -17,10 +17,11 @@ file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 add_subdirectory(src/ECS)
 add_subdirectory(src/Client)
 add_subdirectory(src/Server)
+# add_subdirectory(src/Utils)
 
 # Testing
-#enable_testing()
-#add_subdirectory(tests)
+enable_testing()
+add_subdirectory(tests)
 
 # Configurations spécifiques pour Debug et Release
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Werror -g")

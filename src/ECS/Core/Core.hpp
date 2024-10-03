@@ -89,16 +89,26 @@ namespace ECS {
             void addComponent(std::size_t entity, T component) {
                 auto signature = _entityManager->getSignature(entity);
 
-                signature.set(
-                    ComponentManager::ComponentTypeRegistry::getTypeId<T>(), true);
+                signature.set(CTypeRegistry::getTypeId<T>(), true);
                 _entityManager->setSignature(entity, signature);
                 _systemManager->entitySignatureChanged(entity, signature);
                 _componentManager->getComponents<T>().insertAt(entity, component);
                 std::cout << "in addComponent " << signature << std::endl;
             }
 
+            template<typename... T>
+            std::vector<std::size_t> getEntitiesWithComponent() const {
+                std::vector<std::size_t> matchingEntities;
+                auto entities = _entityManager->getEntities();
+                std::bitset<32> temp;
 
-
+                (temp.set(ECS::CTypeRegistry::getTypeId<T>(), true), ...);
+                for (auto &entity : entities)
+                    if ((getSignature(entity) & temp) == temp)
+                        matchingEntities.push_back(entity);
+                return matchingEntities;
+            };
+            
             /**
              * @brief Retrieves all entities with a matching signature.
              *
@@ -108,11 +118,12 @@ namespace ECS {
             std::vector<std::size_t> getEntitiesWithSignature(Signature systemSignature) const {
                 std::vector<std::size_t> matchingEntities;
                 auto entities = _entityManager->getEntities();
-                    for (auto &entity : entities) {
-                        if ((getSignature(entity) & systemSignature) == systemSignature) {
-                            matchingEntities.push_back(entity);
-                        }
+
+                for (auto &entity : entities) {
+                    if ((getSignature(entity) & systemSignature) == systemSignature) {
+                        matchingEntities.push_back(entity);
                     }
+                }
                 return matchingEntities;
             }
 
@@ -149,9 +160,6 @@ namespace ECS {
             std::shared_ptr<T> getSystem() const {
                 return _systemManager->getSystem<T>();
             }
-
-
-        protected:
 
         private:
             std::shared_ptr<ComponentManager::ComponentManager> _componentManager;

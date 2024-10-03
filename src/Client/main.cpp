@@ -16,7 +16,7 @@ int main(int argc, char **argv)
         return 1;
     }
     Rtype::udpClient client(argv[1], std::stoi(argv[2]));
-
+  
     if (argv[3] != NULL)
         for (int i = 0; i < 5; i++)
             client.send_data(argv[3]);

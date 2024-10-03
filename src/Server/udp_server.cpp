@@ -131,4 +131,3 @@ void Rtype::udpServer::send_to_clients(std::string msg)
     for(auto client: _clientsAddr)
         send_to_client(client.second, msg);
 }
-

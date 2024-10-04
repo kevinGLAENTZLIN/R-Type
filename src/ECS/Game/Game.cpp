@@ -19,7 +19,10 @@ Rtype::Game::Game()
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     _window.Init(1000, 800, "R-Type Game");
+    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+    float zoom = 1.0f;
     SetTargetFPS(60);
+    _ressourcePool.addModel("./resources/Disco.obj");
     _backgroundTexture = LoadTexture("ha.png");
     initComponents();
     initSystems();
@@ -38,6 +41,7 @@ void Rtype::Game::initComponents()
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
+    _core->registerComponent<ECS::Components::Render>();
     _core->registerComponent<ECS::Components::Projectile>();
     _core->registerComponent<ECS::Components::Background>();
 }
@@ -48,6 +52,7 @@ void Rtype::Game::initSystems()
     _core->registerSystem<ECS::Systems::Collision>();
     _core->registerSystem<ECS::Systems::ProjectileCollision>();
     _core->registerSystem<ECS::Systems::InputUpdates>();
+    _core->registerSystem<ECS::Systems::SystemRender>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -76,6 +81,13 @@ void Rtype::Game::initSystems()
     inputUpdatesSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Input>());
     _core->setSystemSignature<ECS::Systems::InputUpdates>(inputUpdatesSignature);
+
+    Signature renderSignature;
+    renderSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    renderSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Render>());
+    _core->setSystemSignature<ECS::Systems::SystemRender>(renderSignature);
 }
 
 void Rtype::Game::initEntities()
@@ -85,6 +97,7 @@ void Rtype::Game::initEntities()
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
     _core->addComponent(player, ECS::Components::Input{});
+    _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
 
     std::size_t enemy = _core->createEntity();
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
@@ -168,6 +181,7 @@ void Rtype::Game::update() {
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
+    // Update the camera to achieve a top-down view
 
     projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
@@ -198,8 +212,20 @@ void Rtype::Game::render()
 
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
-
+    
     renderBackground(positions);
+
+    auto renderSystem = _core->getSystem<ECS::Systems::SystemRender>();
+    auto renderEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender>());
+    _camera.BeginMode();
+    {
+        renderSystem->update(_core->getComponents<ECS::Components::Position>(),
+                             _core->getComponents<ECS::Components::Render>(),
+                             renderEntities,
+                             _ressourcePool);
+        DrawGrid(1000, 1.0f);
+    }
+    _camera.EndMode();
 
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();
@@ -218,6 +244,5 @@ void Rtype::Game::render()
         raylib::Rectangle rect(pos.getX(), pos.getY(), hitbox.getWidth(), hitbox.getHeight());
         rect.Draw(DARKBLUE);
     }
-
     EndDrawing();
 }

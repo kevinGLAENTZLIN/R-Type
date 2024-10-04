@@ -46,9 +46,9 @@ namespace Rtype {
         void createProjectile(std::size_t entityID);
         void update();
         void render();
-        void initComponents();
-        void initSystems();
-        void initEntities();
+        // void initComponents();
+        // void initSystems();
+        // void initEntities();
         void renderBackground(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions);
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;

@@ -23,7 +23,7 @@ Rtype::Game::Game()
     float zoom = 1.0f;
     SetTargetFPS(60);
     _ressourcePool.addModel("./resources/Disco.obj");
-    _backgroundTexture = LoadTexture("background.png");
+    _ressourcePool.addTexture("background.png");
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
@@ -87,14 +87,19 @@ Rtype::Game::Game()
 
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    _core->addComponent(background, ECS::Components::Velocity{-2.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Velocity{-0.5f, 0.0f});
     _core->addComponent(background, ECS::Components::Background{});
 
+    float oui = _ressourcePool.getTexture("background.png").width;
     std::size_t background2 = _core->createEntity();
-    float oui = _backgroundTexture.width;
     _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
-    _core->addComponent(background2, ECS::Components::Velocity{-2.0f, 0.0f});
+    _core->addComponent(background2, ECS::Components::Velocity{-0.5f, 0.0f});
     _core->addComponent(background2, ECS::Components::Background{});
+
+    std::size_t background3 = _core->createEntity();
+    _core->addComponent(background3, ECS::Components::Position{oui * 2, 0.0f});
+    _core->addComponent(background3, ECS::Components::Velocity{-0.5f, 0.0f});
+    _core->addComponent(background3, ECS::Components::Background{});
 }
 
 Rtype::Game::~Game()
@@ -262,9 +267,9 @@ void Rtype::Game::renderBackground(ECS::ComponentManager::SparseArray<ECS::Compo
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
     for (size_t i = 0; i < backgrounds.size(); i++) {
-        if (positions[backgrounds[i]]->getX() == - (_backgroundTexture.width))
-            positions[backgrounds[i]]->setX(_backgroundTexture.width);
-        DrawTexture(_backgroundTexture, positions[backgrounds[i]]->getX(),
+        if (positions[backgrounds[i]]->getX() == - (_ressourcePool.getTexture("background.png").width))
+            positions[backgrounds[i]]->setX(_ressourcePool.getTexture("background.png").width);
+        DrawTexture(_ressourcePool.getTexture("background.png"), positions[backgrounds[i]]->getX(),
                     positions[backgrounds[i]]->getY(), WHITE);
     }
 }
@@ -291,7 +296,6 @@ void Rtype::Game::render()
                              _core->getComponents<ECS::Components::Render>(),
                              renderEntities,
                              _ressourcePool);
-        DrawGrid(1000, 1.0f);
     }
     _camera.EndMode();
 

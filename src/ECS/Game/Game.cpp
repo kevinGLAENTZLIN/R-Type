@@ -21,7 +21,7 @@ Rtype::Game::Game()
     _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
 
 
-    _ressourcePool.addModel("../../../resources/Disco.obj");
+    _ressourcePool.addModel("./resources/Disco.obj");
 
     float zoom = 1.0f;
     SetTargetFPS(60);
@@ -90,7 +90,7 @@ Rtype::Game::Game()
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
     _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Render{"../../../resources/Disco.obj"});
+    _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
 
     std::size_t enemy = _core->createEntity();
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
@@ -159,8 +159,6 @@ void Rtype::Game::update() {
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
 
-    std::cout << "jajouj" << velocityEntities.size() << std::endl;
-
     std::size_t entitesID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
@@ -208,8 +206,6 @@ void Rtype::Game::render()
         DrawGrid(1000, 1.0f);
     }
     _camera.EndMode();
-    DrawTexture(_backgroundTexture, velocities[backgrounds[0]]->getX(),
-                velocities[backgrounds[0]]->getY(), WHITE);
 
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();

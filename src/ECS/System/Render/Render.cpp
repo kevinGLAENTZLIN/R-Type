@@ -18,7 +18,7 @@ void ECS::Systems::SystemRender::update(
             }
             auto &position = positions[entity].value();
             auto &render = renders[entity].value();
-            raylib::Vector3 pos = Vector3(position.getX()/100, 0, position.getY()/100);
+            raylib::Vector3 pos(position.getX() / 100, 0, position.getY() / 100);
             render.render(ressourcePool.getModel(render.getPath()), pos);
     }
 }

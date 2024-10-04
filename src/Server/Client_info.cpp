@@ -1,0 +1,94 @@
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** Client_info
+*/
+
+#include "Client_info.hh"
+
+Rtype::client_info::client_info():
+	_id(-1), _x(0), _y(0), _AckExpected(0), _gameRoom(false),
+	_inGame(false), _port(-1), _addr("")
+{
+}
+
+Rtype::client_info::client_info(int id, int port, std::string addr):
+	_id(id), _x(0), _y(0), _AckExpected(0), _gameRoom(false),
+	_inGame(false), _port(port), _addr(addr)
+{
+}
+
+Rtype::client_info::~client_info()
+{
+}
+
+int Rtype::client_info::getId() const
+{
+	return _id;
+}
+
+void Rtype::client_info::setId(int id)
+{
+	_id = id;
+}
+
+int Rtype::client_info::getX() const
+{
+	return _x;
+}
+
+void Rtype::client_info::setX(int x)
+{
+	_x = x;
+}
+
+int Rtype::client_info::getY() const
+{
+	return _y;
+}
+
+void Rtype::client_info::setY(int y)
+{
+	_y = y;
+}
+
+int Rtype::client_info::getACK() const
+{
+	return _AckExpected;
+}
+
+void Rtype::client_info::setACK()
+{
+	_AckExpected++;
+}
+
+int Rtype::client_info::getRoom() const
+{
+	return _gameRoom;
+}
+
+void Rtype::client_info::setRoom(int room)
+{
+	_gameRoom = room;
+}
+
+int Rtype::client_info::getPort() const
+{
+	return _port;
+}
+
+void Rtype::client_info::setPort(int port)
+{
+	_port = port;
+}
+
+std::string Rtype::client_info::getAddr() const
+{
+	return _addr;
+}
+
+void Rtype::client_info::setAddr(std::string address)
+{
+	_addr = address;
+}

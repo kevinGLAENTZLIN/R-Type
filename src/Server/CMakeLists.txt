@@ -2,6 +2,7 @@ project(r-type_server)
 
 set(NAME_SERVER "${RTYPE}_server")
 set(SERVER_SOURCES
+    ./Client_info.cpp
     ./udp_server.cpp
     ./main.cpp
 )

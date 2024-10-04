@@ -13,7 +13,7 @@
 #include "udp_server.hh"
 
 Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port)
-: _socket(io_service, udp::endpoint(udp::v4(), port)), _clientsAddr()
+: _socket(io_service, udp::endpoint(udp::v4(), port)), _clientsAddr(), _clients()
 {
     std::memset(_data, 0, max_length);
     read_clients();
@@ -56,7 +56,7 @@ int Rtype::udpServer::get_sender_id()
 
     if (id == -1) {
         id = get_available_client_id();
-        _clientsAddr[id] = std::make_pair<std::string, int>(_senderEndpoint.address().to_string(), (int)_senderEndpoint.port());
+        _clients[id] = Rtype::client_info(id, (int)_senderEndpoint.port(), _senderEndpoint.address().to_string());
         send_to_client("Your new ID is " + std::to_string(id)); //! To refactor by the protocol control
     }
     return id;
@@ -68,8 +68,8 @@ int Rtype::udpServer::get_available_client_id()
 
     for (int i = 0; i < INT32_MAX; i++) {
         available = true;
-        for (auto client: _clientsAddr)
-            available &= client.first != i; 
+        for (auto client: _clients)
+            available &= client.second.getId() != i;
         if (available)
             return i;
     }
@@ -78,8 +78,8 @@ int Rtype::udpServer::get_available_client_id()
 
 int Rtype::udpServer::get_client_id_by_addr(std::string addr, int port)
 {
-    for (auto client: _clientsAddr)
-        if (client.second.first == addr && client.second.second == port)
+    for (auto client: _clients)
+        if (client.second.getAddr() == addr && client.second.getPort() == port)
             return client.first;
     return -1;
 }
@@ -91,7 +91,7 @@ bool Rtype::udpServer::is_client_by_addr(std::string addr, int port)
 
 void Rtype::udpServer::disconnect_client(int client_id)
 {
-    _clientsAddr.erase(client_id);
+    _clients.erase(client_id);
 }
 
 void Rtype::udpServer::send_to_client(std::string msg)
@@ -128,6 +128,6 @@ void Rtype::udpServer::send_to_client(std::pair<std::string, int> addr, std::str
 
 void Rtype::udpServer::send_to_clients(std::string msg)
 {
-    for(auto client: _clientsAddr)
-        send_to_client(client.second, msg);
+    for(auto client: _clients)
+        send_to_client(client.second.getAddr(), client.second.getPort(), msg);
 }

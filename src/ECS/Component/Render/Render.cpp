@@ -42,6 +42,14 @@ void ECS::Components::Render::render(raylib::Model &model, raylib::Vector3 posit
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
     model.Draw(position, rotation, 45.0f, scale, WHITE);
 }
+
+void ECS::Components::Render::renderBackground(raylib::Texture2D texture, raylib::Vector3 position)
+{
+    raylib::Vector3 rotation = {0.0f, 1.0f, 0.0f};
+    raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
+    texture.Draw(position, rotation, 45.0f, scale, WHITE);
+}
+
 const std::string ECS::Components::Render::getPath() const
 {
     return _path;

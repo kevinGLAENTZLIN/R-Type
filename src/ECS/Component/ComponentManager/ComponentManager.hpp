@@ -7,9 +7,13 @@
 #pragma once
 
 #include "SparseArray.hpp"
+#include "ComponentTypeRegistry.hpp"
+#include <cstddef>
 #include <unordered_map>
 #include <typeindex>
 #include <any>
+
+using Signature = std::bitset<32>;
 
 namespace ECS{
     namespace ComponentManager {
@@ -29,7 +33,7 @@ namespace ECS{
              * If an already mapped type is given, an exception is raised.
              * Once the SparseArray is created, this function maps it to the given type ID using getTypeId().
              *
-             * @tparam Component Component type of the sparseArray to be created and added to the map. 
+             * @tparam Component Component type of the sparseArray to be created and added to the map.
              * @return Reference to the created SparseArray in the map.
              */
             template <class Component>
@@ -68,23 +72,24 @@ namespace ECS{
                 return std::any_cast<const SparseArray<Component>&>(_sparseArrays.at(std::type_index(typeid(Component))));
             };
 
-            void entityDestroyed(std::size_t entityID) {
-                // Parcourt chaque SparseArray (chaque type de composant)
-                for (auto& [typeIndex, sparseArrayAny] : _sparseArrays) {
-                    // On essaie de caster vers un SparseArray de std::optional
-                    try {
-                        auto& sparseArray = std::any_cast<SparseArray<std::optional<std::any>>&>(sparseArrayAny);
-
-                        // Si l'ID d'entité est valide dans ce tableau, on le détruit
-                        if (entityID < sparseArray.size()) {
-                            sparseArray[entityID] = std::nullopt; // Composant supprimé
+            void entityDestroyed(std::size_t entity, Signature signature) {
+                for (std::size_t i = 0; i < signature.size(); i++) {
+                    if (signature[i]) {
+                        std::type_index componentType = ECS::CTypeRegistry::getTypeFromId(i);
+                        auto it = _sparseArrays.find(componentType);
+                        if (it != _sparseArrays.end()) {
+                            try {
+                                auto& sparseArray = std::any_cast<SparseArray<std::optional<std::any>&>>(it->second);
+                                if (entity < sparseArray.size()) {
+                                    sparseArray[entity] = std::nullopt;
+                                }
+                            } catch (const std::bad_any_cast& e) {
+                                std::cerr << "Bad any_cast for component type: " << componentType.name() << ", error: " << e.what() << std::endl;
+                            }
                         }
-                    } catch (const std::bad_any_cast& e) {
-                        // On ignore si le cast échoue (ce n'est pas le bon type de SparseArray)
-                        std::cerr << "Failed to cast SparseArray: " << e.what() << std::endl;
                     }
                 }
-            };
+            }
 
         private:
 

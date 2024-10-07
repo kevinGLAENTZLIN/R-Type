@@ -45,9 +45,10 @@ std::size_t ECS::Core::Core::createEntity()
  */
 void ECS::Core::Core::destroyEntity(std::size_t entity)
 {
+    Signature signature = _entityManager->getSignature(entity);
     _entityManager->destroyEntity(entity);
     _systemManager->entityDestroyed(entity);
-    _componentManager->entityDestroyed(entity);
+    _componentManager->entityDestroyed(entity, signature);
 }
 
 /**

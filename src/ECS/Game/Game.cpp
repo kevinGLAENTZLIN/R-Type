@@ -7,8 +7,6 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include <cstdlib>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 
@@ -108,87 +106,6 @@ Rtype::Game::~Game()
     std::cout << "Game destroyed" << std::endl;
 }
 
-// void Rtype::Game::initComponents()
-// {
-//     _core->registerComponent<ECS::Components::Position>();
-//     _core->registerComponent<ECS::Components::Velocity>();
-//     _core->registerComponent<ECS::Components::Hitbox>();
-//     _core->registerComponent<ECS::Components::Input>();
-//     _core->registerComponent<ECS::Components::Render>();
-//     _core->registerComponent<ECS::Components::Projectile>();
-//     _core->registerComponent<ECS::Components::Background>();
-// }
-
-// void Rtype::Game::initSystems()
-// {
-//     _core->registerSystem<ECS::Systems::SystemVelocity>();
-//     _core->registerSystem<ECS::Systems::Collision>();
-//     _core->registerSystem<ECS::Systems::ProjectileCollision>();
-//     _core->registerSystem<ECS::Systems::InputUpdates>();
-//     _core->registerSystem<ECS::Systems::SystemRender>();
-
-//     Signature velocitySystemSignature;
-//     velocitySystemSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
-//     velocitySystemSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
-//     _core->setSystemSignature<ECS::Systems::SystemVelocity>(velocitySystemSignature);
-
-//     Signature collisionSignature;
-//     collisionSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
-//     collisionSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
-//     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
-
-//     Signature projectileCollisionSignature;
-//     projectileCollisionSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
-//     projectileCollisionSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
-//     projectileCollisionSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Projectile>());
-//     _core->setSystemSignature<ECS::Systems::ProjectileCollision>(projectileCollisionSignature);
-
-//     Signature inputUpdatesSignature;
-//     inputUpdatesSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Input>());
-//     _core->setSystemSignature<ECS::Systems::InputUpdates>(inputUpdatesSignature);
-
-//     Signature renderSignature;
-//     renderSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
-//     renderSignature.set(
-//         ECS::CTypeRegistry::getTypeId<ECS::Components::Render>());
-//     _core->setSystemSignature<ECS::Systems::SystemRender>(renderSignature);
-// }
-
-// void Rtype::Game::initEntities()
-// {
-//     std::size_t player = _core->createEntity();
-//     _core->addComponent(player, ECS::Components::Position{200.0f, 300.0f});
-//     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
-//     _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
-//     _core->addComponent(player, ECS::Components::Input{});
-//     _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
-
-//     std::size_t enemy = _core->createEntity();
-//     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
-//     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
-//     _core->addComponent(enemy, ECS::Components::Hitbox{50.0f, 50.0f});
-
-//     std::size_t background = _core->createEntity();
-//     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-//     _core->addComponent(background, ECS::Components::Velocity{-2.0f, 0.0f});
-//     _core->addComponent(background, ECS::Components::Background{});
-
-//     std::size_t background2 = _core->createEntity();
-//     float oui = _backgroundTexture.width;
-//     _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
-//     _core->addComponent(background2, ECS::Components::Velocity{-2.0f, 0.0f});
-//     _core->addComponent(background2, ECS::Components::Background{});
-// }
-
 void Rtype::Game::run()
 {
     while (!_window.ShouldClose() && _isRunning) {
@@ -254,7 +171,6 @@ void Rtype::Game::update() {
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
-    // Update the camera to achieve a top-down view
 
     projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),

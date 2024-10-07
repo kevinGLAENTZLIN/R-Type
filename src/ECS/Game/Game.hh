@@ -43,18 +43,15 @@ namespace Rtype {
         void run();
 
     private:
+        ECS::RessourcePool _ressourcePool;
         void createProjectile(std::size_t entityID);
         void update();
         void render();
-        // void initComponents();
-        // void initSystems();
-        // void initEntities();
         void renderBackground(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions);
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;
-        ECS::RessourcePool _ressourcePool;
         Texture2D _backgroundTexture;
     };
 };

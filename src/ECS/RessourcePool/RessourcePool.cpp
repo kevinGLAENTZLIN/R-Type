@@ -40,7 +40,7 @@ void ECS::RessourcePool::addTexture(const std::string &TexturePath)
 {
     raylib::Image image(TexturePath);
     raylib::Texture texture(image);
-    std::cout << "Loaded texture: " << TexturePath << std::endl;
+
     _textures.emplace(TexturePath, std::move(texture));
     _texturesImages.emplace(TexturePath, std::move(image));
 }
@@ -54,6 +54,4 @@ void ECS::RessourcePool::addModel(const std::string &modelPath)
     defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
     _texturesModels.emplace(pngTexturePath, std::move(texture));
     _models.emplace(modelPath, std::move(defaultModel));
-
-    std::cout << "Loaded model: " << modelPath << std::endl;
 }

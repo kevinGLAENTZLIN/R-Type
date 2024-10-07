@@ -15,7 +15,7 @@ void ECS::Systems::SystemRender::update(
     raylib::Vector3 rotation = {0.0f, 0.0f, 0.0f};
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
     for (auto &entity : entities) {
-        if (!(renders[entity].has_value() || positions[entity].has_value())){
+        if (!(renders[entity].has_value() || positions[entity].has_value())) {
             continue;
         }
         auto &position = positions[entity].value();
@@ -28,7 +28,6 @@ void ECS::Systems::SystemRender::update(
             render.render(ressourcePool.getModel(render.getPath()), pos, rotation, scale);
             camera.EndMode();
         } else if (ECS::Utils::getRaylibFileType(path) == ECS::Utils::FileType::Texture) {
-            std::cout << "Texture" << std::endl;
             render.render(ressourcePool.getTexture(render.getPath()), pos, rotation, scale);
         } else {
             continue;

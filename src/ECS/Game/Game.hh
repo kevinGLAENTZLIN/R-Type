@@ -47,11 +47,9 @@ namespace Rtype {
         void createProjectile(std::size_t entityID);
         void update();
         void render();
-        void renderBackground(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions);
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;
-        Texture2D _backgroundTexture;
     };
 };

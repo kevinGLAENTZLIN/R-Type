@@ -16,10 +16,9 @@ Rtype::Game::Game()
     _core = std::make_unique<ECS::Core::Core>();
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetTargetFPS(60);
     _window.Init(1000, 800, "R-Type Game");
     _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
-    float zoom = 1.0f;
-    SetTargetFPS(60);
     _ressourcePool.addModel("./resources/Disco.obj");
     _ressourcePool.addTexture("./resources/background.png");
     _core->registerComponent<ECS::Components::Position>();
@@ -105,8 +104,7 @@ Rtype::Game::Game()
 
 Rtype::Game::~Game()
 {
-    UnloadTexture(_backgroundTexture);
-    std::cout << "Game destroyed" << std::endl;
+    _ressourcePool.UnloadAll();
 }
 
 void Rtype::Game::run()
@@ -181,18 +179,6 @@ void Rtype::Game::update() {
         projectileEntities, collisionEntities);
 }
 
-void Rtype::Game::renderBackground(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions)
-{
-    auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
-
-    for (size_t i = 0; i < backgrounds.size(); i++) {
-        if (positions[backgrounds[i]]->getX() == - (_ressourcePool.getTexture("./resources/background.png").width))
-            positions[backgrounds[i]]->setX(_ressourcePool.getTexture("./resources/background.png").width);
-        DrawTexture(_ressourcePool.getTexture("./resources/background.png"), positions[backgrounds[i]]->getX(),
-                    positions[backgrounds[i]]->getY(), WHITE);
-    }
-}
-
 void Rtype::Game::render()
 {
     BeginDrawing();
@@ -203,17 +189,15 @@ void Rtype::Game::render()
     auto &velocities = _core->getComponents<ECS::Components::Velocity>();
 
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
-    auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
     auto renderSystem = _core->getSystem<ECS::Systems::SystemRender>();
     auto renderEntities  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender>());
-    {
-        renderSystem->update(_core->getComponents<ECS::Components::Position>(),
-                             _core->getComponents<ECS::Components::Render>(),
-                             renderEntities,
-                             _ressourcePool,
-                             _camera);
-    }
+
+    renderSystem->update(_core->getComponents<ECS::Components::Position>(),
+                        _core->getComponents<ECS::Components::Render>(),
+                        renderEntities,
+                        _ressourcePool,
+                        _camera);
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();
         auto &hitbox = hitboxes[toDraw[i]].value();

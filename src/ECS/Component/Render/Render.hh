@@ -18,6 +18,7 @@ namespace ECS {
             const raylib::Color &getColor() const;
             void setColor(const raylib::Color &color);
             const std::string getPath() const;
+
         private:
             raylib::Color _color;
             std::string _path;

@@ -40,7 +40,7 @@ void ECS::Components::Render::render(raylib::Model &model, raylib::Vector3 posit
 void ECS::Components::Render::render(raylib::Texture &texture, raylib::Vector3 position, raylib::Vector3 rotation, raylib::Vector3 scale)
 {
     Vector2 pos = {position.GetX(), position.GetY()};
-    std::cout << "pos: " << pos.x << " " << pos.y << std::endl;
+
     texture.Draw(pos, rotation.GetZ(), scale.GetX(), _color);
 }
 

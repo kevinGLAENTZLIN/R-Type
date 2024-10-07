@@ -23,7 +23,9 @@ Rtype::Game::Game()
     float zoom = 1.0f;
     SetTargetFPS(60);
     _ressourcePool.addModel("./resources/Disco.obj");
-    _ressourcePool.addTexture("background.png");
+    _backgroundTexture = raylib::Texture("background.png");
+    _backgroundStars = raylib::Texture("starsBackground.png");
+
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
@@ -78,28 +80,46 @@ Rtype::Game::Game()
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
     _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
+//    _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
 
     std::size_t enemy = _core->createEntity();
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{50.0f, 50.0f});
 
+    float backgroundWidth = _backgroundTexture.GetWidth();
+    float backgroundHeight = _backgroundTexture.GetHeight();
+//    float starWidth = _backgroundStars.GetWidth();
+
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
     _core->addComponent(background, ECS::Components::Velocity{-0.5f, 0.0f});
     _core->addComponent(background, ECS::Components::Background{});
 
-    float oui = _ressourcePool.getTexture("background.png").width;
     std::size_t background2 = _core->createEntity();
-    _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
+    _core->addComponent(background2, ECS::Components::Position{backgroundWidth, 0.0f});
     _core->addComponent(background2, ECS::Components::Velocity{-0.5f, 0.0f});
     _core->addComponent(background2, ECS::Components::Background{});
 
-    std::size_t background3 = _core->createEntity();
-    _core->addComponent(background3, ECS::Components::Position{oui * 2, 0.0f});
-    _core->addComponent(background3, ECS::Components::Velocity{-0.5f, 0.0f});
-    _core->addComponent(background3, ECS::Components::Background{});
+    std::size_t starBackground1 = _core->createEntity();
+    _core->addComponent(starBackground1, ECS::Components::Position{backgroundWidth / 2, 0.0f});
+    _core->addComponent(starBackground1, ECS::Components::Velocity{-1.25f, 0.0f});
+    _core->addComponent(starBackground1, ECS::Components::Background{});
+
+    std::size_t starBackground2 = _core->createEntity();
+    _core->addComponent(starBackground2, ECS::Components::Position{backgroundWidth * 3 / 2, 0.0f});
+    _core->addComponent(starBackground2, ECS::Components::Velocity{-1.25, 0.0f});
+    _core->addComponent(starBackground2, ECS::Components::Background{});
+
+    std::size_t starForeground1 = _core->createEntity();
+    _core->addComponent(starForeground1, ECS::Components::Position{backgroundWidth / 2, 0.0f});
+    _core->addComponent(starForeground1, ECS::Components::Velocity{-4.0f, 0.0f});
+    _core->addComponent(starForeground1, ECS::Components::Background{});
+
+    std::size_t starForeground2 = _core->createEntity();
+    _core->addComponent(starForeground2, ECS::Components::Position{backgroundWidth * 3 / 2, backgroundHeight * 2 / 10});
+    _core->addComponent(starForeground2, ECS::Components::Velocity{-4.0f, 0.0f});
+    _core->addComponent(starForeground2, ECS::Components::Background{});
 }
 
 Rtype::Game::~Game()
@@ -267,10 +287,27 @@ void Rtype::Game::renderBackground(ECS::ComponentManager::SparseArray<ECS::Compo
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
     for (size_t i = 0; i < backgrounds.size(); i++) {
-        if (positions[backgrounds[i]]->getX() == - (_ressourcePool.getTexture("background.png").width))
-            positions[backgrounds[i]]->setX(_ressourcePool.getTexture("background.png").width);
-        DrawTexture(_ressourcePool.getTexture("background.png"), positions[backgrounds[i]]->getX(),
-                    positions[backgrounds[i]]->getY(), WHITE);
+        if (i  < 2) {
+            if (positions[backgrounds[i]]->getX() <= - (_backgroundTexture.width)) 
+                positions[backgrounds[i]]->setX(_backgroundTexture.width);
+            _backgroundTexture.Draw(
+                raylib::Vector2(positions[backgrounds[i]]->getX(), positions[backgrounds[i]]->getY()),
+                0, 1, WHITE);
+        }
+        if (i >= 2 && i < 4){
+            if (positions[backgrounds[i]]->getX() <= - (_backgroundStars.width * 5))
+                positions[backgrounds[i]]->setX(_backgroundTexture.width * 3 / 2);
+            _backgroundStars.Draw(
+                raylib::Vector2(positions[backgrounds[i]]->getX(), positions[backgrounds[i]]->getY()),
+                0, 5, WHITE);
+        }
+        if (i >= 4) {
+            if (positions[backgrounds[i]]->getX() <= - (_backgroundStars.width * 4))
+                positions[backgrounds[i]]->setX(_backgroundTexture.width * 3 / 2);
+            _backgroundStars.Draw(
+                raylib::Vector2(positions[backgrounds[i]]->getX(), positions[backgrounds[i]]->getY()),
+                0, 4, WHITE);
+        }
     }
 }
 

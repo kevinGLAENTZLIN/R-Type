@@ -55,6 +55,7 @@ namespace Rtype {
         raylib::Window _window;
         raylib::Camera3D _camera;
         ECS::RessourcePool _ressourcePool;
-        Texture2D _backgroundTexture;
+        raylib::Texture _backgroundTexture;
+        raylib::Texture _backgroundStars;
     };
 };

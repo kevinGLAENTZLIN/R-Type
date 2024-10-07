@@ -17,6 +17,7 @@
 #include <map>
 #include <string>
 #include <boost/asio.hpp>
+#include "Client_info.hh"
 
 using boost::asio::ip::udp;
 using boost::asio::ip::address;
@@ -75,6 +76,12 @@ namespace Rtype {
             int get_client_id_by_addr(std::string addr, int port);
 
             /**
+             * @brief Retrieves the last sender client ID.
+             * @return Client ID if found, -1 otherwise.
+             */
+            int get_sender_client_id();
+
+            /**
              * @brief Checks if a client exists by its address.
              * @param addr Client's IP address.
              * @param port Client's port number.
@@ -115,10 +122,75 @@ namespace Rtype {
              */
             void send_to_clients(std::string msg);
 
+            /**
+             * @brief Sends a command to the last sender client.
+             * 
+             * This function uses variadic arguments to handle parameters of the command to send.
+             * Also it pushes the command with its parameters to the client's history.
+             * 
+             * @param function_type The type of command to be sent.
+             * @param function_index The index of the command to be sent.
+             * @param ... Parameters for the command to send in the right order.
+             */
+            void send_to_client(int function_type, int function_index, ...);
+
+            /**
+             * @brief Sends a command to a specific client identified by its IP address and port.
+             * 
+             * This function uses variadic arguments to handle parameters of the command to send.
+             * Also it pushes the command with its parameters to the client's history.
+             * 
+             * @param addr_ip The IP address of the client.
+             * @param port The port of the client.
+             * @param function_type The type of command to be sent.
+             * @param function_index The index of the command to be sent.
+             * @param ... Parameters for the command to send in the right order.
+             */
+            void send_to_client(std::string addr_ip, int port, int function_type, int function_index, ...);
+
+            /**
+             * @brief Sends a command to a specific client identified by its IP address and port.
+             * 
+             * This function uses variadic arguments to handle parameters of the command to send.
+             * Also it pushes the command with its parameters to the client's history.
+             * 
+             * @param addr Client's address as a pair of IP and port.
+             * @param function_type The type of command to be sent.
+             * @param function_index The index of the command to be sent.
+             * @param ... Parameters for the command to send in the right order.
+             */
+            void send_to_client(std::pair<std::string, int> addr, int function_type, int function_index, ...);
+
+            /**
+             * @brief Sends a command to a specific client identified by its ID.
+             * 
+             * This function uses variadic arguments to handle parameters of the command to send.
+             * Also it pushes the command with its parameters to the client's history.
+             * 
+             * @param id ID of the client.
+             * @param function_type The type of command to be sent.
+             * @param function_index The index of the command to be sent.
+             * @param ... Parameters for the command to send in the right order.
+             */
+            void send_to_client(int id, int function_type, int function_index, ...);
+
+            /**
+             * @brief Sends a command to all clients identified.
+             * 
+             * This function uses variadic arguments to handle parameters of the command to send.
+             * Also it pushes the command with its parameters to the client's history.
+             * 
+             * @param function_type The type of command to be sent.
+             * @param function_index The index of the command to be sent.
+             * @param ... Parameters for the command to send in the right order.
+             */
+            void send_to_clients(int function_type, int function_index, ...);
+
+
             udp::socket _socket;
             udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
-            std::map<int, std::pair<std::string, int>> _clientsAddr;
+            std::map<int, Rtype::client_info> _clients;
     };
 }

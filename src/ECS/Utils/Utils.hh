@@ -7,14 +7,27 @@
 
 #pragma once
 #include <iostream>
+#include <string>
+#include <algorithm>
+#include <filesystem>
 
 #include "../Component/Position/Position.hpp"
 #include "../Component/Hitbox/Hitbox.hh"
 
 namespace ECS {
-    
+
     class Utils {
     public:
+        enum FileType {
+            Unknown = 0,
+            Texture,
+            Model,
+            Audio,
+            Font,
+            Shader,
+            Data
+        };
+        static FileType getRaylibFileType(const std::string& path);
         static bool checkCollision(
             const ECS::Components::Position &posA,
             const ECS::Components::Hitbox &hitboxA,

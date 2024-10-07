@@ -26,35 +26,32 @@ void ECS::RessourcePool::UnloadAll()
     _models.clear();
 }
 
-raylib::Model& ECS::RessourcePool::getModel(std::string modelPath) {
-    if (_models.find(modelPath) == _models.end()) {
-        //_models[modelPath] = LoadModel(modelPath.c_str());
-        std::cout << "Loaded model: " << modelPath << std::endl;
-    }
+raylib::Model& ECS::RessourcePool::getModel(std::string modelPath)
+{
     return _models[modelPath];
 }
 
-raylib::Texture& ECS::RessourcePool::getTexture(std::string texturePath) {
-    if (_textures.find(texturePath) == _textures.end()) {
-        _textures[texturePath] = LoadTexture(texturePath.c_str());
-        std::cout << "Loaded texture: " << texturePath << std::endl;
-    }
+raylib::Texture& ECS::RessourcePool::getTexture(std::string texturePath)
+{
     return _textures[texturePath];
 }
 
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)
 {
-    raylib::Texture texture = LoadTexture(TexturePath.c_str());
+    raylib::Texture texture(TexturePath);
     std::cout << "Loaded texture: " << TexturePath << std::endl;
     _textures.emplace(TexturePath, std::move(texture));
 }
 
-void ECS::RessourcePool::addModel(const std::string &modelPath) {
+void ECS::RessourcePool::addModel(const std::string &modelPath)
+{
     std::string pngTexturePath = modelPath.substr(0, modelPath.find_last_of('.')) + ".png";
-    raylib::Texture texture = LoadTexture(pngTexturePath.c_str());
-    std::cout << "Loaded texture: " << pngTexturePath << std::endl;
-
+    raylib::Texture texture(pngTexturePath.c_str());
     raylib::Model defaultModel(modelPath);
-    //defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-    _models.emplace(modelPath,std::move(defaultModel));
+
+    defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    _texturesModels.emplace(pngTexturePath, std::move(texture));
+    _models.emplace(modelPath, std::move(defaultModel));
+
+    std::cout << "Loaded model: " << modelPath << std::endl;
 }

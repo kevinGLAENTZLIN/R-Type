@@ -21,15 +21,14 @@ namespace ECS {
 
             void UnloadAll();
             raylib::Model &getModel(std::string modelPath);
-            raylib::Texture2D &getTexture(std::string texturePath);
+            raylib::Texture &getTexture(std::string texturePath);
 
             void addModel(const std::string &modelPath);
             void addTexture(const std::string &TexturePath);
         private:
 
             std::map<const std::string, raylib::Model> _models;
-            std::map<const std::string, raylib::Texture2D> _textures;
-            std::vector<std::unique_ptr<raylib::Model>> _pitier;
-            raylib::Model _defaultModel;
+            std::map<const std::string, raylib::Texture> _texturesModels;
+            std::map<const std::string, raylib::Texture> _textures;
     };
 }

@@ -22,8 +22,8 @@ Rtype::Game::Game()
     _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
     float zoom = 1.0f;
     SetTargetFPS(60);
-    _ressourcePool.addModel("./resources/Disco.obj");
-    _ressourcePool.addTexture("background.png");
+    _ressourcePool.addModel("../../../resources/Disco.obj");
+    _ressourcePool.addTexture("../../../resources/background.png");
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
@@ -78,7 +78,7 @@ Rtype::Game::Game()
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
     _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
+    _core->addComponent(player, ECS::Components::Render{"../../../resources/Disco.obj"});
 
     std::size_t enemy = _core->createEntity();
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
@@ -90,7 +90,7 @@ Rtype::Game::Game()
     _core->addComponent(background, ECS::Components::Velocity{-0.5f, 0.0f});
     _core->addComponent(background, ECS::Components::Background{});
 
-    float oui = _ressourcePool.getTexture("background.png").width;
+    float oui = _ressourcePool.getTexture("../../../resources/background.png").width;
     std::size_t background2 = _core->createEntity();
     _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
     _core->addComponent(background2, ECS::Components::Velocity{-0.5f, 0.0f});
@@ -170,7 +170,7 @@ Rtype::Game::~Game()
 //     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
 //     _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
 //     _core->addComponent(player, ECS::Components::Input{});
-//     _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
+//     _core->addComponent(player, ECS::Components::Render{"../../../resources/Disco.obj"});
 
 //     std::size_t enemy = _core->createEntity();
 //     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
@@ -267,9 +267,9 @@ void Rtype::Game::renderBackground(ECS::ComponentManager::SparseArray<ECS::Compo
     auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
     for (size_t i = 0; i < backgrounds.size(); i++) {
-        if (positions[backgrounds[i]]->getX() == - (_ressourcePool.getTexture("background.png").width))
-            positions[backgrounds[i]]->setX(_ressourcePool.getTexture("background.png").width);
-        DrawTexture(_ressourcePool.getTexture("background.png"), positions[backgrounds[i]]->getX(),
+        if (positions[backgrounds[i]]->getX() == - (_ressourcePool.getTexture("../../../resources/background.png").width))
+            positions[backgrounds[i]]->setX(_ressourcePool.getTexture("../../../resources/background.png").width);
+        DrawTexture(_ressourcePool.getTexture("../../../resources/background.png"), positions[backgrounds[i]]->getX(),
                     positions[backgrounds[i]]->getY(), WHITE);
     }
 }

@@ -13,11 +13,12 @@ namespace ECS {
             Render& operator=(const Render& other);
             ~Render() = default;
 
-            void render(raylib::Model &model, raylib::Vector3 position);
+            void render(raylib::Model &model, raylib::Vector3 position, raylib::Vector3 rotation, raylib::Vector3 scale);
+            void render(raylib::Texture &texture, raylib::Vector3 position, raylib::Vector3 rotation, raylib::Vector3 scale);
+            const raylib::Color &getColor() const;
+            void setColor(const raylib::Color &color);
             const std::string getPath() const;
         private:
-            raylib::Model _model;
-            raylib::Texture _texture;
             raylib::Color _color;
             std::string _path;
             float _rotation;

@@ -46,6 +46,8 @@ set(LIB_SOURCES
     ./Component/Velocity/Velocity.cpp
     ./Component/Hitbox/Hitbox.cpp
     ./Component/Text/Text.cpp
+    ./Component/Rotate/Rotate.cpp
+    ./Component/Scale/Scale.cpp
     ./Component/Volume/Volume.cpp
     ./Component/Input/Input.cpp
     ./System/Velocity/Velocity.cpp

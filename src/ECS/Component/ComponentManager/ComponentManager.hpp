@@ -67,16 +67,25 @@ namespace ECS{
             SparseArray<Component> const &getComponents() const{
                 return std::any_cast<const SparseArray<Component>&>(_sparseArrays.at(std::type_index(typeid(Component))));
             };
-            
-            void entityDestroyed(std::size_t entity) {
-                for (auto& [type, sparseArrayAny] : _sparseArrays) {
-                    auto& sparseArray = std::any_cast<SparseArray<std::optional<std::any>>&>(sparseArrayAny);
-                    if (entity < sparseArray.size()) {
-                        sparseArray[entity] = std::nullopt;
+
+            void entityDestroyed(std::size_t entityID) {
+                // Parcourt chaque SparseArray (chaque type de composant)
+                for (auto& [typeIndex, sparseArrayAny] : _sparseArrays) {
+                    // On essaie de caster vers un SparseArray de std::optional
+                    try {
+                        auto& sparseArray = std::any_cast<SparseArray<std::optional<std::any>>&>(sparseArrayAny);
+
+                        // Si l'ID d'entité est valide dans ce tableau, on le détruit
+                        if (entityID < sparseArray.size()) {
+                            sparseArray[entityID] = std::nullopt; // Composant supprimé
+                        }
+                    } catch (const std::bad_any_cast& e) {
+                        // On ignore si le cast échoue (ce n'est pas le bon type de SparseArray)
+                        std::cerr << "Failed to cast SparseArray: " << e.what() << std::endl;
                     }
                 }
             };
-            
+
         private:
 
             /**

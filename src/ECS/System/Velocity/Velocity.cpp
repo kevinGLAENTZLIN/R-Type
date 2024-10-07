@@ -12,9 +12,9 @@ void ECS::Systems::SystemVelocity::update(
     std::vector<std::size_t> &entities)
 {
     for (auto &entity : entities) {
-            auto &position = positions[entity].value();
-            auto &velocity = velocities[entity].value();
-            position.setX(position.getX() + velocity.getX());
-            position.setY(position.getY() + velocity.getY());
+        auto &position = positions[entity].value();
+        auto &velocity = velocities[entity].value();
+        position.setX(position.getX() + velocity.getX());
+        position.setY(position.getY() + velocity.getY());
     }
 }

@@ -11,6 +11,7 @@
 #include <cstdlib>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
+std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
 
 Rtype::Game::Game()
     : _isRunning(true)
@@ -147,6 +148,22 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Projectile{});
 }
 
+void Rtype::Game::destroyProjectile(std::size_t entityID)
+{
+    _core->destroyEntity(entityID);
+/*
+    auto &positions = _core->getComponents<ECS::Components::Position>();
+    if (!positions[entityID].has_value()) {
+        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+        return;
+    }
+    const ECS::Components::Position &entityPos = positions[entityID].value();
+    std::size_t projectile = _core->createEntity();
+    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + 60.0f, entityPos.getY() + 10.0f});
+    _core->addComponent(projectile, ECS::Components::Velocity{5.0f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Hitbox{10.0f, 5.0f});
+    _core->addComponent(projectile, ECS::Components::Projectile{});
+ */}
 
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
@@ -178,10 +195,13 @@ void Rtype::Game::update() {
                            collisionEntities);
     // Update the camera to achieve a top-down view
 
-    projectileCollisionSystem->projectileIsHit(
+    std::size_t projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
         _core->getComponents<ECS::Components::Hitbox>(),
         projectileEntities, collisionEntities);
+
+    if (projectileEntityId <= 10000)
+        destroyProjectile(projectileEntityId);
 }
 
 void Rtype::Game::render()

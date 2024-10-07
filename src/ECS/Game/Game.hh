@@ -44,6 +44,7 @@ namespace Rtype {
 
     private:
         void createProjectile(std::size_t entityID);
+        void destroyProjectile(std::size_t entityID);
         void update();
         void render();
         bool _isRunning;

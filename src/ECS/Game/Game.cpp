@@ -7,8 +7,6 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include <cstdlib>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 
@@ -17,14 +15,12 @@ Rtype::Game::Game()
 {
     _core = std::make_unique<ECS::Core::Core>();
 
-    _window.Init(1290, 720, "R-Type Game");
-    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
-
-
-    _ressourcePool.addModel("./resources/Disco.obj");
-
-    float zoom = 1.0f;
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
+    _window.Init(1000, 800, "R-Type Game");
+    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+    _ressourcePool.addModel("./resources/Disco.obj");
+    _ressourcePool.addTexture("./resources/background.png");
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
@@ -46,16 +42,12 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
     _core->setSystemSignature<ECS::Systems::SystemVelocity>(velocitySystemSignature);
 
-    std::cout << "velocity sign " << velocitySystemSignature << std::endl;
-
     Signature collisionSignature;
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
-
-    std::cout << "collision sign " << collisionSignature << std::endl;
 
     Signature projectileCollisionSignature;
     projectileCollisionSignature.set(
@@ -66,14 +58,10 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Projectile>());
     _core->setSystemSignature<ECS::Systems::ProjectileCollision>(projectileCollisionSignature);
 
-    std::cout << "projectileCollision sign " << projectileCollisionSignature << std::endl;
-
     Signature inputUpdatesSignature;
     inputUpdatesSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Input>());
     _core->setSystemSignature<ECS::Systems::InputUpdates>(inputUpdatesSignature);
-
-    std::cout << "input sign " << inputUpdatesSignature << std::endl;
 
     Signature renderSignature;
     renderSignature.set(
@@ -81,9 +69,6 @@ Rtype::Game::Game()
     renderSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Render>());
     _core->setSystemSignature<ECS::Systems::SystemRender>(renderSignature);
-
-    std::cout << "render sign " << renderSignature << std::endl;
-
 
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{200.0f, 300.0f});
@@ -99,16 +84,27 @@ Rtype::Game::Game()
 
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    _core->addComponent(background, ECS::Components::Velocity{10.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Velocity{-0.5f, 0.0f});
     _core->addComponent(background, ECS::Components::Background{});
+    _core->addComponent(background, ECS::Components::Render{"./resources/background.png"});
 
-    _backgroundTexture = LoadTexture("backgroundTest.png");
+    float oui = _ressourcePool.getTexture("./resources/background.png").width;
+    std::size_t background2 = _core->createEntity();
+    _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
+    _core->addComponent(background2, ECS::Components::Velocity{-0.5f, 0.0f});
+    _core->addComponent(background2, ECS::Components::Background{});
+    _core->addComponent(background2, ECS::Components::Render{"./resources/background.png"});
+
+    std::size_t background3 = _core->createEntity();
+    _core->addComponent(background3, ECS::Components::Position{oui * 2, 0.0f});
+    _core->addComponent(background3, ECS::Components::Velocity{-0.5f, 0.0f});
+    _core->addComponent(background3, ECS::Components::Background{});
+    _core->addComponent(background3, ECS::Components::Render{"./resources/background.png"});
 }
 
 Rtype::Game::~Game()
 {
-    UnloadTexture(_backgroundTexture);
-    std::cout << "Game destroyed" << std::endl;
+    _ressourcePool.UnloadAll();
 }
 
 void Rtype::Game::run()
@@ -135,6 +131,7 @@ std::vector<std::size_t> getAllInputs() {
 void Rtype::Game::createProjectile(std::size_t entityID)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
+
     if (!positions[entityID].has_value()) {
         std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
         return;
@@ -146,7 +143,6 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Hitbox{10.0f, 5.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
 }
-
 
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
@@ -176,7 +172,6 @@ void Rtype::Game::update() {
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
-    // Update the camera to achieve a top-down view
 
     projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
@@ -194,19 +189,15 @@ void Rtype::Game::render()
     auto &velocities = _core->getComponents<ECS::Components::Velocity>();
 
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
-    auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
-    auto renderSystem = _core->getSystem<ECS::Systems::SystemRender>();
-    auto renderEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender>());
-    _camera.BeginMode();
-    {
-    renderSystem->update(_core->getComponents<ECS::Components::Position>(),
-                         _core->getComponents<ECS::Components::Render>(),
-                         renderEntities,
-                         _ressourcePool);
-        DrawGrid(1000, 1.0f);
-    }
-    _camera.EndMode();
 
+    auto renderSystem = _core->getSystem<ECS::Systems::SystemRender>();
+    auto renderEntities  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender>());
+
+    renderSystem->update(_core->getComponents<ECS::Components::Position>(),
+                        _core->getComponents<ECS::Components::Render>(),
+                        renderEntities,
+                        _ressourcePool,
+                        _camera);
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();
         auto &hitbox = hitboxes[toDraw[i]].value();

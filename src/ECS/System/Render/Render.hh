@@ -12,6 +12,7 @@
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/Render/Render.hh"
 #include "../../RessourcePool/RessourcePool.hh"
+#include "../../Utils/Utils.hh"
 
 namespace ECS {
     namespace Systems {
@@ -24,7 +25,8 @@ namespace ECS {
             void update(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
                         ECS::ComponentManager::SparseArray<ECS::Components::Render> &renders,
                         std::vector<std::size_t> &entities,
-                        ECS::RessourcePool &ressourcePool);
+                        ECS::RessourcePool &ressourcePool,
+                        raylib::Camera3D &camera);;
         };
     }
 }

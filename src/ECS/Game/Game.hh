@@ -27,7 +27,8 @@
 #include "../System/Collision/Collision.hh"
 #include "../System/ProjectileCollision/ProjectileCollision.hh"
 #include "../System/InputUpdates/InputUpdates.hh"
-#include "../System/Render/Render.hh"
+#include "../System/Render3D/Render3D.hh"
+#include "../System/Render2D/Render2D.hh"
 
 #include "../RessourcePool/RessourcePool.hh"
 #include "raylib-cpp.hpp"

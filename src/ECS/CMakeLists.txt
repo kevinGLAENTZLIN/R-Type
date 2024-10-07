@@ -55,8 +55,10 @@ set(LIB_SOURCES
     ./System/ProjectileCollision/ProjectileCollision.cpp
     ./System/InputUpdates/InputUpdates.cpp
     ./Game/Game.cpp
-    ./Component/Render/Render.cpp
-    ./System/Render/Render.cpp
+    ./Component/Render2D/Render2D.cpp
+    ./Component/Render3D/Render3D.cpp
+    ./System/Render2D/Render2D.cpp
+    ./System/Render3D/Render3D.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )

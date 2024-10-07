@@ -31,15 +31,16 @@ void ECS::Systems::InputUpdates::updateInputedVelocity(
     float velX = 0;
     float velY = 0;
 
+    float veloValue = 0.1f;
     for (std::size_t i = 0; i < entities.size(); i++) {
         if (inputs[entities[i]]->contains(ECS::Components::RIGHT))
-            velX += 2;
+            velX += veloValue;
         if (inputs[entities[i]]->contains(ECS::Components::UP))
-            velY -= 2;
+            velY -= veloValue;
         if (inputs[entities[i]]->contains(ECS::Components::LEFT))
-            velX -= 2;
+            velX -= veloValue;
         if (inputs[entities[i]]->contains(ECS::Components::DOWN))
-            velY += 2;
+            velY += veloValue;
         velocities[entities[i]]->setVelPair(std::make_pair(velX, velY));
     }
     inputs.clear();

@@ -17,7 +17,7 @@ bool ECS::Utils::checkCollision(
             posA.getY() + hitboxA.getHeight() > posB.getY());
 }
 
-static ECS::Utils::FileType getRaylibFileType(const std::string& path) {
+ECS::Utils::FileType ECS::Utils::getRaylibFileType(const std::string& path) {
         std::string extension = std::filesystem::path(path).extension().string();
         std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 

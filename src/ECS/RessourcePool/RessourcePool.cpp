@@ -9,21 +9,21 @@
 #include "RessourcePool.hh"
 
 ECS::RessourcePool::RessourcePool()
-{
-}
+{}
 
 ECS::RessourcePool::~RessourcePool()
-{
-    UnloadAll();
-}
+{}
 
 void ECS::RessourcePool::UnloadAll()
 {
     for (auto &model : _models) {
-        UnloadModel(model.second);
-        std::cout << "Unloaded model: " << model.first << std::endl;
+        if (model.second.meshes != nullptr) {
+            model.second.Unload();
+            std::cout << "Unloaded model: " << model.first << std::endl;
+        } else {
+            std::cout << "Model: " << model.first << " already unloaded" << std::endl;
+        }
     }
-    _models.clear();
 }
 
 raylib::Model& ECS::RessourcePool::getModel(std::string modelPath)

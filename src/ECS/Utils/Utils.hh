@@ -27,12 +27,12 @@ namespace ECS {
             Shader,
             Data
         };
-        static FileType getRaylibFileType(const std::string& path);
         static bool checkCollision(
             const ECS::Components::Position &posA,
             const ECS::Components::Hitbox &hitboxA,
             const ECS::Components::Position &posB,
             const ECS::Components::Hitbox &hitboxB);
 
+        static FileType getRaylibFileType(const std::string& path);
     };
 }

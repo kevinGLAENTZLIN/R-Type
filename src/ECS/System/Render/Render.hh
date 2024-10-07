@@ -12,6 +12,7 @@
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/Render/Render.hh"
 #include "../../RessourcePool/RessourcePool.hh"
+#include "../../Utils/Utils.hh"
 
 namespace ECS {
     namespace Systems {

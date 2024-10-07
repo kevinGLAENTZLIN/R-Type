@@ -14,12 +14,21 @@ void ECS::Systems::SystemRender::update(
     raylib::Vector3 rotation = {0.0f, 0.0f, 0.0f};
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
     for (auto &entity : entities) {
-            if (!(renders[entity].has_value() || positions[entity].has_value())){
-               continue;
-            }
-            auto &position = positions[entity].value();
-            auto &render = renders[entity].value();
-            raylib::Vector3 pos(position.getX() / 100, 0, position.getY() / 100);
+        if (!(renders[entity].has_value() || positions[entity].has_value())){
+            continue;
+        }
+        auto &position = positions[entity].value();
+        auto &render = renders[entity].value();
+        raylib::Vector3 pos(position.getX() , 0, position.getY());
+        const std::string path = render.getPath();
+
+        if (ECS::Utils::getRaylibFileType(path) == ECS::Utils::FileType::Model) {
             render.render(ressourcePool.getModel(render.getPath()), pos, rotation, scale);
+        } else if (ECS::Utils::getRaylibFileType(path) == ECS::Utils::FileType::Texture) {
+            std::cout << "Texture" << std::endl;
+            render.render(ressourcePool.getTexture(render.getPath()), pos, rotation, scale);
+        } else {
+            continue;
+        }
     }
 }

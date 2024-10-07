@@ -67,7 +67,16 @@ namespace ECS{
             SparseArray<Component> const &getComponents() const{
                 return std::any_cast<const SparseArray<Component>&>(_sparseArrays.at(std::type_index(typeid(Component))));
             };
-
+            
+            void entityDestroyed(std::size_t entity) {
+                for (auto& [type, sparseArrayAny] : _sparseArrays) {
+                    auto& sparseArray = std::any_cast<SparseArray<std::optional<std::any>>&>(sparseArrayAny);
+                    if (entity < sparseArray.size()) {
+                        sparseArray[entity] = std::nullopt;
+                    }
+                }
+            };
+            
         private:
 
             /**

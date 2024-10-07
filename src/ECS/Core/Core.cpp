@@ -47,6 +47,7 @@ void ECS::Core::Core::destroyEntity(std::size_t entity)
 {
     _entityManager->destroyEntity(entity);
     _systemManager->entityDestroyed(entity);
+    _componentManager->entityDestroyed(entity);
 }
 
 /**

@@ -14,7 +14,6 @@ namespace ECS {
             ~Render() = default;
 
             void render(raylib::Model &model, raylib::Vector3 position);
-            void renderBackground(raylib::Texture2D texture, raylib::Vector3 position)
             const std::string getPath() const;
         private:
             raylib::Model _model;

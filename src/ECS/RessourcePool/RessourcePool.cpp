@@ -28,7 +28,7 @@ void ECS::RessourcePool::UnloadAll()
 
 raylib::Model& ECS::RessourcePool::getModel(std::string modelPath) {
     if (_models.find(modelPath) == _models.end()) {
-        _models[modelPath] = LoadModel(modelPath.c_str());
+        //_models[modelPath] = LoadModel(modelPath.c_str());
         std::cout << "Loaded model: " << modelPath << std::endl;
     }
     return _models[modelPath];

@@ -7,6 +7,11 @@
 
 #include "Client_info.hh"
 
+/**
+ * @file Client_info.cpp
+ * @brief Implementation of the client info class in order to handle information of the clients in the R-Type Game
+ */
+
 Rtype::client_info::client_info():
 	_id(-1), _x(0), _y(0), _AckExpected(0), _AckToSend(0), _gameRoom(false),
 	_inGame(false), _port(-1), _addr("")

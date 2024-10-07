@@ -79,7 +79,7 @@ namespace ECS{
                         auto it = _sparseArrays.find(componentType);
                         if (it != _sparseArrays.end()) {
                             try {
-                                auto& sparseArray = std::any_cast<SparseArray<std::optional<std::any>&>>(it->second);
+                                auto sparseArray = std::any_cast<SparseArray<std::optional<std::any>>>(it->second);
                                 if (entity < sparseArray.size()) {
                                     sparseArray[entity] = std::nullopt;
                                 }
@@ -90,6 +90,7 @@ namespace ECS{
                     }
                 }
             }
+
 
         private:
 

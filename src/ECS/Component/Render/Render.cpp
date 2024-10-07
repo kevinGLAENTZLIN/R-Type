@@ -7,31 +7,54 @@
 
 #include "Render.hh"
 
-ECS::Components::Render::Render(std::string path, float rotation, float scale):
-    _texture(path), _rotation(rotation), _scale(scale)
-{}
-
-Texture2D &ECS::Components::Render::getTexture() const
+ECS::Components::Render::Render(const std::string path, float rotation, float scale):
+    _color(WHITE), _path(path), _rotation(rotation), _scale(scale)
 {
-    return _texture;
 }
 
-float ECS::Components::Render::getRotation() const
+ECS::Components::Render::Render(const Render& other):
+    _color(other._color),
+    _path(other._path),
+    _rotation(other._rotation),
+    _scale(other._scale)
+
 {
-    return _rotation;
 }
 
-float ECS::Components::Render::getScale() const
+ECS::Components::Render& ECS::Components::Render::operator=(const Render& other)
 {
-    return _scale;
+    if (this != &other) {
+        _color = other._color;
+        _rotation = other._rotation;
+        _scale = other._scale;
+        _path = other._path;
+    }
+    return *this;
 }
 
-void ECS::Components::Render::setRotation(float rotation)
+void ECS::Components::Render::render(raylib::Model &model, raylib::Vector3 position, raylib::Vector3 rotation, raylib::Vector3 scale)
 {
-    _rotation = rotation;
+    model.Draw(position, rotation, 45.0f, scale, _color);
 }
 
-void ECS::Components::Render::setScale(float scale)
+void ECS::Components::Render::render(raylib::Texture &texture, raylib::Vector3 position, raylib::Vector3 rotation, raylib::Vector3 scale)
 {
-    _scale = scale;
+    Vector2 pos = {position.GetX(), position.GetY()};
+
+    texture.Draw(pos, rotation.GetZ(), scale.GetX(), _color);
+}
+
+const raylib::Color& ECS::Components::Render::getColor() const
+{
+    return _color;
+}
+
+void ECS::Components::Render::setColor(const raylib::Color& color)
+{
+    _color = color;
+}
+
+const std::string ECS::Components::Render::getPath() const
+{
+    return _path;
 }

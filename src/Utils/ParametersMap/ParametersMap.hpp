@@ -70,46 +70,56 @@ namespace Utils
             static void init_map() 
             {
                 _parametersMap = {
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::NewClientConnected}, {0, 0}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::GamesAvailable}, {0, 0}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::CreateGame}, {0, 0}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::JoinGame}, {0, 0}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::GameWonLost}, {0, 0}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::SafetyCheck}, {0, 0}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::LevelComplete}, {0, 0}},
+                    {{InfoTypeEnum::GameInfo, GameInfoEnum::NewClientConnected}, {"bbi", "if"}},
+                    {{InfoTypeEnum::GameInfo, GameInfoEnum::GamesAvailable}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, GameInfoEnum::CreateGame}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, GameInfoEnum::JoinGame}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, GameInfoEnum::GameWonLost}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, GameInfoEnum::SafetyCheck}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, GameInfoEnum::LevelComplete}, {"", ""}},
 
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerSpawnOnGame}, {0, 0}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerDie}, {0, 0}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerMove}, {0, 0}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerAttack}, {0, 0}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerGotPowerUp}, {0, 0}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerHitAWall}, {0, 0}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerScore}, {0, 0}},
+                    {{InfoTypeEnum::Player, PlayerEnum::PlayerSpawnOnGame}, {"", ""}},
+                    {{InfoTypeEnum::Player, PlayerEnum::PlayerDie}, {"", ""}},
+                    {{InfoTypeEnum::Player, PlayerEnum::PlayerMove}, {"", ""}},
+                    {{InfoTypeEnum::Player, PlayerEnum::PlayerAttack}, {"", ""}},
+                    {{InfoTypeEnum::Player, PlayerEnum::PlayerGotPowerUp}, {"", ""}},
+                    {{InfoTypeEnum::Player, PlayerEnum::PlayerHitAWall}, {"", ""}},
+                    {{InfoTypeEnum::Player, PlayerEnum::PlayerScore}, {"", ""}},
 
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemySpawn}, {0, 0}},
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyDie}, {0, 0}},
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyMove}, {0, 0}},
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyAttack}, {0, 0}},
+                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemySpawn}, {"", ""}},
+                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyDie}, {"", ""}},
+                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyMove}, {"", ""}},
+                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyAttack}, {"", ""}},
 
-                    {{InfoTypeEnum::Boss, BossEnum::BossSpawn}, {0, 0}},
-                    {{InfoTypeEnum::Boss, BossEnum::BossDie}, {0, 0}},
-                    {{InfoTypeEnum::Boss, BossEnum::BossAttack}, {0, 0}},
+                    {{InfoTypeEnum::Boss, BossEnum::BossSpawn}, {"", ""}},
+                    {{InfoTypeEnum::Boss, BossEnum::BossDie}, {"", ""}},
+                    {{InfoTypeEnum::Boss, BossEnum::BossAttack}, {"", ""}},
 
-                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpSpawn}, {0, 0}},
-                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpDisappear}, {0, 0}},
-                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpAttack}, {0, 0}},
+                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpSpawn}, {"", ""}},
+                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpDisappear}, {"", ""}},
+                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpAttack}, {"", ""}},
 
-                    {{InfoTypeEnum::Projectile, ProjectileEnum::ProjectileFired}, {0, 0}},
-                    {{InfoTypeEnum::Projectile, ProjectileEnum::ProjectileHit}, {0, 0}},
+                    {{InfoTypeEnum::Projectile, ProjectileEnum::ProjectileFired}, {"", ""}},
+                    {{InfoTypeEnum::Projectile, ProjectileEnum::ProjectileHit}, {"", ""}},
                 };
             }
 
-            static int getParameterPerFunctionServer(int function_type, int function_index)
+            static int getNbParameterPerFunctionServer(int function_type, int function_index)
+            {
+                return _parametersMap[{function_type, function_index}].first.length();
+            }
+
+            static int getNbParameterPerFunctionClient(int function_type, int function_index)
+            {
+                return _parametersMap[{function_type, function_index}].second.length();
+            }
+
+            static std::string getParameterTypePerFunctionServer(int function_type, int function_index)
             {
                 return _parametersMap[{function_type, function_index}].first;
             }
 
-            static int getParameterPerFunctionClient(int function_type, int function_index)
+            static std::string getParameterTypePerFunctionClient(int function_type, int function_index)
             {
                 return _parametersMap[{function_type, function_index}].second;
             }
@@ -117,10 +127,12 @@ namespace Utils
 
         private:
             // Correspond to the map of all functions available with the protocol.
-            // The first pair of int correspond to the key : function type & function index.
-            // Function type and index are set in various Enum
-            // The second pair of int correspond to the number of parameter.
-            // The first int is about parameters awaited on the server side, the second one is by the client side.
-            static std::map<std::pair<int, int>, std::pair<int, int>> _parametersMap; 
+            //
+            // The first pair correspond to the key : function type & function index.
+            // Function type and index are set in some Enums
+            //
+            // The second pair correspond to the type of parameter. (b: Bool, c: Char, i: Int, f: Float)
+            // The first string is about parameters awaited on the server side, the second one is by the client side.
+            static std::map<std::pair<int, int>, std::pair<std::string, std::string>> _parametersMap; 
     };
 }

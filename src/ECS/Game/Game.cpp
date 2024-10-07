@@ -207,15 +207,13 @@ void Rtype::Game::render()
 
     auto renderSystem = _core->getSystem<ECS::Systems::SystemRender>();
     auto renderEntities  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender>());
-    _camera.BeginMode();
     {
         renderSystem->update(_core->getComponents<ECS::Components::Position>(),
                              _core->getComponents<ECS::Components::Render>(),
                              renderEntities,
-                             _ressourcePool);
+                             _ressourcePool,
+                             _camera);
     }
-    _camera.EndMode();
-
     for (std::size_t i = 0; i < toDraw.size(); ++i) {
         auto &pos = positions[toDraw[i]].value();
         auto &hitbox = hitboxes[toDraw[i]].value();

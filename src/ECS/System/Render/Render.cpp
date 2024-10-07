@@ -9,7 +9,8 @@ void ECS::Systems::SystemRender::update(
     ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
     ECS::ComponentManager::SparseArray<ECS::Components::Render> &renders,
     std::vector<std::size_t> &entities,
-    ECS::RessourcePool &ressourcePool)
+    ECS::RessourcePool &ressourcePool,
+    raylib::Camera3D &camera)
 {
     raylib::Vector3 rotation = {0.0f, 0.0f, 0.0f};
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
@@ -23,7 +24,9 @@ void ECS::Systems::SystemRender::update(
         const std::string path = render.getPath();
 
         if (ECS::Utils::getRaylibFileType(path) == ECS::Utils::FileType::Model) {
+            camera.BeginMode();
             render.render(ressourcePool.getModel(render.getPath()), pos, rotation, scale);
+            camera.EndMode();
         } else if (ECS::Utils::getRaylibFileType(path) == ECS::Utils::FileType::Texture) {
             std::cout << "Texture" << std::endl;
             render.render(ressourcePool.getTexture(render.getPath()), pos, rotation, scale);

@@ -38,9 +38,11 @@ raylib::Texture& ECS::RessourcePool::getTexture(std::string texturePath)
 
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)
 {
-    raylib::Texture texture(TexturePath);
+    raylib::Image image(TexturePath);
+    raylib::Texture texture(image);
     std::cout << "Loaded texture: " << TexturePath << std::endl;
     _textures.emplace(TexturePath, std::move(texture));
+    _texturesImages.emplace(TexturePath, std::move(image));
 }
 
 void ECS::RessourcePool::addModel(const std::string &modelPath)

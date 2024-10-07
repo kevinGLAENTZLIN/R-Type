@@ -24,6 +24,14 @@ void ECS::RessourcePool::UnloadAll()
             std::cout << "Model: " << model.first << " already unloaded" << std::endl;
         }
     }
+    for (auto &texture : _textures) {
+        if (texture.second.id != 0) {
+            texture.second.Unload();
+            std::cout << "Unloaded texture: " << texture.first << std::endl;
+        } else {
+            std::cout << "Texture: " << texture.first << " already unloaded" << std::endl;
+        }
+    }
 }
 
 raylib::Model& ECS::RessourcePool::getModel(std::string modelPath)

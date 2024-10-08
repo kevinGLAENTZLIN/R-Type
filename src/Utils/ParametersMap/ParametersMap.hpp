@@ -9,11 +9,15 @@
 
 #include <iostream>
 #include <map>
+#include <cstdint>
+#include <concepts>
+#include <type_traits>
+
 
 namespace Utils
 {
     // Enums representing different categories of functions.
-    enum InfoTypeEnum {
+    enum class InfoTypeEnum: uint8_t {
         GameInfo = 0,
         Player,
         Enemy,
@@ -23,7 +27,7 @@ namespace Utils
     };
 
     // Enums for various game-related functions.
-    enum GameInfoEnum {
+    enum class GameInfoEnum: uint8_t {
         NewClientConnected = 0,
         GamesAvailable,
         CreateGame,
@@ -34,7 +38,7 @@ namespace Utils
     };
 
     // Enums for player-related functions.
-    enum PlayerEnum {
+    enum class PlayerEnum: uint8_t {
         PlayerSpawnOnGame = 0,
         PlayerDie,
         PlayerMove,
@@ -45,7 +49,7 @@ namespace Utils
     };
 
     // Enums for enemy-related functions.
-    enum EnemyEnum {
+    enum class EnemyEnum: uint8_t {
         EnemySpawn = 0,
         EnemyDie,
         EnemyMove,
@@ -53,24 +57,29 @@ namespace Utils
     };
 
     // Enums for boss-related functions.
-    enum BossEnum {
+    enum class BossEnum: uint8_t {
         BossSpawn = 0,
         BossDie,
         BossAttack
     };
 
     // Enums for power-up-related functions.
-    enum PowerUpEnum {
+    enum class PowerUpEnum: uint8_t {
         PowerUpSpawn = 0,
         PowerUpDisappear,
         PowerUpAttack
     };
 
     // Enums for projectile-related functions.
-    enum ProjectileEnum {
+    enum class ProjectileEnum: uint8_t {
         ProjectileFired = 0,
         ProjectileHit
     };
+
+    template <typename T>
+    concept FunctionIndex = std::is_same_v<T, GameInfoEnum> || std::is_same_v<T, PlayerEnum> ||
+                        std::is_same_v<T, EnemyEnum> || std::is_same_v<T, BossEnum> ||
+                        std::is_same_v<T, PowerUpEnum> || std::is_same_v<T, ProjectileEnum>;
 
     // Class managing a mapping of parameters for all functions of the protocol.
     class ParametersMap {
@@ -84,37 +93,37 @@ namespace Utils
             static void init_map() 
             {
                 _parametersMap = {
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::NewClientConnected}, {"bbi", "if"}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::GamesAvailable}, {"", ""}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::CreateGame}, {"", ""}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::JoinGame}, {"", ""}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::GameWonLost}, {"", ""}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::SafetyCheck}, {"", ""}},
-                    {{InfoTypeEnum::GameInfo, GameInfoEnum::LevelComplete}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::NewClientConnected)}, {"bbi", "if"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::JoinGame)}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GameWonLost)}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::SafetyCheck)}, {"", ""}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::LevelComplete)}, {"", ""}},
 
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerSpawnOnGame}, {"", ""}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerDie}, {"", ""}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerMove}, {"", ""}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerAttack}, {"", ""}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerGotPowerUp}, {"", ""}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerHitAWall}, {"", ""}},
-                    {{InfoTypeEnum::Player, PlayerEnum::PlayerScore}, {"", ""}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", ""}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerDie)}, {"", ""}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"", ""}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerAttack)}, {"", ""}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerGotPowerUp)}, {"", ""}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerHitAWall)}, {"", ""}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerScore)}, {"", ""}},
 
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemySpawn}, {"", ""}},
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyDie}, {"", ""}},
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyMove}, {"", ""}},
-                    {{InfoTypeEnum::Enemy, EnemyEnum::EnemyAttack}, {"", ""}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", ""}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyDie)}, {"", ""}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyMove)}, {"", ""}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyAttack)}, {"", ""}},
 
-                    {{InfoTypeEnum::Boss, BossEnum::BossSpawn}, {"", ""}},
-                    {{InfoTypeEnum::Boss, BossEnum::BossDie}, {"", ""}},
-                    {{InfoTypeEnum::Boss, BossEnum::BossAttack}, {"", ""}},
+                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", ""}},
+                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossDie)}, {"", ""}},
+                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossAttack)}, {"", ""}},
 
-                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpSpawn}, {"", ""}},
-                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpDisappear}, {"", ""}},
-                    {{InfoTypeEnum::PowerUp, PowerUpEnum::PowerUpAttack}, {"", ""}},
+                    {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpSpawn)}, {"", ""}},
+                    {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpDisappear)}, {"", ""}},
+                    {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpAttack)}, {"", ""}},
 
-                    {{InfoTypeEnum::Projectile, ProjectileEnum::ProjectileFired}, {"", ""}},
-                    {{InfoTypeEnum::Projectile, ProjectileEnum::ProjectileHit}, {"", ""}},
+                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"", ""}},
+                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileHit)}, {"", ""}},
                 };
             }
 
@@ -124,7 +133,7 @@ namespace Utils
              * @param function_index The index of the function.
              * @return The number of parameters expected by the server.
              */
-            static int getNbParameterPerFunctionServer(int function_type, int function_index)
+            static int getNbParameterPerFunctionServer(InfoTypeEnum function_type, uint8_t function_index)
             {
                 return _parametersMap[{function_type, function_index}].first.length();
             }
@@ -135,7 +144,7 @@ namespace Utils
              * @param function_index The index of the function.
              * @return The number of parameters expected by the client.
              */
-            static int getNbParameterPerFunctionClient(int function_type, int function_index)
+            static int getNbParameterPerFunctionClient(InfoTypeEnum function_type, uint8_t function_index)
             {
                 return _parametersMap[{function_type, function_index}].second.length();
             }
@@ -146,7 +155,7 @@ namespace Utils
              * @param function_index The index of the function.
              * @return The parameter types expected by the server as a string.
              */
-            static std::string getParameterTypePerFunctionServer(int function_type, int function_index)
+            static std::string getParameterTypePerFunctionServer(InfoTypeEnum function_type, uint8_t function_index)
             {
                 return _parametersMap[{function_type, function_index}].first;
             }
@@ -157,7 +166,7 @@ namespace Utils
              * @param function_index The index of the function.
              * @return The parameter types expected by the client as a string.
              */
-            static std::string getParameterTypePerFunctionClient(int function_type, int function_index)
+            static std::string getParameterTypePerFunctionClient(InfoTypeEnum function_type, uint8_t function_index)
             {
                 return _parametersMap[{function_type, function_index}].second;
             }
@@ -171,6 +180,6 @@ namespace Utils
              * expected by the server & client, respectively.
              * Parameter types are denoted by characters (e.g., b: Bool, c: Char, i: Int, f: Float).
              */
-            static std::map<std::pair<int, int>, std::pair<std::string, std::string>> _parametersMap; 
+            static std::map<std::pair<InfoTypeEnum, uint8_t>, std::pair<std::string, std::string>> _parametersMap; 
     };
 }

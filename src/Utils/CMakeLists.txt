@@ -4,6 +4,9 @@ set(NAME_LIB "Utils")
 set(NAME_DEBUG_EXE "${RTYPE}-Utils-Debug")
 
 set(LIB_SOURCES
+    ./Response/Response.cpp
+    ./Protocol/Protocol.cpp
+    ./ParametersMap/ParametersMap.cpp
     )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
@@ -19,7 +22,8 @@ set_target_properties(${NAME_LIB} PROPERTIES
 
 target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Protocol
+    ${CMAKE_CURRENT_SOURCE_DIR}Protocol
+    ${CMAKE_CURRENT_SOURCE_DIR}Response
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

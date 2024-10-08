@@ -17,7 +17,7 @@
 #include <map>
 #include <string>
 #include <boost/asio.hpp>
-#include "Client_info.hh"
+#include "Client_info.hpp"
 
 using boost::asio::ip::udp;
 using boost::asio::ip::address;
@@ -132,7 +132,20 @@ namespace Rtype {
              * @param function_index The index of the command to be sent.
              * @param ... Parameters for the command to send in the right order.
              */
-            void send_to_client(int function_type, int function_index, ...);
+            template <Utils::FunctionIndex T>
+            void send_to_client(Utils::InfoTypeEnum function_type, T function_index, ...)
+            {
+                    va_list params;
+
+                    va_start(params, function_index);
+                    _clients[get_sender_client_id()].pushCmdToHistory(function_type, function_index, params);
+                    // Encrypt message
+                    va_end(params);
+                    // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+                    // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+                    //     read_clients();
+                    // });
+            }
 
             /**
              * @brief Sends a command to a specific client identified by its IP address and port.
@@ -146,7 +159,20 @@ namespace Rtype {
              * @param function_index The index of the command to be sent.
              * @param ... Parameters for the command to send in the right order.
              */
-            void send_to_client(std::string addr_ip, int port, int function_type, int function_index, ...);
+            template <Utils::FunctionIndex T>
+            void send_to_client(std::string addr_ip, int port, Utils::InfoTypeEnum function_type, T function_index, ...)
+            {
+                    va_list params;
+
+                    va_start(params, function_index);
+                    _clients[get_client_id_by_addr(addr_ip, port)].pushCmdToHistory(function_type, function_index, params);
+                    // Encrypt message
+                    va_end(params);
+                    // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+                    // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+                    //     read_clients();
+                    // });
+            }
 
             /**
              * @brief Sends a command to a specific client identified by its IP address and port.
@@ -159,7 +185,20 @@ namespace Rtype {
              * @param function_index The index of the command to be sent.
              * @param ... Parameters for the command to send in the right order.
              */
-            void send_to_client(std::pair<std::string, int> addr, int function_type, int function_index, ...);
+            template <Utils::FunctionIndex T>
+            void send_to_client(std::pair<std::string, int> addr, Utils::InfoTypeEnum function_type, T function_index, ...)
+            {
+                va_list params;
+
+                va_start(params, function_index);
+                _clients[get_client_id_by_addr(addr.first, addr.second)].pushCmdToHistory(function_type, function_index, params);
+                // Encrypt message
+                va_end(params);
+                // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+                // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+                //     read_clients();
+                // });
+            }
 
             /**
              * @brief Sends a command to a specific client identified by its ID.
@@ -172,7 +211,20 @@ namespace Rtype {
              * @param function_index The index of the command to be sent.
              * @param ... Parameters for the command to send in the right order.
              */
-            void send_to_client(int id, int function_type, int function_index, ...);
+            template <Utils::FunctionIndex T>
+            void send_to_client(int id, Utils::InfoTypeEnum function_type, T function_index, ...)
+            {
+                va_list params;
+
+                va_start(params, function_index);
+                _clients[id].pushCmdToHistory(function_type, function_index, params);
+                // Encrypt message
+                va_end(params);
+                // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+                // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+                //     read_clients();
+                // });
+            }
 
             /**
              * @brief Sends a command to all clients identified.
@@ -184,8 +236,25 @@ namespace Rtype {
              * @param function_index The index of the command to be sent.
              * @param ... Parameters for the command to send in the right order.
              */
-            void send_to_clients(int function_type, int function_index, ...);
+            template <Utils::FunctionIndex T>
+            void send_to_clients(Utils::InfoTypeEnum function_type, T function_index, ...)
+            {
+                va_list params;
+                va_list tmp;
 
+                va_start(params, function_index);
+                for(auto client: _clients) {
+                    va_copy(tmp, params);
+                    client.second.pushCmdToHistory(function_type, function_index, tmp);
+                    // Encrypt message
+                    va_end(tmp);
+                    // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+                    // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+                    //     read_clients();
+                    // });
+                }
+                va_end(params);
+            }
 
             udp::socket _socket;
             udp::endpoint _senderEndpoint;

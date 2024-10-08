@@ -15,6 +15,7 @@ void ECS::Systems::SystemRender3D::update(
 {
     raylib::Vector3 rotation = {0.0f, 0.0f, 0.0f};
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
+    bool drawHitBox = true;
 
     camera.BeginMode();
     for (auto &entity : entities) {
@@ -23,10 +24,13 @@ void ECS::Systems::SystemRender3D::update(
         }
         auto &position = positions[entity].value();
         auto &render = renders[entity].value();
-        raylib::Vector3 pos(position.getX() , 0, position.getY());
+        raylib::Vector3 pos(position.getX() , 0.0f, position.getY());
         const std::string path = render.getPath();
-
-        render.render(ressourcePool.getModel(render.getPath()), pos, rotation, scale);
+        if (drawHitBox) {
+            std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(ressourcePool.getModel(path));
+            DrawCubeWires(pos, TmpHitbox.first, 1.0f, TmpHitbox.second, RED);
+        }
+        render.render(ressourcePool.getModel(path), pos, rotation, scale);
     }
     camera.EndMode();
 }

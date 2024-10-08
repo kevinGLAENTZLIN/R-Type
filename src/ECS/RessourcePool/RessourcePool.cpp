@@ -46,17 +46,17 @@ raylib::Texture& ECS::RessourcePool::getTexture(std::string texturePath)
 
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)
 {
-    raylib::Image image(TexturePath);
-    raylib::Texture texture(image);
+    std::string pathRessources = "./resources/" + TexturePath + "/" + TexturePath + ".png";
+    raylib::Texture defaultTexture(pathRessources);
 
-    _textures.emplace(TexturePath, std::move(texture));
-    _texturesImages.emplace(TexturePath, std::move(image));
+    _textures.emplace(TexturePath, std::move(defaultTexture));
 }
 
 void ECS::RessourcePool::addModel(const std::string &modelPath)
 {
-    std::string pngTexturePath = modelPath.substr(0, modelPath.find_last_of('.')) + ".png";
-    raylib::Model defaultModel(modelPath);
+    std::string pathRessources = "./resources/" + modelPath + "/" + modelPath + ".obj";
+    std::string pngTexturePath = pathRessources.substr(0, pathRessources.find_last_of('.')) + ".png";
+    raylib::Model defaultModel(pathRessources);
 
     if (std::filesystem::exists(pngTexturePath)) {
         raylib::Texture texture(pngTexturePath.c_str());

@@ -43,3 +43,13 @@ ECS::Utils::FileType ECS::Utils::getRaylibFileType(const std::string& path) {
             return ECS::Utils::FileType::Unknown;
         }
     }
+
+
+std::pair<float, float> ECS::Utils::getModelSize(const raylib::Model &model)
+{
+    raylib::BoundingBox box = model.GetBoundingBox();
+    float width = box.max.x - box.min.x;
+    float height = box.max.z - box.min.z;
+
+    return std::make_pair(width, height);
+}

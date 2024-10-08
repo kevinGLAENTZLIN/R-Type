@@ -33,6 +33,5 @@ namespace ECS {
             std::map<const std::string, raylib::Model> _models;
             std::map<const std::string, raylib::Texture> _texturesModels;
             std::map<const std::string, raylib::Texture> _textures;
-            std::map<const std::string, raylib::Image> _texturesImages;
     };
 }

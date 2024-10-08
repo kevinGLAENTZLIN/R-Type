@@ -17,9 +17,11 @@ Rtype::Game::Game()
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
-    _window.Init(1000, 800, "R-Type Game");
+    _window.Init(1280, 720, "R-Type Game");
     _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
-    _ressourcePool.addModel("./resources/Disco.obj");
+    _ressourcePool.addModel("./resources/ship_yellow/ship_yellow.obj");
+    _ressourcePool.addModel("./resources/base_projectile/base_projectile.obj");
+    _ressourcePool.addModel("./resources/enemy_one/enemy_one.obj");
     _ressourcePool.addTexture("./resources/background.png");
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
@@ -81,16 +83,17 @@ Rtype::Game::Game()
     _core->setSystemSignature<ECS::Systems::SystemRender2D>(renderSignature2D);
 
     std::size_t player = _core->createEntity();
-    _core->addComponent(player, ECS::Components::Position{0.0f, 0.0f});
+    _core->addComponent(player, ECS::Components::Position{-10.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
-    _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
+    _core->addComponent(player, ECS::Components::Hitbox{1.6058f, 1.40368f});
     _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Render3D{"./resources/Disco.obj"});
+    _core->addComponent(player, ECS::Components::Render3D{"./resources/ship_yellow/ship_yellow.obj"});
 
     std::size_t enemy = _core->createEntity();
-    _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
-    _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
-    _core->addComponent(enemy, ECS::Components::Hitbox{50.0f, 50.0f});
+    _core->addComponent(enemy, ECS::Components::Position{10.0f, 2.0f});
+    _core->addComponent(enemy, ECS::Components::Velocity{-0.08f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Hitbox{0.49849f, 0.49849f});
+    _core->addComponent(enemy, ECS::Components::Render3D{"./resources/enemy_one/enemy_one.obj"});
 
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
@@ -148,10 +151,11 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     }
     const ECS::Components::Position &entityPos = positions[entityID].value();
     std::size_t projectile = _core->createEntity();
-    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + 60.0f, entityPos.getY() + 10.0f});
-    _core->addComponent(projectile, ECS::Components::Velocity{5.0f, 0.0f});
-    _core->addComponent(projectile, ECS::Components::Hitbox{10.0f, 5.0f});
+    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + (1.40368f / 2.0f) + (0.12f), entityPos.getY()});
+    _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Hitbox{0.12f , 0.18098f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
+    _core->addComponent(projectile, ECS::Components::Render3D{"./resources/base_projectile/base_projectile.obj"});
 }
 
 void Rtype::Game::update() {
@@ -211,7 +215,7 @@ void Rtype::Game::render()
                         _core->getComponents<ECS::Components::Render2D>(),
                         renderEntities2D,
                         _ressourcePool);
-
+    DrawGrid(10, 1.0f);
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
                         _core->getComponents<ECS::Components::Render3D>(),
                         renderEntities3D,

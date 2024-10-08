@@ -56,10 +56,13 @@ void ECS::RessourcePool::addTexture(const std::string &TexturePath)
 void ECS::RessourcePool::addModel(const std::string &modelPath)
 {
     std::string pngTexturePath = modelPath.substr(0, modelPath.find_last_of('.')) + ".png";
-    raylib::Texture texture(pngTexturePath.c_str());
     raylib::Model defaultModel(modelPath);
 
-    defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-    _texturesModels.emplace(pngTexturePath, std::move(texture));
+    if (std::filesystem::exists(pngTexturePath)) {
+        raylib::Texture texture(pngTexturePath.c_str());
+        defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+        _texturesModels.emplace(pngTexturePath, std::move(texture));
+    }
+
     _models.emplace(modelPath, std::move(defaultModel));
 }

@@ -46,6 +46,7 @@ namespace Rtype {
     private:
         ECS::RessourcePool _ressourcePool;
         void createProjectile(std::size_t entityID);
+        void destroyProjectile(std::size_t entityID);
         void update();
         void render();
         bool _isRunning;

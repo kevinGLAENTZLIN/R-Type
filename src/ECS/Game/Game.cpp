@@ -7,8 +7,6 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include <cstdlib>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -18,19 +16,18 @@ Rtype::Game::Game()
 {
     _core = std::make_unique<ECS::Core::Core>();
 
-    _window.Init(1290, 720, "R-Type Game");
-    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
-
-
-    _ressourcePool.addModel("./resources/Disco.obj");
-
-    float zoom = 1.0f;
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
+    _window.Init(1000, 800, "R-Type Game");
+    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+    _ressourcePool.addModel("./resources/Disco.obj");
+    _ressourcePool.addTexture("./resources/background.png");
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
-    _core->registerComponent<ECS::Components::Render>();
+    _core->registerComponent<ECS::Components::Render2D>();
+    _core->registerComponent<ECS::Components::Render3D>();
     _core->registerComponent<ECS::Components::Projectile>();
     _core->registerComponent<ECS::Components::Background>();
 
@@ -38,7 +35,8 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::Collision>();
     _core->registerSystem<ECS::Systems::ProjectileCollision>();
     _core->registerSystem<ECS::Systems::InputUpdates>();
-    _core->registerSystem<ECS::Systems::SystemRender>();
+    _core->registerSystem<ECS::Systems::SystemRender2D>();
+    _core->registerSystem<ECS::Systems::SystemRender3D>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -47,16 +45,12 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
     _core->setSystemSignature<ECS::Systems::SystemVelocity>(velocitySystemSignature);
 
-    std::cout << "velocity sign " << velocitySystemSignature << std::endl;
-
     Signature collisionSignature;
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
-
-    std::cout << "collision sign " << collisionSignature << std::endl;
 
     Signature projectileCollisionSignature;
     projectileCollisionSignature.set(
@@ -67,31 +61,32 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Projectile>());
     _core->setSystemSignature<ECS::Systems::ProjectileCollision>(projectileCollisionSignature);
 
-    std::cout << "projectileCollision sign " << projectileCollisionSignature << std::endl;
-
     Signature inputUpdatesSignature;
     inputUpdatesSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Input>());
     _core->setSystemSignature<ECS::Systems::InputUpdates>(inputUpdatesSignature);
 
-    std::cout << "input sign " << inputUpdatesSignature << std::endl;
-
-    Signature renderSignature;
-    renderSignature.set(
+    Signature renderSignature3D;
+    renderSignature3D.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
-    renderSignature.set(
-        ECS::CTypeRegistry::getTypeId<ECS::Components::Render>());
-    _core->setSystemSignature<ECS::Systems::SystemRender>(renderSignature);
+    renderSignature3D.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Render3D>());
+    _core->setSystemSignature<ECS::Systems::SystemRender3D>(renderSignature3D);
 
-    std::cout << "render sign " << renderSignature << std::endl;
 
+    Signature renderSignature2D;
+    renderSignature2D.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    renderSignature2D.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Render2D>());
+    _core->setSystemSignature<ECS::Systems::SystemRender2D>(renderSignature2D);
 
     std::size_t player = _core->createEntity();
-    _core->addComponent(player, ECS::Components::Position{200.0f, 300.0f});
+    _core->addComponent(player, ECS::Components::Position{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{50.0f, 50.0f});
     _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Render{"./resources/Disco.obj"});
+    _core->addComponent(player, ECS::Components::Render3D{"./resources/Disco.obj"});
 
     std::size_t enemy = _core->createEntity();
     _core->addComponent(enemy, ECS::Components::Position{500.0f, 300.0f});
@@ -100,16 +95,27 @@ Rtype::Game::Game()
 
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    _core->addComponent(background, ECS::Components::Velocity{10.0f, 0.0f});
+    _core->addComponent(background, ECS::Components::Velocity{-0.5f, 0.0f});
     _core->addComponent(background, ECS::Components::Background{});
+    _core->addComponent(background, ECS::Components::Render2D{"./resources/background.png"});
 
-    _backgroundTexture = LoadTexture("backgroundTest.png");
+    float oui = _ressourcePool.getTexture("./resources/background.png").width;
+    std::size_t background2 = _core->createEntity();
+    _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
+    _core->addComponent(background2, ECS::Components::Velocity{-0.5f, 0.0f});
+    _core->addComponent(background2, ECS::Components::Background{});
+    _core->addComponent(background2, ECS::Components::Render2D{"./resources/background.png"});
+
+    std::size_t background3 = _core->createEntity();
+    _core->addComponent(background3, ECS::Components::Position{oui * 2, 0.0f});
+    _core->addComponent(background3, ECS::Components::Velocity{-0.5f, 0.0f});
+    _core->addComponent(background3, ECS::Components::Background{});
+    _core->addComponent(background3, ECS::Components::Render2D{"./resources/background.png"});
 }
 
 Rtype::Game::~Game()
 {
-    UnloadTexture(_backgroundTexture);
-    std::cout << "Game destroyed" << std::endl;
+    _ressourcePool.UnloadAll();
 }
 
 void Rtype::Game::run()
@@ -136,6 +142,7 @@ std::vector<std::size_t> getAllInputs() {
 void Rtype::Game::createProjectile(std::size_t entityID)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
+
     if (!positions[entityID].has_value()) {
         std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
         return;
@@ -201,35 +208,23 @@ void Rtype::Game::render()
     auto &velocities = _core->getComponents<ECS::Components::Velocity>();
 
     auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
-    auto backgrounds = _core->getEntitiesWithComponent<ECS::Components::Background>();
-    auto renderSystem = _core->getSystem<ECS::Systems::SystemRender>();
-    auto renderEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender>());
-    _camera.BeginMode();
-    {
-    renderSystem->update(_core->getComponents<ECS::Components::Position>(),
-                         _core->getComponents<ECS::Components::Render>(),
-                         renderEntities,
-                         _ressourcePool);
-        DrawGrid(1000, 1.0f);
-    }
-    _camera.EndMode();
 
-    for (std::size_t i = 0; i < toDraw.size(); ++i) {
-        auto &pos = positions[toDraw[i]].value();
-        auto &hitbox = hitboxes[toDraw[i]].value();
+    auto renderSystem2D = _core->getSystem<ECS::Systems::SystemRender2D>();
+    auto renderEntities2D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender2D>());
 
-        if (hitbox.getWidth() <= 0 || hitbox.getHeight() <= 0) {
-            std::cerr << "Invalid hitbox dimensions!" << std::endl;
-            continue;
-        }
+    auto renderSystem3D = _core->getSystem<ECS::Systems::SystemRender3D>();
+    auto renderEntities3D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender3D>());
 
-        if (pos.getX() < 0 || pos.getY() < 0) {
-            std::cerr << "Invalid position!" << std::endl;
-            continue;
-        }
 
-        raylib::Rectangle rect(pos.getX(), pos.getY(), hitbox.getWidth(), hitbox.getHeight());
-        rect.Draw(DARKBLUE);
-    }
+    renderSystem2D->update(_core->getComponents<ECS::Components::Position>(),
+                        _core->getComponents<ECS::Components::Render2D>(),
+                        renderEntities2D,
+                        _ressourcePool);
+
+    renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
+                        _core->getComponents<ECS::Components::Render3D>(),
+                        renderEntities3D,
+                        _ressourcePool,
+                        _camera);
     EndDrawing();
 }

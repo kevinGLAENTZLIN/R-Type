@@ -27,7 +27,8 @@
 #include "../System/Collision/Collision.hh"
 #include "../System/ProjectileCollision/ProjectileCollision.hh"
 #include "../System/InputUpdates/InputUpdates.hh"
-#include "../System/Render/Render.hh"
+#include "../System/Render3D/Render3D.hh"
+#include "../System/Render2D/Render2D.hh"
 
 #include "../RessourcePool/RessourcePool.hh"
 #include "raylib-cpp.hpp"
@@ -43,6 +44,7 @@ namespace Rtype {
         void run();
 
     private:
+        ECS::RessourcePool _ressourcePool;
         void createProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void update();
@@ -51,7 +53,5 @@ namespace Rtype {
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;
-        ECS::RessourcePool _ressourcePool;
-        Texture2D _backgroundTexture;
     };
 };

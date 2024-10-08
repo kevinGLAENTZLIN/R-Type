@@ -46,6 +46,8 @@ set(LIB_SOURCES
     ./Component/Velocity/Velocity.cpp
     ./Component/Hitbox/Hitbox.cpp
     ./Component/Text/Text.cpp
+    ./Component/Rotate/Rotate.cpp
+    ./Component/Scale/Scale.cpp
     ./Component/Volume/Volume.cpp
     ./Component/Input/Input.cpp
     ./System/Velocity/Velocity.cpp
@@ -53,8 +55,10 @@ set(LIB_SOURCES
     ./System/ProjectileCollision/ProjectileCollision.cpp
     ./System/InputUpdates/InputUpdates.cpp
     ./Game/Game.cpp
-    ./Component/Render/Render.cpp
-    ./System/Render/Render.cpp
+    ./Component/Render2D/Render2D.cpp
+    ./Component/Render3D/Render3D.cpp
+    ./System/Render2D/Render2D.cpp
+    ./System/Render3D/Render3D.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )
@@ -101,10 +105,9 @@ target_include_directories(${NAME_LIB} PUBLIC
 
 # Compiler le main.cpp seulement en mode Debug
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
+    set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
     add_executable(${NAME_DEBUG_EXE} main.cpp)
 
-    file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
     target_link_libraries(${NAME_DEBUG_EXE} PRIVATE ${NAME_LIB})
 endif()

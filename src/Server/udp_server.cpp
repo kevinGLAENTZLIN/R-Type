@@ -13,8 +13,9 @@
 #include "udp_server.hh"
 
 Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port)
-: _socket(io_service, udp::endpoint(udp::v4(), port)), _clientsAddr()
+: _socket(io_service, udp::endpoint(udp::v4(), port)), _clients()
 {
+    Utils::ParametersMap::init_map();
     std::memset(_data, 0, max_length);
     read_clients();
 }
@@ -56,7 +57,7 @@ int Rtype::udpServer::get_sender_id()
 
     if (id == -1) {
         id = get_available_client_id();
-        _clientsAddr[id] = std::make_pair<std::string, int>(_senderEndpoint.address().to_string(), (int)_senderEndpoint.port());
+        _clients[id] = Rtype::client_info(id, (int)_senderEndpoint.port(), _senderEndpoint.address().to_string());
         send_to_client("Your new ID is " + std::to_string(id)); //! To refactor by the protocol control
     }
     return id;
@@ -68,8 +69,8 @@ int Rtype::udpServer::get_available_client_id()
 
     for (int i = 0; i < INT32_MAX; i++) {
         available = true;
-        for (auto client: _clientsAddr)
-            available &= client.first != i; 
+        for (auto client: _clients)
+            available &= client.second.getId() != i;
         if (available)
             return i;
     }
@@ -78,10 +79,15 @@ int Rtype::udpServer::get_available_client_id()
 
 int Rtype::udpServer::get_client_id_by_addr(std::string addr, int port)
 {
-    for (auto client: _clientsAddr)
-        if (client.second.first == addr && client.second.second == port)
+    for (auto client: _clients)
+        if (client.second.getAddr() == addr && client.second.getPort() == port)
             return client.first;
     return -1;
+}
+
+int Rtype::udpServer::get_sender_client_id()
+{
+    return get_client_id_by_addr(_senderEndpoint.address().to_string(), (int)_senderEndpoint.port());
 }
 
 bool Rtype::udpServer::is_client_by_addr(std::string addr, int port)
@@ -91,7 +97,7 @@ bool Rtype::udpServer::is_client_by_addr(std::string addr, int port)
 
 void Rtype::udpServer::disconnect_client(int client_id)
 {
-    _clientsAddr.erase(client_id);
+    _clients.erase(client_id);
 }
 
 void Rtype::udpServer::send_to_client(std::string msg)
@@ -128,6 +134,81 @@ void Rtype::udpServer::send_to_client(std::pair<std::string, int> addr, std::str
 
 void Rtype::udpServer::send_to_clients(std::string msg)
 {
-    for(auto client: _clientsAddr)
-        send_to_client(client.second, msg);
+    for(auto client: _clients)
+        send_to_client(client.second.getAddr(), client.second.getPort(), msg);
+}
+
+void Rtype::udpServer::send_to_client(std::string addr_ip, int port, int function_type, int function_index, ...)
+{
+    va_list params;
+
+    va_start(params, function_index);
+    _clients[get_client_id_by_addr(addr_ip, port)].pushCmdToHistory(function_type, function_index, params);
+    // Encrypt message
+    va_end(params);
+    // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+    // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+    //     read_clients();
+    // });
+}
+
+void Rtype::udpServer::send_to_client(std::pair<std::string, int> addr, int function_type, int function_index, ...)
+{
+    va_list params;
+
+    va_start(params, function_index);
+    _clients[get_client_id_by_addr(addr.first, addr.second)].pushCmdToHistory(function_type, function_index, params);
+    // Encrypt message
+    va_end(params);
+    // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+    // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+    //     read_clients();
+    // });
+}
+
+void Rtype::udpServer::send_to_client(int id, int function_type, int function_index, ...)
+{
+    va_list params;
+
+    va_start(params, function_index);
+    _clients[id].pushCmdToHistory(function_type, function_index, params);
+    // Encrypt message
+    va_end(params);
+    // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+    // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+    //     read_clients();
+    // });
+}
+
+void Rtype::udpServer::send_to_client(int function_type, int function_index, ...)
+{
+    va_list params;
+
+    va_start(params, function_index);
+    _clients[get_sender_client_id()].pushCmdToHistory(function_type, function_index, params);
+    // Encrypt message
+    va_end(params);
+    // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+    // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+    //     read_clients();
+    // });
+}
+
+void Rtype::udpServer::send_to_clients(int function_type, int function_index, ...)
+{
+    va_list params;
+    va_list tmp;
+
+    va_start(params, function_index);
+    for(auto client: _clients) {
+        va_copy(tmp, params);
+        client.second.pushCmdToHistory(function_type, function_index, tmp);
+        // Encrypt message
+        va_end(tmp);
+        // _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+        // [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
+        //     read_clients();
+        // });
+    }
+    va_end(params);
 }

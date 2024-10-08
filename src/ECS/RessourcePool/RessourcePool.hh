@@ -19,14 +19,17 @@ namespace ECS {
             RessourcePool();
             ~RessourcePool();
 
-            void UnloadAll();
             raylib::Model &getModel(std::string modelPath);
+            raylib::Texture &getTexture(std::string texturePath);
 
             void addModel(const std::string &modelPath);
+            void addTexture(const std::string &TexturePath);
+            void UnloadAll();
         private:
 
             std::map<const std::string, raylib::Model> _models;
-            std::vector<std::unique_ptr<raylib::Model>> _pitier;
-            raylib::Model _defaultModel;
+            std::map<const std::string, raylib::Texture> _texturesModels;
+            std::map<const std::string, raylib::Texture> _textures;
+            std::map<const std::string, raylib::Image> _texturesImages;
     };
 }

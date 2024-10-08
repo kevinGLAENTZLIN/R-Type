@@ -9,16 +9,19 @@
 ECS::EntityManager::EntityManager::EntityManager():
     _mLivingEntityCount(0)
 {
-    for (std::size_t entity = 0; entity < MAX_ENTITIES; ++entity) {
-        _mAvailableEntities.push(entity);
+    std::size_t entity = 10000;
+
+    while (entity > 0) {
+        _mAvailableEntities.push(entity - 1);
+        entity--;
     }
 }
 
 std::size_t ECS::EntityManager::EntityManager::createEntity()
 {
-    if (_mLivingEntityCount > MAX_ENTITIES)
+    if (_mLivingEntityCount >= MAX_ENTITIES)
         return MAX_ENTITIES;
-    std::size_t id = _mAvailableEntities.front();
+    std::size_t id = _mAvailableEntities.top();
     _mAvailableEntities.pop();
     ++_mLivingEntityCount;
     return id;

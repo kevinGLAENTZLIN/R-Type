@@ -1,7 +1,7 @@
 /*
 ** EPITECH PROJECT, 2024
 ** R-Type - ECS : ProjectileCollision
-** File description:
+** Fie description:
 ** Handles collision between projectiles and other entities.
 */
 
@@ -16,8 +16,14 @@ std::size_t ECS::Systems::ProjectileCollision::projectileIsHit(
     bool selfCollision = false;
 
     for (std::size_t j = 0; j < projectileEntities.size(); ++j) {
-        for (std::size_t i = 0; i < entities.size(); ++i) {
-           
+        std::size_t projectile = projectileEntities[j];
+        auto &projectilePos = positions[projectile].value();
+        auto &projectileHitbox = hitboxes[projectile].value();
+
+        if (projectilePos.getX() >= 1500 || projectilePos.getY() >= 1000)
+            return projectile;
+        
+        for (std::size_t i = 0; i < entities.size(); ++i) {           
             for (std::size_t temp = 0; temp < projectileEntities.size(); temp++)
                 if (entities[i] == projectileEntities[temp]) {
                     selfCollision = true;
@@ -28,19 +34,11 @@ std::size_t ECS::Systems::ProjectileCollision::projectileIsHit(
                 continue;
             }
             std::size_t entity = entities[i];
-            std::size_t projectile = projectileEntities[j];
+            auto &entityPos = positions[entity].value();
+            auto &entityHitbox = hitboxes[entity].value();
 
-            auto &posA = positions[entity].value();
-            auto &hitboxA = hitboxes[entity].value();
-            
-            auto &posB = positions[projectile].value();
-            auto &hitboxB = hitboxes[projectile].value();
-                
-            if (ECS::Utils::checkCollision(posA, hitboxA, posB, hitboxB)) {
-                std::cout << "Projectile " << projectile << " collided with Entity ";
-                std::cout << entity << " and should be destroyed" << std::endl;
+            if (ECS::Utils::checkCollision(entityPos, entityHitbox, projectilePos, projectileHitbox))
                 return projectile;
-            }
         }
     }
     return 100000;

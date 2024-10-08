@@ -3,6 +3,7 @@ project(r-type_server)
 set(NAME_SERVER "${RTYPE}_server")
 set(SERVER_SOURCES
     ./Client_info.cpp
+    ./Game_info.cpp
     ./udp_server.cpp
     ./main.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils/ParametersMap/ParametersMap.cpp

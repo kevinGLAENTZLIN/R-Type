@@ -13,13 +13,13 @@
  */
 
 Rtype::client_info::client_info():
-	_id(-1), _x(0), _y(0), _AckExpected(0), _AckToSend(0), _gameRoom(false),
+	_id(-1), _x(0), _y(0), _AckExpected(0), _AckToSend(0), _gameRoom(-1),
 	_inGame(false), _port(-1), _addr("")
 {
 }
 
 Rtype::client_info::client_info(int id, int port, std::string addr):
-	_id(id), _x(0), _y(0), _AckExpected(0), _AckToSend(0), _gameRoom(false),
+	_id(id), _x(0), _y(0), _AckExpected(0), _AckToSend(0), _gameRoom(-1),
 	_inGame(false), _port(port), _addr(addr)
 {
 }
@@ -86,6 +86,10 @@ int Rtype::client_info::getRoom() const
 void Rtype::client_info::setRoom(int room)
 {
 	_gameRoom = room;
+	if (room == -1)
+		_inGame = false;
+	else
+		_inGame = true;
 }
 
 int Rtype::client_info::getPort() const

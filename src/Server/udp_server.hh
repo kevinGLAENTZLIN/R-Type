@@ -18,6 +18,7 @@
 #include <string>
 #include <boost/asio.hpp>
 #include "Client_info.hh"
+#include "Game_info.hh"
 
 using boost::asio::ip::udp;
 using boost::asio::ip::address;
@@ -192,5 +193,6 @@ namespace Rtype {
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
             std::map<int, Rtype::client_info> _clients;
+            std::vector<Rtype::Game_info> _games;
     };
 }

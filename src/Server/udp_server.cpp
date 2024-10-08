@@ -13,7 +13,7 @@
 #include "udp_server.hh"
 
 Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port)
-: _socket(io_service, udp::endpoint(udp::v4(), port)), _clients()
+: _socket(io_service, udp::endpoint(udp::v4(), port)), _clients(), _games()
 {
     Utils::ParametersMap::init_map();
     std::memset(_data, 0, max_length);
@@ -63,6 +63,7 @@ int Rtype::udpServer::get_sender_id()
     return id;
 }
 
+// ! Refactor: to remove -> handle by Command
 int Rtype::udpServer::get_available_client_id()
 {
     bool available = false;

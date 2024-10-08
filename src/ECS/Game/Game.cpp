@@ -147,17 +147,20 @@ std::vector<std::size_t> getAllInputs() {
 void Rtype::Game::createProjectile(std::size_t entityID)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
+    auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
     if (!positions[entityID].has_value()) {
         std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
         return;
     }
     const ECS::Components::Position &entityPos = positions[entityID].value();
+    const ECS::Components::Hitbox &entityHitbox = hitboxes[entityID].value();
+
     std::size_t projectile = _core->createEntity();
 
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
     _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + (1.40368f / 2.0f) + (0.12f), entityPos.getY()});
+    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + (entityHitbox.getWidth()), entityPos.getY()});
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});

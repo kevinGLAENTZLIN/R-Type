@@ -22,7 +22,7 @@ namespace ECS {
             ProjectileCollision() = default;
             ~ProjectileCollision() = default;
 
-            void projectileIsHit(
+            std::size_t projectileIsHit(
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
                 std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities);

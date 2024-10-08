@@ -18,7 +18,10 @@
 #pragma once
 
 #include <iostream>
-
+#include <unordered_map>
+#include <functional>
+#include <memory>
+#include <typeindex>
 
 namespace ECS {
     namespace ComponentManager {
@@ -46,7 +49,20 @@ namespace ECS {
             template <typename Component>
             static std::size_t getTypeId() {
                 static std::size_t index = nextTypeIndex++;
+                if (indexToTypeMap.count(index) == 0) {
+                    // Enregistrement dans la map inverse
+                    indexToTypeMap[index] = []() -> std::type_index {
+                        return std::type_index(typeid(Component));
+                    };
+                }
                 return index;
+            }
+
+            static std::type_index getTypeFromId(std::size_t id) {
+                if (indexToTypeMap.count(id) == 0) {
+                    throw std::runtime_error("Invalid TypeId: no such type registered.");
+                }
+                return indexToTypeMap.at(id)();
             }
         
         private:
@@ -55,7 +71,8 @@ namespace ECS {
              *
              * It is incremented each time getTypeId() is called with a new type.
              */
-            static std::size_t nextTypeIndex;
+            static std::size_t nextTypeIndex; // Utilisé pour générer des ID uniques
+            static std::unordered_map<std::size_t, std::function<std::type_index()>> indexToTypeMap;
         };
     }
 

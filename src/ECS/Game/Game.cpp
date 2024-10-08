@@ -9,6 +9,7 @@
 #include "Game.hh"
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
+std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
 
 Rtype::Game::Game()
     : _isRunning(true)
@@ -162,6 +163,11 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
 }
 
+void Rtype::Game::destroyProjectile(std::size_t entityID)
+{
+    _core->destroyEntity(entityID);
+}
+
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
@@ -191,10 +197,13 @@ void Rtype::Game::update() {
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
 
-    projectileCollisionSystem->projectileIsHit(
+    std::size_t projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
         _core->getComponents<ECS::Components::Hitbox>(),
         projectileEntities, collisionEntities);
+
+    if (projectileEntityId <= 10000)
+        destroyProjectile(projectileEntityId);
 }
 
 void Rtype::Game::render()

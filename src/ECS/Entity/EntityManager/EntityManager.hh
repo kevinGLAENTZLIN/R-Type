@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <vector>
 #include <iostream>
-#include <queue>
+#include <stack>
 #include <array>
 #include <bitset>
 #include <cstdint>
@@ -34,7 +34,7 @@ namespace ECS {
             std::vector<std::size_t> getEntities() const;
 
         private:
-            std::queue<std::size_t> _mAvailableEntities;
+            std::stack<std::size_t> _mAvailableEntities;
             std::array<Signature, MAX_ENTITIES> _mSignatures;
             std::size_t _mLivingEntityCount;
         };

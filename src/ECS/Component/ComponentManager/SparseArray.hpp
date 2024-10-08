@@ -20,6 +20,7 @@ namespace ECS {
         class SparseArray {
         public:
             using value_type = std::optional<Component>;
+            using cc_type = Component &;
             using reference_type = value_type &;
             using const_reference_type = value_type const &;
             using container_t = std::vector<value_type>;
@@ -106,6 +107,12 @@ namespace ECS {
                 return _data[pos];
             };
 
+            cc_type insertAt(size_type pos, std::optional<Component> component) {
+                if (pos >= size())
+                    _data.resize(pos+ 1);
+                _data[pos] = component;
+                return _data[pos];
+            };
             /**
              * @brief Moves an object to an index in the class container.
              *
@@ -148,7 +155,7 @@ namespace ECS {
             /**
              * @brief Returns the index of the given object.
              *
-             * @return If the given toSearch object is found, its index is returned. If it is not found, size() is returned. 
+             * @return If the given toSearch object is found, its index is returned. If it is not found, size() is returned.
              */
             size_type getIndex(value_type const & toSearch) const {
                 for (size_type index = 0; index < size(); index++)
@@ -162,7 +169,7 @@ namespace ECS {
             void clear() {
                 _data.clear();
             };
-            
+
         private:
             container_t _data;
         };

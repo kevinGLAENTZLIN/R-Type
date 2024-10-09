@@ -13,7 +13,7 @@ namespace Rtype
 {
     namespace Command
     {
-        namespace Enemy
+        namespace Boss
         {
             class Spawn: ICommand{
                 public:

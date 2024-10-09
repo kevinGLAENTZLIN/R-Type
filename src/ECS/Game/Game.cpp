@@ -23,6 +23,7 @@ Rtype::Game::Game()
     _ressourcePool.addModel("ship_yellow");
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
+    _ressourcePool.addModel("background_layer0");
     _ressourcePool.addTexture("background");
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
@@ -100,9 +101,9 @@ Rtype::Game::Game()
 
     std::size_t background = _core->createEntity();
     _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    _core->addComponent(background, ECS::Components::Velocity{-0.5f, 0.0f});
-    _core->addComponent(background, ECS::Components::Background{});
-    _core->addComponent(background, ECS::Components::Render2D{"background"});
+    _core->addComponent(background, ECS::Components::Velocity{-0.0f, 0.0f});
+    //_core->addComponent(background, ECS::Components::Background{});
+    _core->addComponent(background, ECS::Components::Render3D{"background_layer0"});
 
     float oui = _ressourcePool.getTexture("background").width;
     std::size_t background2 = _core->createEntity();
@@ -231,7 +232,6 @@ void Rtype::Game::render()
                         _core->getComponents<ECS::Components::Render2D>(),
                         renderEntities2D,
                         _ressourcePool);
-    DrawGrid(10, 1.0f);
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
                         _core->getComponents<ECS::Components::Render3D>(),
                         renderEntities3D,

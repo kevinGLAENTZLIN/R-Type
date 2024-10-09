@@ -18,6 +18,9 @@ void ECS::Systems::SystemRender3D::update(
     bool drawHitBox = true;
 
     camera.BeginMode();
+    if (drawHitBox)
+        DrawGrid(100, 1.0f);
+
     for (auto &entity : entities) {
         if (!(renders[entity].has_value() || positions[entity].has_value())) {
             continue;

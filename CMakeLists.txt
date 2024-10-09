@@ -15,6 +15,7 @@ file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 
 # Ajouter le sous-répertoire ECS
 add_subdirectory(src/ECS)
+add_subdirectory(src/Command)
 add_subdirectory(src/Client)
 add_subdirectory(src/Server)
 # add_subdirectory(src/Utils)

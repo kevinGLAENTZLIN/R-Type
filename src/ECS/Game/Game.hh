@@ -20,6 +20,7 @@
 #include "../Component/Input/Input.hh"
 #include "../Component/Projectile/Projectile.hh"
 #include "../Component/Background/Background.hpp"
+#include "../Component/Patapata/Patapata.hpp"
 
 #include "../System/SystemManager/SystemManager.hpp"
 

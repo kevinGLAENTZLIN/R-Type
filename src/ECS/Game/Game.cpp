@@ -30,6 +30,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::Render3D>();
     _core->registerComponent<ECS::Components::Projectile>();
     _core->registerComponent<ECS::Components::Background>();
+    _core->registerSystem<ECS::Components::Patapata>();
 
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
@@ -37,6 +38,7 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::InputUpdates>();
     _core->registerSystem<ECS::Systems::SystemRender2D>();
     _core->registerSystem<ECS::Systems::SystemRender3D>();
+    _core->registerSystem<ECS::Systems::UpdateVelocityPatapata>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -80,6 +82,13 @@ Rtype::Game::Game()
     renderSignature2D.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Render2D>());
     _core->setSystemSignature<ECS::Systems::SystemRender2D>(renderSignature2D);
+
+    Signature updateVelocityPatapataSignature;
+    updateVelocityPatapataSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
+    updateVelocityPatapataSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Patapata>());
+    _core->setSystemSignature<ECS::Systems::UpdateVelocityPatapata>(updateVelocityPatapataSignature);
 
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{0.0f, 0.0f});
@@ -144,7 +153,7 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     auto &positions = _core->getComponents<ECS::Components::Position>();
 
     if (!positions[entityID].has_value()) {
-        //std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
         return;
     }
     const ECS::Components::Position &entityPos = positions[entityID].value();
@@ -165,7 +174,10 @@ void Rtype::Game::update() {
     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
     auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
+    auto patapataSystem = _core->getSystem<ECS::Systems::Patapata>();
 
+
+    auto patapataEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Patapata>());
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
@@ -177,6 +189,8 @@ void Rtype::Game::update() {
 
     if (entitesID <= 10000)
         createProjectile(entitesID);
+    patapataSystem->update(_core->getComponents<ECS::Components::Velocity>(),
+                            patapataEntities);
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);
@@ -214,7 +228,6 @@ void Rtype::Game::render()
 
     auto renderSystem3D = _core->getSystem<ECS::Systems::SystemRender3D>();
     auto renderEntities3D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender3D>());
-
 
     renderSystem2D->update(_core->getComponents<ECS::Components::Position>(),
                         _core->getComponents<ECS::Components::Render2D>(),

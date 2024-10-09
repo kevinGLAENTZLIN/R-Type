@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36" version="24.7.17" pages="2">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="ECS">
-    <mxGraphModel dx="2251" dy="3072" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1313" dy="2279" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -636,7 +636,7 @@
           <mxGeometry y="34" width="330" height="76" as="geometry" />
         </mxCell>
         <mxCell id="poZoN8kQUyQc4HhDRA4U-58" value="System" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="2400" y="-990" width="250" height="340" as="geometry">
+          <mxGeometry x="2710" y="-1160" width="250" height="340" as="geometry">
             <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -844,6 +844,140 @@
         </mxCell>
         <mxCell id="jB-Xp0p8wetHSDOnZMpT-42" value="+ clear(void) : void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="jB-Xp0p8wetHSDOnZMpT-6" vertex="1">
           <mxGeometry y="790" width="460" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="46qobdDRxBcM_sSUUL1y-0">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2710" y="-1055" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-0" value="SystemVelocity" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="2210" y="-1155" width="400" height="200" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-2" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-0">
+          <mxGeometry y="26" width="400" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-41" value="+ SystemVelocity : Constructor " style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-0">
+          <mxGeometry y="34" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-42" value="+ ~SystemVelocity : Constructor " style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-0">
+          <mxGeometry y="60" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-43" value="+ update(positions, velocities, entities :&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Position&gt;,&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Velocity&gt;,&#xa;std::vector&lt;std::size_t&gt;) : void&#xa;&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-0">
+          <mxGeometry y="86" width="400" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="46qobdDRxBcM_sSUUL1y-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2960" y="-1055" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-4" value="SystemRender3D" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="3050" y="-1140" width="400" height="170" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-6" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-4">
+          <mxGeometry y="26" width="400" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-45" value="+ SystemRender3D : Constructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-4">
+          <mxGeometry y="34" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-46" value="+ ~SystemRender3D : Destructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-4">
+          <mxGeometry y="60" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-47" value="+ update(positions, render, entities, resourcePool, camera :&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Position&gt;&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Render3D&gt;&#xa;std::vector&lt;std::size_t&gt;, ECS::RessourcePool, raylib::Camera3D) : void&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-4">
+          <mxGeometry y="86" width="400" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-48" value="SystemRender2D" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="2200" y="-910" width="400" height="170" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-49" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-48">
+          <mxGeometry y="26" width="400" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="46qobdDRxBcM_sSUUL1y-48" source="46qobdDRxBcM_sSUUL1y-50">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="46.90909090909088" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-50" value="+ SystemRender2D : Constructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-48">
+          <mxGeometry y="34" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-51" value="+ ~SystemRender2D : Destructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-48">
+          <mxGeometry y="60" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-52" value="+ update(positions, render, entities, resourcePool,  :&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Position&gt;&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Render2D&gt;&#xa;std::vector&lt;std::size_t&gt;, ECS::RessourcePool) : void&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-48">
+          <mxGeometry y="86" width="400" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-54" value="ProjectileCollision" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="3050" y="-890" width="400" height="170" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-55" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-54">
+          <mxGeometry y="26" width="400" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="46qobdDRxBcM_sSUUL1y-54" source="46qobdDRxBcM_sSUUL1y-57">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-90" y="47" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-57" value="+ ProjectileCollision : Constructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-54">
+          <mxGeometry y="34" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-58" value="+ ~ProjectileCollision : Destructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-54">
+          <mxGeometry y="60" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-59" value="+ projectileIsHit(positions, hitboxes, projectileEntities, entities,  :&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Position&gt;&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Hitbox&gt;&#xa;std::vector&lt;std::size_t&gt;, std::vector&lt;std:size_t&gt;) : std::size_t&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-54">
+          <mxGeometry y="86" width="400" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-61" value="InputUpdates" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="3050" y="-680" width="400" height="240" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-62" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-61">
+          <mxGeometry y="26" width="400" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-64" value="+ InputUpdates : Constructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-61">
+          <mxGeometry y="34" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-65" value="+ ~InputUpdates : Destructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-61">
+          <mxGeometry y="60" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-66" value="+ updateInputs(inputs, inputComponents, entities,  :&#xa;const std::vector&lt;std::size_t&gt; &amp;&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Input&gt; &amp;&#xa;std::vector&lt;std::size_t&gt;) : std::size_t&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-61">
+          <mxGeometry y="86" width="400" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-68" value="+ updateInputedVelocity(inputs, velocitites, entities,  :&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Input&gt; &amp;&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Velocity&gt; &amp;&#xa;std::vector&lt;std::size_t&gt;) : void&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-61">
+          <mxGeometry y="160" width="400" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-67" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="46qobdDRxBcM_sSUUL1y-65" target="poZoN8kQUyQc4HhDRA4U-58">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-69" value="Collision" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="2210" y="-680" width="400" height="240" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-70" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-69">
+          <mxGeometry y="26" width="400" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-71" value="+ Collision : Constructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-69">
+          <mxGeometry y="34" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-72" value="+ ~Collision : Destructor" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-69">
+          <mxGeometry y="60" width="400" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-73" value="+ isHit(positions, hitboxes, entities,  :&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Position&gt; &amp;&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Hitbox&gt; &amp;&#xa;std::vector&lt;std::size_t&gt;) : void&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-69">
+          <mxGeometry y="86" width="400" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-74" value="+ projectileIsHit(positions, hitboxes, entities,  :&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components::Position&gt; &amp;&#xa;ECS::ComponentManager::SparseArray&lt;ECS::Components:: Hitbox &gt; &amp;&#xa;std::vector&lt;std::size_t&gt;) : static void&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="46qobdDRxBcM_sSUUL1y-69">
+          <mxGeometry y="160" width="400" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="46qobdDRxBcM_sSUUL1y-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="46qobdDRxBcM_sSUUL1y-73" target="poZoN8kQUyQc4HhDRA4U-58">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

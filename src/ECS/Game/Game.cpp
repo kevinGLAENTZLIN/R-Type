@@ -90,6 +90,7 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
     updateVelocityPataPataSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::PataPata>());
+    _core->setSystemSignature<ECS::Systems::UpdateVelocityPataPata>(updateVelocityPataPataSignature);
 
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{-10.0f, 0.0f});

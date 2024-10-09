@@ -24,6 +24,7 @@ Rtype::Game::Game()
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
     _ressourcePool.addTexture("background");
+
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
@@ -74,7 +75,6 @@ Rtype::Game::Game()
     renderSignature3D.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Render3D>());
     _core->setSystemSignature<ECS::Systems::SystemRender3D>(renderSignature3D);
-
 
     Signature renderSignature2D;
     renderSignature2D.set(
@@ -159,8 +159,8 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     std::size_t projectile = _core->createEntity();
 
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
+    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
     _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + (entityHitbox.getWidth()), entityPos.getY()});
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
@@ -182,12 +182,10 @@ void Rtype::Game::update() {
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
 
-    std::size_t entitesID = inputUpdatesSystem->updateInputs(getAllInputs(),
+    std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
 
-    if (entitesID <= 10000)
-        createProjectile(entitesID);
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);
@@ -195,6 +193,9 @@ void Rtype::Game::update() {
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
                            velocityEntities);
+
+    if (entityID <= 10000)
+        createProjectile(entityID);
 
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),

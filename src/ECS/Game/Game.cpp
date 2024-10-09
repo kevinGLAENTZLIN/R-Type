@@ -181,7 +181,53 @@ void Rtype::Game::destroyProjectile(std::size_t entityID)
     _core->destroyEntity(entityID);
 }
 
+// void Rtype::Game::update() {
+//     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
+//     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
+//     auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
+//     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
+//     auto patapataSystem = _core->getSystem<ECS::Systems::UpdateVelocityPataPata>();
+
+//     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
+//     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
+//     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
+//     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
+//     auto patapataEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityPataPata>());
+
+
+//     patapataSystem->update(_core->getComponents<ECS::Components::Velocity>(),
+//                            patapataEntities);
+//     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
+//                                      _core->getComponents<ECS::Components::Input>(),
+//                                      inputEntities);
+
+//     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
+//                                               _core->getComponents<ECS::Components::Velocity>(),
+//                                               inputEntities);
+
+//     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
+//                            _core->getComponents<ECS::Components::Velocity>(),
+//                            velocityEntities);
+
+//     if (entityID <= 10000)
+//         createProjectile(entityID);
+
+//     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
+//                            _core->getComponents<ECS::Components::Hitbox>(),
+//                            collisionEntities);
+
+//     std::size_t projectileEntityId = projectileCollisionSystem->projectileIsHit(
+//         _core->getComponents<ECS::Components::Position>(),
+//         _core->getComponents<ECS::Components::Hitbox>(),
+//         projectileEntities, collisionEntities);
+
+//     if (projectileEntityId <= 10000)
+//         destroyProjectile(projectileEntityId);
+// }
+
 void Rtype::Game::update() {
+    float currentTime = GetTime();
+
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
     auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
@@ -194,9 +240,9 @@ void Rtype::Game::update() {
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     auto patapataEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityPataPata>());
 
-
     patapataSystem->update(_core->getComponents<ECS::Components::Velocity>(),
-                           patapataEntities);
+                           patapataEntities, currentTime);
+
     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
@@ -224,6 +270,7 @@ void Rtype::Game::update() {
     if (projectileEntityId <= 10000)
         destroyProjectile(projectileEntityId);
 }
+
 
 void Rtype::Game::render()
 {

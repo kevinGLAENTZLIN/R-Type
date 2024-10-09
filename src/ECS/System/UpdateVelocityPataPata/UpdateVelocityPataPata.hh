@@ -15,7 +15,7 @@ namespace ECS {
 
             void update(
                 ECS::ComponentManager::SparseArray<ECS::Components::Velocity> & velocities,
-                std::vector<std::size_t> pataPatas);
+                std::vector<std::size_t> pataPatas, float timeElapsed));
         };
     }
 }

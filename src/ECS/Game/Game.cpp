@@ -144,7 +144,7 @@ void Rtype::Game::createProjectile(std::size_t entityID)
     auto &positions = _core->getComponents<ECS::Components::Position>();
 
     if (!positions[entityID].has_value()) {
-        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+        //std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
         return;
     }
     const ECS::Components::Position &entityPos = positions[entityID].value();

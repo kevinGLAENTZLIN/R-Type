@@ -20,7 +20,7 @@ std::size_t ECS::Systems::ProjectileCollision::projectileIsHit(
         auto &projectilePos = positions[projectile].value();
         auto &projectileHitbox = hitboxes[projectile].value();
 
-        if (projectilePos.getX() >= 1500 || projectilePos.getY() >= 1000)
+        if (projectilePos.getX() >= 11.0 || projectilePos.getX() <= -11.0)
             return projectile;
         
         for (std::size_t i = 0; i < entities.size(); ++i) {           

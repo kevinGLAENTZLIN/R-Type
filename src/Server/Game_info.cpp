@@ -7,6 +7,11 @@
 
 #include "Game_info.hh"
 
+Rtype::Game_info::Game_info():
+	_id(-1), _level(0), _nbMaxPlayer(6), _players()
+{
+}
+
 Rtype::Game_info::Game_info(int id):
 	_id(id), _level(0), _nbMaxPlayer(6), _players()
 {

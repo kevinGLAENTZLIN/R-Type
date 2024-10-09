@@ -16,6 +16,7 @@ namespace Rtype
 {
     class Game_info {
         public:
+            Game_info();
             Game_info(int id);
             ~Game_info();
 

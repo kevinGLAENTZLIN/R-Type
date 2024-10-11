@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cmath>
 #include "../System/System.hpp"
 
 #include "../../Component/ComponentManager/SparseArray.hpp"
 #include "../../Component/Velocity/Velocity.hh"
+#include "../../Component/Position/Position.hpp"
 
 namespace ECS {
     namespace Systems {
@@ -15,7 +17,8 @@ namespace ECS {
 
             void update(
                 ECS::ComponentManager::SparseArray<ECS::Components::Velocity> & velocities,
-                std::vector<std::size_t> pataPatas, float timeElapsed));
+                ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
+                std::vector<std::size_t> pataPatas);
         };
     }
 }

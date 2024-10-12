@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace Boss
         {
-            class Spawn: ICommand{
+            class Spawn: public ICommand{
                 public:
-                    Spawn(std::map<int, Rtype::client_info> players, int bossType, int x, int y);
-                    Spawn();
+                    Spawn() = default;
                     ~Spawn();
+
+                    void set_server(std::map<int, Rtype::client_info> players, int bossType, int x, int y);
+                    void set_client();
 
                     void execute_client_side();
                     void execute_server_side();

@@ -7,13 +7,14 @@
 
 #include "Attack.hh"
 
-Rtype::Command::Boss::Attack::Attack(std::map<int, Rtype::client_info> players, int bossType, int bossAttackType):
-    _players(players), _bossType(bossType), _bossAttackType(bossAttackType)
+void Rtype::Command::Boss::Attack::set_server(std::map<int, Rtype::client_info> players, int bossType, int bossAttackType)
 {
+    _players = players;
+    _bossType = bossType;
+    _bossAttackType = bossAttackType;
 }
 
-Rtype::Command::Boss::Attack::Attack():
-    _players(), _bossType(-1), _bossAttackType(-1)
+void Rtype::Command::Boss::Attack::set_client()
 {
 }
 

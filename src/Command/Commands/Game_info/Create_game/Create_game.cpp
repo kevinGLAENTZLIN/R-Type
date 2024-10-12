@@ -7,14 +7,15 @@
 
 #include "Create_game.hh"
 
-Rtype::Command::GameInfo::Create_game::Create_game(udp::endpoint endpoint):
-    _endpoint(endpoint)
+void Rtype::Command::GameInfo::Create_game::set_client(udp::endpoint endpoint)
 {
+    _endpoint = endpoint;
 }
 
-Rtype::Command::GameInfo::Create_game::Create_game(udp::endpoint endpoint, std::vector<int> &games):
-    _endpoint(endpoint), _games(games)
+void Rtype::Command::GameInfo::Create_game::set_server(udp::endpoint endpoint, std::vector<Rtype::Game_info> &games)
 {
+    _endpoint = endpoint;
+    _games = games;
 }
 
 Rtype::Command::GameInfo::Create_game::~Create_game()

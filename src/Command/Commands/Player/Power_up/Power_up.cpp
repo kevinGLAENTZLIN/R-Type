@@ -7,14 +7,17 @@
 
 #include "Power_up.hh"
 
-Rtype::Command::Player::Power_up::Power_up(std::map<int, Rtype::client_info> players, int playerID, int powerUpID):
-    _endpoint(), _players(players), _playerID(playerID), _powerUpID(powerUpID)
+void Rtype::Command::Player::Power_up::set_server(std::map<int, Rtype::client_info> players, int playerID, int powerUpID)
 {
+    _players = players;
+    _playerID = playerID;
+    _powerUpID = powerUpID;
 }
 
-Rtype::Command::Player::Power_up::Power_up(udp::endpoint endpoint, int powerUpID):
-    _endpoint(endpoint), _players(), _playerID(-1), _powerUpID(powerUpID)
+void Rtype::Command::Player::Power_up::set_client(udp::endpoint endpoint, int powerUpID)
 {
+    _endpoint = endpoint;
+    _powerUpID = powerUpID;
 }
 
 Rtype::Command::Player::Power_up::~Power_up()

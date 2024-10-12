@@ -7,13 +7,13 @@
 
 #include "Die.hh"
 
-Rtype::Command::Enemy::Die::Die(std::map<int, Rtype::client_info> players, int mobID):
-    _players(players), _mobID(mobID)
+void Rtype::Command::Enemy::Die::set_server(std::map<int, Rtype::client_info> players, int mobID)
 {
+    _players = players;
+    _mobID = mobID;
 }
 
-Rtype::Command::Enemy::Die::Die():
-    _players(), _mobID(-1)
+void Rtype::Command::Enemy::Die::set_client()
 {
 }
 

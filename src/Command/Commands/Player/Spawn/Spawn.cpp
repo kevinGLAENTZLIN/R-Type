@@ -7,13 +7,15 @@
 
 #include "Spawn.hh"
 
-Rtype::Command::Player::Spawn::Spawn(std::map<int, Rtype::client_info> players, int playerID, int x, int y):
-    _players(players), _playerID(playerID), _x(x), _y(y)
+void Rtype::Command::Player::Spawn::set_server(std::map<int, Rtype::client_info> players, int playerID, int x, int y)
 {
+    _players = players;
+    _playerID = playerID;
+    _x = x;
+    _y = y;
 }
 
-Rtype::Command::Player::Spawn::Spawn():
-    _players(), _playerID(-1), _x(-1), _y(-1)
+void Rtype::Command::Player::Spawn::set_client()
 {
 }
 

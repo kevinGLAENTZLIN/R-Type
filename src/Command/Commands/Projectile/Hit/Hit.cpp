@@ -7,13 +7,13 @@
 
 #include "Hit.hh"
 
-Rtype::Command::Projectile::Hit::Hit(std::map<int, Rtype::client_info> players, int projectileID):
-    _players(players), _projectileID(projectileID)
+void Rtype::Command::Projectile::Hit::set_server(std::map<int, Rtype::client_info> players, int projectileID)
 {
+    _players = players;
+    _projectileID = projectileID;
 }
 
-Rtype::Command::Projectile::Hit::Hit():
-    _players(), _projectileID(-1)
+void Rtype::Command::Projectile::Hit::set_client()
 {
 }
 

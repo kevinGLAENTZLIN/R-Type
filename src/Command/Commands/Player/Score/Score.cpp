@@ -7,14 +7,15 @@
 
 #include "Score.hh"
 
-Rtype::Command::Player::Score::Score(std::map<int, Rtype::client_info> players, int score):
-    _endpoint(), _players(players), _score(score)
+void Rtype::Command::Player::Score::set_server(std::map<int, Rtype::client_info> players, int score)
 {
+    _players = players;
+    _score = score;
 }
 
-Rtype::Command::Player::Score::Score(udp::endpoint endpoint):
-    _endpoint(endpoint), _players(), _score(-1)
+void Rtype::Command::Player::Score::set_client(udp::endpoint endpoint)
 {
+    _endpoint = endpoint;
 }
 
 Rtype::Command::Player::Score::~Score()

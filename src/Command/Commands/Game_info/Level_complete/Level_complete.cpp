@@ -7,14 +7,14 @@
 
 #include "Level_complete.hh"
 
-Rtype::Command::GameInfo::Level_complete::Level_complete():
-    _endpoint(), _game()
+void Rtype::Command::GameInfo::Level_complete::set_client()
 {
 }
 
-Rtype::Command::GameInfo::Level_complete::Level_complete(udp::endpoint endpoint, Rtype::Game_info &game):
-    _endpoint(endpoint), _game(game)
+void Rtype::Command::GameInfo::Level_complete::set_server(udp::endpoint endpoint, Rtype::Game_info &game)
 {
+    _endpoint = endpoint;
+    _game = game;
 }
 
 Rtype::Command::GameInfo::Level_complete::~Level_complete()

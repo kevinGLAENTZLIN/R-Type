@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace Player
         {
-            class Hit_wall: ICommand{
+            class Hit_wall: public ICommand{
                 public:
-                    Hit_wall(std::map<int, Rtype::client_info> players, int playerID);
-                    Hit_wall(udp::endpoint endpoint);
+                    Hit_wall() = default;
                     ~Hit_wall();
+
+                    void set_server(std::map<int, Rtype::client_info> players, int playerID);
+                    void set_client(udp::endpoint endpoint);
 
                     void execute_client_side();
                     void execute_server_side();

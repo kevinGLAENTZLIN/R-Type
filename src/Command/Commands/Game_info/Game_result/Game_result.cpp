@@ -7,14 +7,14 @@
 
 #include "Game_result.hh"
 
-Rtype::Command::GameInfo::Game_result::Game_result():
-    _endpoint(), _game()
+void Rtype::Command::GameInfo::Game_result::set_client()
 {
 }
 
-Rtype::Command::GameInfo::Game_result::Game_result(udp::endpoint endpoint, Rtype::Game_info game):
-    _endpoint(endpoint), _game(game)
+void Rtype::Command::GameInfo::Game_result::set_server(udp::endpoint endpoint, Rtype::Game_info game)
 {
+    _endpoint = endpoint;
+    _game = game;
 }
 
 Rtype::Command::GameInfo::Game_result::~Game_result()

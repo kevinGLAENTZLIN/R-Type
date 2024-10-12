@@ -7,13 +7,16 @@
 
 #include "Spawn.hh"
 
-Rtype::Command::Enemy::Spawn::Spawn(std::map<int, Rtype::client_info> players, int mobType, int mobID, int x, int y):
-    _players(players), _mobType(mobType), _mobID(mobID), _x(x), _y(y)
+void Rtype::Command::Enemy::Spawn::set_server(std::map<int, Rtype::client_info> players, int mobType, int mobID, int x, int y)
 {
+    _players = players;
+    _mobType = mobType;
+    _mobID = mobID;
+    _x = x;
+    _y = y;
 }
 
-Rtype::Command::Enemy::Spawn::Spawn():
-    _players(), _mobType(-1), _mobID(-1), _x(-1), _y(-1)
+void Rtype::Command::Enemy::Spawn::set_client()
 {
 }
 

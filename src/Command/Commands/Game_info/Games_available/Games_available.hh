@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Games_available: ICommand{
+            class Games_available: public ICommand{
                 public:
-                    Games_available(udp::endpoint endpoint);
-                    Games_available(udp::endpoint endpoint, std::vector<Rtype::Game_info> games);
+                    Games_available() = default;
                     ~Games_available();
+
+                    void set_client(udp::endpoint endpoint);
+                    void set_server(udp::endpoint endpoint, std::vector<Rtype::Game_info> games);
 
                     void execute_client_side();
                     void execute_server_side();

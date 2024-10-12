@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace Player
         {
-            class Score: ICommand{
+            class Score: public ICommand{
                 public:
-                    Score(std::map<int, Rtype::client_info> players, int score);
-                    Score(udp::endpoint endpoint);
+                    Score() = default;
                     ~Score();
+
+                    void set_server(std::map<int, Rtype::client_info> players, int score);
+                    void set_client(udp::endpoint endpoint);
 
                     void execute_client_side();
                     void execute_server_side();

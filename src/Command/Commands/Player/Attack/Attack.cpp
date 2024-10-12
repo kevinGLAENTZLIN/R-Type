@@ -7,14 +7,16 @@
 
 #include "Attack.hh"
 
-Rtype::Command::Player::Attack::Attack(std::map<int, Rtype::client_info> players, int projectileID):
-    _endpoint(), _players(players), _projectileID(projectileID)
+void Rtype::Command::Player::Attack::set_server(std::map<int, Rtype::client_info> players, int projectileID)
 {
+    _players = players;
+    _projectileID = projectileID;
 }
 
-Rtype::Command::Player::Attack::Attack(udp::endpoint endpoint, int projectileID):
-    _endpoint(endpoint), _players(), _projectileID(projectileID)
+void Rtype::Command::Player::Attack::set_client(udp::endpoint endpoint, int projectileID)
 {
+    _endpoint = endpoint;
+    _projectileID = projectileID;
 }
 
 Rtype::Command::Player::Attack::~Attack()

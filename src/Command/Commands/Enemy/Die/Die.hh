@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace Enemy
         {
-            class Die: ICommand{
+            class Die: public ICommand{
                 public:
-                    Die(std::map<int, Rtype::client_info> players, int mobID);
-                    Die();
+                    Die() = default;
                     ~Die();
+
+                    void set_server(std::map<int, Rtype::client_info> players, int mobID);
+                    void set_client();
 
                     void execute_client_side();
                     void execute_server_side();

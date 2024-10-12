@@ -7,14 +7,15 @@
 
 #include "Games_available.hh"
 
-Rtype::Command::GameInfo::Games_available::Games_available(udp::endpoint endpoint):
-    _endpoint(endpoint), _games()
+void Rtype::Command::GameInfo::Games_available::set_client(udp::endpoint endpoint)
 {
+    _endpoint = endpoint;
 }
 
-Rtype::Command::GameInfo::Games_available::Games_available(udp::endpoint endpoint, std::vector<Rtype::Game_info> games):
-    _endpoint(endpoint), _games(games)
+void Rtype::Command::GameInfo::Games_available::set_server(udp::endpoint endpoint, std::vector<Rtype::Game_info> games)
 {
+    _endpoint = endpoint;
+    _games = games;
 }
 
 Rtype::Command::GameInfo::Games_available::~Games_available()

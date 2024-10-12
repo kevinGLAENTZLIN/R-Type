@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace Enemy
         {
-            class Attack: ICommand{
+            class Attack: public ICommand{
                 public:
-                    Attack(std::map<int, Rtype::client_info> players, int mobID);
-                    Attack();
+                    Attack() = default;
                     ~Attack();
+
+                    void set_server(std::map<int, Rtype::client_info> players, int mobID);
+                    void set_client();
 
                     void execute_client_side();
                     void execute_server_side();

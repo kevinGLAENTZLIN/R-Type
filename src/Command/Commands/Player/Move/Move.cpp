@@ -7,14 +7,19 @@
 
 #include "Move.hh"
 
-Rtype::Command::Player::Move::Move(std::map<int, Rtype::client_info> players, int playerID, int x, int y):
-    _endpoint(), _players(players), _playerID(playerID), _x(x), _y(y) 
+void Rtype::Command::Player::Move::set_server(std::map<int, Rtype::client_info> players, int playerID, int x, int y)
 {
+    _players = players;
+    _playerID = playerID;
+    _x = x;
+    _y = y;
 }
 
-Rtype::Command::Player::Move::Move(udp::endpoint endpoint, int x, int y):
-    _endpoint(endpoint), _players(), _playerID(-1), _x(x), _y(y) 
+void Rtype::Command::Player::Move::set_client(udp::endpoint endpoint, int x, int y)
 {
+    _endpoint = endpoint;
+    _x = x;
+    _y = y;
 }
 
 Rtype::Command::Player::Move::~Move()

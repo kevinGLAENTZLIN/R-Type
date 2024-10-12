@@ -7,14 +7,16 @@
 
 #include "Join_game.hh"
 
-Rtype::Command::GameInfo::Join_game::Join_game(udp::endpoint endpoint, int gameRoom):
-    _endpoint(endpoint), _gameRoom(gameRoom), _game()
+void Rtype::Command::GameInfo::Join_game::set_client(udp::endpoint endpoint, int gameRoom)
 {
+    _endpoint = endpoint;
+    _gameRoom = gameRoom;
 }
 
-Rtype::Command::GameInfo::Join_game::Join_game(udp::endpoint endpoint, Rtype::Game_info &game):
-    _endpoint(endpoint), _gameRoom(-1), _game(game)
+void Rtype::Command::GameInfo::Join_game::set_server(udp::endpoint endpoint, Rtype::Game_info &game)
 {
+    _endpoint = endpoint;
+    _game = game;
 }
 
 Rtype::Command::GameInfo::Join_game::~Join_game()

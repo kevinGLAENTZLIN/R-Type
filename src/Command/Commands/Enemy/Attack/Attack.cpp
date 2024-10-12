@@ -7,13 +7,13 @@
 
 #include "Attack.hh"
 
-Rtype::Command::Enemy::Attack::Attack(std::map<int, Rtype::client_info> players, int mobID):
-    _players(players), _mobID(mobID)
+void Rtype::Command::Enemy::Attack::set_server(std::map<int, Rtype::client_info> players, int mobID)
 {
+    _players = players;
+    _mobID = mobID;
 }
 
-Rtype::Command::Enemy::Attack::Attack():
-    _players(), _mobID(-1)
+void Rtype::Command::Enemy::Attack::set_client()
 {
 }
 

@@ -7,13 +7,13 @@
 
 #include "Die.hh"
 
-Rtype::Command::Player::Die::Die(std::map<int, Rtype::client_info> players, int playerID):
-    _players(players), _playerID(playerID)
+void Rtype::Command::Player::Die::set_server(std::map<int, Rtype::client_info> players, int playerID)
 {
+    _players = players;
+    _playerID = playerID;
 }
 
-Rtype::Command::Player::Die::Die():
-    _players(), _playerID(-1)
+void Rtype::Command::Player::Die::set_client()
 {
 }
 

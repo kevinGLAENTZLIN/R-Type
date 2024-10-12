@@ -28,6 +28,7 @@ bool Rtype::Game_info::isGameAvailable(void)
 
 int Rtype::Game_info::gameStatus(void)
 {
+	return 0;
 }
 
 int Rtype::Game_info::getLevel(void)

@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Client_connection: ICommand{
+            class Client_connection: public ICommand{
                 public:
-                    Client_connection(udp::endpoint endpoint);
-                    Client_connection(udp::endpoint endpoint, std::map<int, Rtype::client_info> &clients);
+                    Client_connection() = default;
                     ~Client_connection();
+
+                    void set_client(udp::endpoint endpoint);
+                    void set_server(udp::endpoint endpoint, std::map<int, Rtype::client_info> &clients);
 
                     void execute_client_side();
                     void execute_server_side();

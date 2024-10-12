@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Join_game: ICommand{
+            class Join_game: public ICommand{
                 public:
-                    Join_game(udp::endpoint endpoint, int gameRoom);
-                    Join_game(udp::endpoint endpoint, Rtype::Game_info &game);
+                    Join_game() = default;
                     ~Join_game();
+
+                    void set_client(udp::endpoint endpoint, int gameRoom);
+                    void set_server(udp::endpoint endpoint, Rtype::Game_info &game);
 
                     void execute_client_side();
                     void execute_server_side();

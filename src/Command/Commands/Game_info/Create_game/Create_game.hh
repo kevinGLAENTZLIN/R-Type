@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Create_game: ICommand{
+            class Create_game: public ICommand{
                 public:
-                    Create_game(udp::endpoint endpoint);
-                    Create_game(udp::endpoint endpoint, std::vector<int> &games);
+                    Create_game() = default;
                     ~Create_game();
+
+                    void set_client(udp::endpoint endpoint);
+                    void set_server(udp::endpoint endpoint, std::vector<Rtype::Game_info> &games);
 
                     void execute_client_side();
                     void execute_server_side();

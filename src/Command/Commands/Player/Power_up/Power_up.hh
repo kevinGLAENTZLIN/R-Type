@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace Player
         {
-            class Power_up: ICommand{
+            class Power_up: public ICommand{
                 public:
-                    Power_up(std::map<int, Rtype::client_info> players, int playerID, int powerUpID);
-                    Power_up(udp::endpoint endpoint, int powerUpID);
+                    Power_up() = default;
                     ~Power_up();
+
+                    void set_server(std::map<int, Rtype::client_info> players, int playerID, int powerUpID);
+                    void set_client(udp::endpoint endpoint, int powerUpID);
 
                     void execute_client_side();
                     void execute_server_side();

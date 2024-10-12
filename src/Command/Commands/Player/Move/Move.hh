@@ -15,11 +15,13 @@ namespace Rtype
     {
         namespace Player
         {
-            class Move: ICommand{
+            class Move: public ICommand{
                 public:
-                    Move(std::map<int, Rtype::client_info> players, int playerID, int x, int y);
-                    Move(udp::endpoint endpoint, int x, int y);
+                    Move() = default;
                     ~Move();
+
+                    void set_server(std::map<int, Rtype::client_info> players, int playerID, int x, int y);
+                    void set_client(udp::endpoint endpoint, int x, int y);
 
                     void execute_client_side();
                     void execute_server_side();

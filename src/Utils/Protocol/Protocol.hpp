@@ -5,64 +5,95 @@
 ** Protocole.hh
 */
 
+/**
+ * @file Protocole.hpp
+ * @brief Declaration of the Utils::Network::Protocole class for the communication protocol.
+ */
+
 #pragma once
 #include <cstdint>
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <any>
+#include "../Response/Response.hpp"
 
 namespace Utils
 {
     namespace Network
     {
-
-        enum class InfoType : uint8_t {
-            GameInfo = 1 << 1,
-            Player = 1 << 2,
-            Enemy = 1 << 3,
-            Boss = 1 << 4,
-            PowerUp = 1 << 5,
-            Projectile = 1 << 6,
-        };
-
-
+        /**
+         * @typedef bytes
+         * @brief Alias for a vector of uint8_t.
+         */
         using bytes = std::vector<uint8_t>;
 
         class Protocol
         {
         private:
-            // SIZE OF DIFFERENT PARAMS IN BITS
-            const std::size_t ACK_SIZE = sizeof(uint32_t);
-            const std::size_t PARAMS_SIZE_SIZE = sizeof(uint8_t);
-            const std::size_t INFO_TYPE_SIZE = sizeof(uint8_t);
-            const std::size_t FUNCTION_TYPE_SIZE = sizeof(uint8_t);
-            const std::size_t MIN_SIZE = ACK_SIZE + PARAMS_SIZE_SIZE + INFO_TYPE_SIZE + FUNCTION_TYPE_SIZE;
+            static const std::size_t ACK_SIZE = sizeof(uint32_t);
+            static const std::size_t PARAMS_SIZE_SIZE = sizeof(uint8_t);
+            static const std::size_t INFO_TYPE_SIZE = sizeof(uint8_t);
+            static const std::size_t FUNCTION_TYPE_SIZE = sizeof(uint8_t);
 
+            /**
+             * @brief Appends a fixed-size type into a bytes vector.
+             * 
+             * @tparam T have to be Primitive type.
+             * @param msg The bytes vector to append the value to.
+             * @param value The value to append.
+             */
             template<typename T>
-            void appendFixedSizeTypeIntoBytes(bytes &msg, T value) {
+            static void appendFixedSizeTypeIntoBytes(bytes &msg, T value) {
                 bytes converted_value(sizeof(T));
 
                 std::memcpy(converted_value.data(), &value, sizeof(T));
                 msg.insert(msg.end(), converted_value.begin(), converted_value.end());
             }
+            /**
+             * @brief Extracts a fixed-size type from a bytes vector.
+             * 
+             * @param offset The offset to start extracting from.
+             * @param msg The bytes vector to extract the value from.
+             * @param type_ The type of the value to extract.
+             * @return The extracted value in a std::any.
+             */
+            static std::any newParam(std::size_t &offset, bytes msg, char type_);
+            
 
         public:
             Protocol() = delete;
-            template<typename... Args>
-            bytes CreateMsg(uint32_t ack, InfoType info, uint8_t functionDefiner, Args... args)
+
+            /**
+             * @brief Encode the msg in bytes.
+             * @tparam T The type of the function to send.
+             * @param ack The ACK number.
+             * @param info The type of the message.
+             * @param functionDefiner The function to send.
+             * @param args The list of arguments to send.
+             * @return The message to send in bytes.
+             */
+            template<Utils::FunctionIndex T, typename... Args>
+            static bytes CreateMsg(uint32_t ack, Utils::InfoTypeEnum info, T functionDefiner, Args... args)
             {
                 bytes msg;
-                uint16_t sizeOfMsg = MIN_SIZE;
-                ((sizeOfMsg += sizeof(args)), ...)
+
                 appendFixedSizeTypeIntoBytes(msg, ack);
-                appendFixedSizeTypeIntoBytes(msg, sizeOfMsg);
                 appendFixedSizeTypeIntoBytes(msg, info);
-                appendFixedSizeTypeIntoBytes(msg, functionDefiner);
+                appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner));
                 (appendFixedSizeTypeIntoBytes(msg, args), ...);
+
+                return msg;
             }
 
+            /**
+             * @brief Parse the message received.
+             * @param isClient True if the message is read by a Client, False if it's read by a Server.
+             * @param msg The message to parse.
+             * @return The response to the message.
+             */
+            static Response ParseMsg(bool isClient, bytes &msg);
         };
-                
     } // namespace Network
     
 } // namespace Utils

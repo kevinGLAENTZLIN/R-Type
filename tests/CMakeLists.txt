@@ -7,7 +7,8 @@ set(TEST_NAME "r-type_tests")
 # List the test source files
 set(TEST_SOURCES
     MainTest.cpp
-    EntityManager.cpp
+    ECS/Entity/EntityManager.cpp
+    Utils/Protocol.cpp
 )
 
 # Create the test executable from the sources
@@ -16,6 +17,7 @@ add_executable(${TEST_NAME} ${TEST_SOURCES})
 # Link the Doctest library to the test executable
 target_link_libraries(${TEST_NAME} PRIVATE doctest::doctest)
 target_link_libraries(${TEST_NAME} PUBLIC ${RTYPE})
+target_link_libraries(${TEST_NAME} PUBLIC "Utils")
 
 # Add the tests to CTest for integration with the testing framework
 add_test(NAME RTypeTests COMMAND ${TEST_NAME})

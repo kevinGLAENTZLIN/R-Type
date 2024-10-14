@@ -17,6 +17,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
     set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
     target_link_libraries(${NAME_SERVER} PRIVATE Boost::asio)
+    target_link_libraries(${NAME_SERVER} PRIVATE ${NAME_LIB_CMD})
+    target_link_libraries(${NAME_SERVER} PRIVATE ${NAME_LIB})
 else()
     add_executable(${NAME_SERVER} ${SERVER_SOURCES})
 

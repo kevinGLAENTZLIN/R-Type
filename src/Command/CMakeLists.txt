@@ -2,7 +2,7 @@ project(R-Type-Server-Cmd)
 
 find_package(boost_asio CONFIG REQUIRED)
 
-set(NAME_LIB_CMD ${RTYPE}-cmd)
+set(NAME_LIB_CMD ${RTYPE}-cmd CACHE INTERNAL "")
 
 set(LIB_CMD_SRC
     ./Commands/Game_info/Create_game/Create_game.cpp
@@ -26,7 +26,8 @@ set(LIB_CMD_SRC
     ./Commands/Player/Hit_wall/Hit_wall.cpp
     ./Commands/Player/Power_up/Power_up.cpp
     ./Commands/Player/Spawn/Spawn.cpp
-    ./Factory/Factory.cpp
+    ./Invoker/Command_invoker.cpp
+    # ./Factory/Factory.cpp
 )
 
 
@@ -38,8 +39,9 @@ add_library(${NAME_LIB_CMD} STATIC ${LIB_CMD_SRC})
 
 set_target_properties(${NAME_LIB_CMD} PROPERTIES
     OUTPUT_NAME ${NAME_LIB_CMD}
-    SUFFIX "a"
+    SUFFIX ".a"
 )
+message(${NAME_LIB_CMD})
 
 target_link_libraries(${NAME_LIB_CMD} PRIVATE Boost::asio)
 
@@ -72,5 +74,6 @@ target_include_directories(${NAME_LIB_CMD} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Player/Hit_wall
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Player/Power_up
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Player/Spawn
-    ${CMAKE_CURRENT_SOURCE_DIR}/Factory
+    ${CMAKE_CURRENT_SOURCE_DIR}/Invoker
+    # ${CMAKE_CURRENT_SOURCE_DIR}/Factory
 )

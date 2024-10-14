@@ -19,6 +19,8 @@
 #include <boost/asio.hpp>
 #include "Client_info.hh"
 #include "Game_info.hh"
+#include "../Command/Factory/Factory.hh"
+#include "../Command/Invoker/Command_invoker.hh"
 
 using boost::asio::ip::udp;
 using boost::asio::ip::address;
@@ -194,5 +196,7 @@ namespace Rtype {
             char _data[max_length];
             std::map<int, Rtype::client_info> _clients;
             std::vector<Rtype::Game_info> _games;
+            Rtype::Command::Command_invoker _commandInvoker;
+            // Rtype::Command::Factory _commandFactory;
     };
 }

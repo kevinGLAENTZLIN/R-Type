@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <boost/asio.hpp>
+
+using boost::asio::ip::udp;
+
 namespace Rtype
 {
     namespace Command
@@ -14,11 +18,11 @@ namespace Rtype
         class ICommand {
             public:
                 virtual ~ICommand() {}
-                virtual void execute_client_side();
-                virtual void execute_server_side();
+                virtual void execute_client_side() = 0;
+                virtual void execute_server_side() = 0;
 
-                virtual void set_server();
-                virtual void set_client();
+                virtual void set_server() = 0;
+                virtual void set_client() = 0;
         };
     }
 }

@@ -7,7 +7,8 @@
 
 #pragma once
 #include "../../../ICommand.hh"
-#include "../../../../Server/udp_server.hh"
+#include "../../../../Server/Game_info.hh"
+#include <map>
 
 namespace Rtype
 {

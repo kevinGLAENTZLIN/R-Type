@@ -11,11 +11,11 @@
 /**
  * @brief Constructor of Position component.
  *
- * @tparam float x, float y.
+ * @tparam float x, float y, float z.
  * @return void.
  */
-ECS::Components::Position::Position(float x, float y):
-    _x(x), _y(y)
+ECS::Components::Position::Position(float x, float y, float z):
+    _x(x), _y(y), _z(z)
 {}
 
 /**
@@ -41,6 +41,18 @@ float ECS::Components::Position::getY() const
 }
 
 /**
+ * @brief Getter _Z to Position component.
+ *
+ * @tparam void.
+ * @return Float based on private attribute _z which represent position in depth of an position entity.
+ */
+
+float ECS::Components::Position::getZ() const
+{
+    return _z;
+}
+
+/**
  * @brief Setter _X to Position component.
  *
  * @tparam float x.
@@ -63,6 +75,17 @@ void ECS::Components::Position::setY(float y)
 }
 
 /**
+ * @brief Setter _Z to Position component.
+ *
+ * @tparam float z.
+ * @return void.
+ */
+void ECS::Components::Position::setZ(float z)
+{
+    _z = z;
+}
+
+/**
  * @brief Getter _X and _Y to Position component.
  *
  * @tparam void.
@@ -72,4 +95,16 @@ void ECS::Components::Position::setY(float y)
 std::pair<float, float> ECS::Components::Position::getPosPair() const
 {
     return std::make_pair(_x, _y);
+}
+
+/**
+ * @brief Getter _X, _Y and _Z to Position component.
+ *
+ * @tparam void.
+ * @return std::tuple<float, float, float> based on private attribute _x, _y and _z
+ * which represent position in row, column and depth of an position entity
+ */
+std::tuple<float, float, float> ECS::Components::Position::getPosition() const
+{
+    return std::make_tuple(_x, _y, _z);
 }

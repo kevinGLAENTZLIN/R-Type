@@ -7,7 +7,7 @@
 
 #pragma once
 #include "../../../ICommand.hh"
-#include "../../../../Server/udp_server.hh"
+#include "../../../../Server/Game_info.hh"
 
 namespace Rtype
 {
@@ -17,7 +17,7 @@ namespace Rtype
         {
             class Game_result: public ICommand{
                 public:
-                    Game_result();
+                    Game_result() = default;
                     ~Game_result();
 
                     void set_client();

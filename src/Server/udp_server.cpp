@@ -14,7 +14,7 @@
 
 Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port):
     _socket(io_service, udp::endpoint(udp::v4(), port)), _clients(), _games(),
-    _commandInvoker("Server")
+    _commandInvoker("Server"), _commandFactory()
 {
     Utils::ParametersMap::init_map();
     std::memset(_data, 0, max_length);

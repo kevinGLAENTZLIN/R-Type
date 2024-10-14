@@ -197,6 +197,6 @@ namespace Rtype {
             std::map<int, Rtype::client_info> _clients;
             std::vector<Rtype::Game_info> _games;
             Rtype::Command::Command_invoker _commandInvoker;
-            // Rtype::Command::Factory _commandFactory;
+            Rtype::Command::Factory _commandFactory;
     };
 }

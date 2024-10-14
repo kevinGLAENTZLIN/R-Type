@@ -7,7 +7,7 @@
 
 #pragma once
 #include "../../../ICommand.hh"
-#include "../../../../Server/udp_server.hh"
+#include "../../../../Server/Client_info.hh"
 
 namespace Rtype
 {
@@ -17,7 +17,7 @@ namespace Rtype
         {
             class Spawn: public ICommand{
                 public:
-                    Spawn();
+                    Spawn() = default;
                     ~Spawn();
 
                     void set_server(std::map<int, Rtype::client_info> players, int mobType, int mobID, int x, int y);

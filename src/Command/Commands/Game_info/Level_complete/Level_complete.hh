@@ -7,7 +7,7 @@
 
 #pragma once
 #include "../../../ICommand.hh"
-#include "../../../../Server/udp_server.hh"
+#include "../../../../Server/Game_info.hh"
 
 namespace Rtype
 {
@@ -17,7 +17,7 @@ namespace Rtype
         {
             class Level_complete: public ICommand{
                 public:
-                    Level_complete();
+                    Level_complete() = default;
                     ~Level_complete();
 
                     void set_client();

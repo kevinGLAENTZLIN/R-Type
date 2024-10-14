@@ -27,7 +27,7 @@ set(LIB_CMD_SRC
     ./Commands/Player/Power_up/Power_up.cpp
     ./Commands/Player/Spawn/Spawn.cpp
     ./Invoker/Command_invoker.cpp
-    # ./Factory/Factory.cpp
+    ./Factory/Factory.cpp
 )
 
 
@@ -75,5 +75,5 @@ target_include_directories(${NAME_LIB_CMD} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Player/Power_up
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Player/Spawn
     ${CMAKE_CURRENT_SOURCE_DIR}/Invoker
-    # ${CMAKE_CURRENT_SOURCE_DIR}/Factory
+    ${CMAKE_CURRENT_SOURCE_DIR}/Factory
 )

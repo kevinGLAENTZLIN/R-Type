@@ -76,6 +76,19 @@ namespace Utils
         ProjectileHit
     };
 
+    /**
+     * @brief A concept that constrains a type T to be one of the specified enumeration types.
+     * 
+     * This concept ensures that the template parameter T can only be one of the following types:
+     * - GameInfoEnum
+     * - PlayerEnum
+     * - EnemyEnum
+     * - BossEnum
+     * - PowerUpEnum
+     * - ProjectileEnum
+     * 
+     * Any type that does not match one of these enumerations will not satisfy this concept.
+     */
     template <typename T>
     concept FunctionIndex = std::is_same_v<T, GameInfoEnum> || std::is_same_v<T, PlayerEnum> ||
                         std::is_same_v<T, EnemyEnum> || std::is_same_v<T, BossEnum> ||

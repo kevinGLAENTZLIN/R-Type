@@ -6,7 +6,7 @@
 */
 
 /**
- * @file udp_server.hh
+ * @file udp_server.hpp
  * @brief Declaration of the Rtype::udpServer class for UDP server communication.
  */
 

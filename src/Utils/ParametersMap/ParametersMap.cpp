@@ -9,5 +9,5 @@
 
 namespace Utils {
     // Define the static member variable of the ParametersMap class.
-    std::map<std::pair<int, int>, std::pair<std::string, std::string>> ParametersMap::_parametersMap;
+    std::map<std::pair<InfoTypeEnum, uint8_t>, std::pair<std::string, std::string>> ParametersMap::_parametersMap;
 }

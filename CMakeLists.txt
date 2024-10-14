@@ -17,7 +17,7 @@ file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 add_subdirectory(src/ECS)
 add_subdirectory(src/Client)
 add_subdirectory(src/Server)
-# add_subdirectory(src/Utils)
+add_subdirectory(src/Utils)
 
 # Testing
 enable_testing()

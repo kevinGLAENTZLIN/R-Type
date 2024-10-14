@@ -50,6 +50,28 @@ float ECS::Components::Velocity::getY() const
 }
 
 /**
+ * @brief Setter _x of Velocity component.
+ *
+ * @tparam float x.
+ * @return void.
+ */
+void ECS::Components::Velocity::setX(float x)
+{
+    _x = x;
+}
+
+/**
+ * @brief Setter _y of Velocity component.
+ *
+ * @tparam float y.
+ * @return void.
+ */
+void ECS::Components::Velocity::setY(float y)
+{
+    _y = y;
+}
+
+/**
  * @brief Getter _x and _y of Velocity component.
  *
  * @tparam void.

@@ -52,6 +52,7 @@ set(LIB_SOURCES
     ./Component/Input/Input.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
+    ./System/UpdateVelocityPataPata/UpdateVelocityPataPata.cpp
     ./System/ProjectileCollision/ProjectileCollision.cpp
     ./System/InputUpdates/InputUpdates.cpp
     ./Game/Game.cpp

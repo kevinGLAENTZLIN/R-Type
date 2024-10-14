@@ -36,6 +36,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::Render3D>();
     _core->registerComponent<ECS::Components::Projectile>();
     _core->registerComponent<ECS::Components::Background>();
+    _core->registerComponent<ECS::Components::PataPata>();
 
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
@@ -44,6 +45,7 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::SystemRender2D>();
     _core->registerSystem<ECS::Systems::SystemRender3D>();
     _core->registerSystem<ECS::Systems::SystemBackground>();
+    _core->registerSystem<ECS::Systems::UpdateVelocityPataPata>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -94,6 +96,13 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Background>());
     _core->setSystemSignature<ECS::Systems::SystemBackground>(backgroundSignature);
 
+    Signature updateVelocityPataPataSignature;
+    updateVelocityPataPataSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Velocity>());
+    updateVelocityPataPataSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::PataPata>());
+    _core->setSystemSignature<ECS::Systems::UpdateVelocityPataPata>(updateVelocityPataPataSignature);
+
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{-10.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
@@ -102,12 +111,20 @@ Rtype::Game::Game()
     _core->addComponent(player, ECS::Components::Input{});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
 
-    std::size_t enemy = _core->createEntity();
-    _core->addComponent(enemy, ECS::Components::Position{10.0f, 2.0f});
-    _core->addComponent(enemy, ECS::Components::Velocity{-0.08f, 0.0f});
     TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
-    _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
+    std::size_t pataPata1 = _core->createEntity();
+    _core->addComponent(pataPata1, ECS::Components::Position{10.0f, 2.0f});
+    _core->addComponent(pataPata1, ECS::Components::Velocity{0.0f, 0.0f});
+    _core->addComponent(pataPata1, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(pataPata1, ECS::Components::Render3D{"enemy_one"});
+    _core->addComponent(pataPata1, ECS::Components::PataPata{});
+
+    std::size_t pataPata2 = _core->createEntity();
+    _core->addComponent(pataPata2, ECS::Components::Position{13.0f, -3.0f});
+    _core->addComponent(pataPata2, ECS::Components::Velocity{0.0f, 0.0f});
+    _core->addComponent(pataPata2, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(pataPata2, ECS::Components::Render3D{"enemy_one"});
+    _core->addComponent(pataPata2, ECS::Components::PataPata{});
 
     createBackgroundLayers(2.f , "background_layer0");
     createBackgroundLayers(3.f , "background_layer1");
@@ -205,12 +222,18 @@ void Rtype::Game::update() {
     auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
     auto backgroundSystem = _core->getSystem<ECS::Systems::SystemBackground>();
+    auto pataPataSystem = _core->getSystem<ECS::Systems::UpdateVelocityPataPata>();
 
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     auto backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
+    auto patapataEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityPataPata>());
+
+    pataPataSystem->update(_core->getComponents<ECS::Components::Velocity>(),
+                           _core->getComponents<ECS::Components::Position>(),
+                           patapataEntities);
 
     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
@@ -245,6 +268,7 @@ void Rtype::Game::update() {
     if (false)
         _camera.Update(CAMERA_FREE);
 }
+
 
 void Rtype::Game::render()
 {

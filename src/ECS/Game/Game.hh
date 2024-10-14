@@ -20,6 +20,7 @@
 #include "../Component/Input/Input.hh"
 #include "../Component/Projectile/Projectile.hh"
 #include "../Component/Background/Background.hpp"
+#include "../Component/Patapata/Patapata.hpp"
 
 #include "../System/SystemManager/SystemManager.hpp"
 
@@ -31,6 +32,7 @@
 #include "../System/Render2D/Render2D.hh"
 #include "../System/Background/Background.hh"
 
+#include "../System/UpdateVelocityPataPata/UpdateVelocityPataPata.hh"
 
 #include "../RessourcePool/RessourcePool.hh"
 #include "raylib-cpp.hpp"

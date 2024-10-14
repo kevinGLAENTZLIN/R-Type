@@ -60,6 +60,7 @@ set(LIB_SOURCES
     ./System/Render2D/Render2D.cpp
     ./System/Render3D/Render3D.cpp
     ./RessourcePool/RessourcePool.cpp
+    ./System/Background/Background.cpp
 
 )
 # Créer la bibliothèque

@@ -49,7 +49,7 @@ namespace Rtype
                  * @param ... Parameters for the command to send in the right order.
                  */
                 template <Utils::FunctionIndex T>
-                void send_to_endpoint(Utils::InfoTypeEnum function_type, T function_index, ...)
+                void sendToEndpoint(Utils::InfoTypeEnum function_type, T function_index, ...)
                 {
                         va_list params;
 

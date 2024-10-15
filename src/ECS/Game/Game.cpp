@@ -111,15 +111,6 @@ Rtype::Game::Game()
     _core->addComponent(player, ECS::Components::Input{});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
 
-
-    std::size_t player = _core->createEntity();
-    _core->addComponent(player, ECS::Components::Position{-10.0f, 0.0f});
-    _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
-    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
-    _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
-
     TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t pataPata1 = _core->createEntity();
     _core->addComponent(pataPata1, ECS::Components::Position{10.0f, 2.0f});
@@ -127,32 +118,6 @@ Rtype::Game::Game()
     _core->addComponent(pataPata1, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(pataPata1, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(pataPata1, ECS::Components::PataPata{});
-
-    std::size_t pataPata2 = _core->createEntity();
-    _core->addComponent(pataPata2, ECS::Components::Position{13.0f, -3.0f});
-    _core->addComponent(pataPata2, ECS::Components::Velocity{0.0f, 0.0f});
-    _core->addComponent(pataPata2, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(pataPata2, ECS::Components::Render3D{"enemy_one"});
-    _core->addComponent(pataPata2, ECS::Components::PataPata{});
-
-    std::size_t background = _core->createEntity();
-    _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    _core->addComponent(background, ECS::Components::Velocity{-0.5f, 0.0f});
-    _core->addComponent(background, ECS::Components::Background{});
-    _core->addComponent(background, ECS::Components::Render2D{"background"});
-
-    float oui = _ressourcePool.getTexture("background").width;
-    std::size_t background2 = _core->createEntity();
-    _core->addComponent(background2, ECS::Components::Position{oui, 0.0f});
-    _core->addComponent(background2, ECS::Components::Velocity{-0.5f, 0.0f});
-    _core->addComponent(background2, ECS::Components::Background{});
-    _core->addComponent(background2, ECS::Components::Render2D{"background"});
-
-    std::size_t background3 = _core->createEntity();
-    _core->addComponent(background3, ECS::Components::Position{oui * 2, 0.0f});
-    _core->addComponent(background3, ECS::Components::Velocity{-0.5f, 0.0f});
-    _core->addComponent(background3, ECS::Components::Background{});
-    _core->addComponent(background3, ECS::Components::Render2D{"background"});
 
     std::size_t pataPata2 = _core->createEntity();
     _core->addComponent(pataPata2, ECS::Components::Position{13.0f, -3.0f});
@@ -236,50 +201,6 @@ void Rtype::Game::destroyProjectile(std::size_t entityID)
 {
     _core->destroyEntity(entityID);
 }
-
-// void Rtype::Game::update() {
-//     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
-//     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
-//     auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
-//     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
-//     auto patapataSystem = _core->getSystem<ECS::Systems::UpdateVelocityPataPata>();
-
-//     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
-//     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
-//     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
-//     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
-//     auto patapataEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityPataPata>());
-
-
-//     patapataSystem->update(_core->getComponents<ECS::Components::Velocity>(),
-//                            patapataEntities);
-//     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
-//                                      _core->getComponents<ECS::Components::Input>(),
-//                                      inputEntities);
-
-//     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
-//                                               _core->getComponents<ECS::Components::Velocity>(),
-//                                               inputEntities);
-
-//     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
-//                            _core->getComponents<ECS::Components::Velocity>(),
-//                            velocityEntities);
-
-//     if (entityID <= 10000)
-//         createProjectile(entityID);
-
-//     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
-//                            _core->getComponents<ECS::Components::Hitbox>(),
-//                            collisionEntities);
-
-//     std::size_t projectileEntityId = projectileCollisionSystem->projectileIsHit(
-//         _core->getComponents<ECS::Components::Position>(),
-//         _core->getComponents<ECS::Components::Hitbox>(),
-//         projectileEntities, collisionEntities);
-
-//     if (projectileEntityId <= 10000)
-//         destroyProjectile(projectileEntityId);
-// }
 
 void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath)
 {
@@ -371,7 +292,6 @@ void Rtype::Game::render()
                         _core->getComponents<ECS::Components::Render2D>(),
                         renderEntities2D,
                         _ressourcePool);
-    DrawGrid(10, 1.0f);
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
                         _core->getComponents<ECS::Components::Render3D>(),
                         renderEntities3D,

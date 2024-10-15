@@ -50,7 +50,7 @@ namespace ECS {
             * @param entities Vector of other entity IDs to check against projectiles.
             * @return The ID of the projectile that has collided, or a large number (100000) if no collision occurs.
             */
-            std::size_t projectileIsHit(
+            std::vector<std::size_t> projectileIsHit(
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
                 std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities);

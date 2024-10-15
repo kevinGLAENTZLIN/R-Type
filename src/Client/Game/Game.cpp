@@ -136,12 +136,12 @@ std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, f
 
 std::size_t Rtype::Game::createPlayer(float pos_x, float pos_y)
 {
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(player, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Scale{1.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
-    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(player, ECS::Components::Input{});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
@@ -272,13 +272,13 @@ void Rtype::Game::update() {
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
 
-    std::size_t projectileEntityId = projectileCollisionSystem->projectileIsHit(
+    std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
         _core->getComponents<ECS::Components::Hitbox>(),
         projectileEntities, collisionEntities);
 
-    if (projectileEntityId <= 10000)
-        destroyProjectile(projectileEntityId);
+    for (int i = 0; i < projectileEntityId.size(); i++)
+        destroyProjectile(projectileEntityId[i]);
     if (false)
         _camera.Update(CAMERA_FREE);
 }

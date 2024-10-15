@@ -14,7 +14,6 @@
 #include <type_traits>
 #include <variant>
 
-
 namespace Utils
 {
     // Enums representing different categories of functions.

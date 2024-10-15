@@ -136,8 +136,10 @@ Rtype::Game::~Game()
     _ressourcePool.UnloadAll();
 }
 
-void Rtype::Game::run()
+void Rtype::Game::run(const std::string &serverAddr, const int serverPort)
 {
+    _udpClient = std::make_unique<Rtype::udpClient>(serverAddr, serverPort);
+
     while (!_window.ShouldClose() && _isRunning) {
         update();
         render();

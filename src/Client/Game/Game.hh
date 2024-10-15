@@ -36,13 +36,16 @@
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
+#include "../udp_client.hh"
+#include <memory>
+
 namespace Rtype {
     class Game {
     public:
         Game();
         ~Game();
 
-        void run();
+        void run(const std::string &serverAddr, const int serverPort);
 
     private:
         ECS::RessourcePool _ressourcePool;
@@ -53,6 +56,7 @@ namespace Rtype {
         void render();
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
+        std::unique_ptr<Rtype::udpClient> _udpClient;
         raylib::Window _window;
         raylib::Camera3D _camera;
     };

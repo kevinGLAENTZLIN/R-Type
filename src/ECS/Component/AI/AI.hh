@@ -6,7 +6,7 @@
 */
 #pragma once
 
-#include "enemiesTypeEnum.hpp"
+#include "../../../Utils/enemiesTypeEnum.hpp"
 
 namespace ECS {
     namespace Components {

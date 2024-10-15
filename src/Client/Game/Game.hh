@@ -37,7 +37,9 @@
 
 #include "../udp_client.hh"
 // #include "../Network/udp_client.hh"
-#include <memory>
+
+#include "../../Utils/enemiesTypeEnum.hpp"
+#include <cstddef>
 
 namespace Rtype {
     class Game {
@@ -46,6 +48,9 @@ namespace Rtype {
         ~Game();
 
         void run(const std::string &serverAddr, const int serverPort);
+        std::size_t createPlayer(float pos_x, float pos_y);
+        void createOtherPlayer(float pos_x, float pos_y);
+        std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
 
     private:
         void createProjectile(std::size_t entityID);

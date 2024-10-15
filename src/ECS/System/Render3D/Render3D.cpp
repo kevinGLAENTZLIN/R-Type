@@ -20,9 +20,6 @@ void ECS::Systems::SystemRender3D::update(
     bool drawHitBox = true;
 
     camera.BeginMode();
-    if (drawHitBox)
-        DrawGrid(100, 1.0f);
-
     for (auto &entity : entities) {
         rotation = raylib::Vector3(0.0f, 0.0f, 0.0f);
         scale = raylib::Vector3(1.0f, 1.0f, 1.0f);

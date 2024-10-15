@@ -6,16 +6,16 @@
 */
 #include "AI.hh"
 
-ECS::Components::AI::AI(ECS::enemiesTypeEnum_t enemyType):
+ECS::Components::AI::AI(enemiesTypeEnum_t enemyType):
     _enemyType(enemyType)
 {}
 
-ECS::enemiesTypeEnum_t ECS::Components::AI::getEnemyType() const
+enemiesTypeEnum_t ECS::Components::AI::getEnemyType() const
 {
     return _enemyType;
 }
 
-void ECS::Components::AI::setEnemyType(ECS::enemiesTypeEnum_t enemyType)
+void ECS::Components::AI::setEnemyType(enemiesTypeEnum_t enemyType)
 {
     _enemyType = enemyType;
 }

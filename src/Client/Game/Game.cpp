@@ -7,6 +7,7 @@
 */
 
 #include "Game.hh"
+#include <cstddef>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -109,35 +110,6 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
     _core->setSystemSignature<ECS::Systems::UpdateVelocityAI>(updateVelocityAISignature);
 
-    std::size_t player = _core->createEntity();
-    _core->addComponent(player, ECS::Components::Position{-10.0f, 0.0f});
-    _core->addComponent(player, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
-    _core->addComponent(player, ECS::Components::Scale{1.0f});
-    _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
-    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
-    _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
-
-    TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
-    std::size_t pataPata1 = _core->createEntity();
-    _core->addComponent(pataPata1, ECS::Components::Position{10.0f, 2.0f});
-    _core->addComponent(pataPata1, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
-    _core->addComponent(pataPata1, ECS::Components::Scale{1.0f});
-    _core->addComponent(pataPata1, ECS::Components::Velocity{0.0f, 0.0f});
-    _core->addComponent(pataPata1, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(pataPata1, ECS::Components::Render3D{"enemy_one"});
-    _core->addComponent(pataPata1, ECS::Components::AI{ECS::PATAPATA});
-
-    std::size_t pataPata2 = _core->createEntity();
-    _core->addComponent(pataPata2, ECS::Components::Position{13.0f, -3.0f});
-    _core->addComponent(pataPata2, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
-    _core->addComponent(pataPata2, ECS::Components::Scale{1.0f});
-    _core->addComponent(pataPata2, ECS::Components::Velocity{0.0f, 0.0f});
-    _core->addComponent(pataPata2, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(pataPata2, ECS::Components::Render3D{"enemy_one"});
-    _core->addComponent(pataPata2, ECS::Components::AI{ECS::PATAPATA});
-
     createBackgroundLayers(2.f , "background_layer0");
     createBackgroundLayers(3.f , "background_layer1");
     createBackgroundLayers(5.f , "background_layer2");
@@ -148,9 +120,53 @@ Rtype::Game::~Game()
     _ressourcePool.UnloadAll();
 }
 
+std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y)
+{
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
+    std::size_t enemy = _core->createEntity();
+    _core->addComponent(enemy, ECS::Components::Position{pos_x, pos_y});
+    _core->addComponent(enemy, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Scale{1.0f});
+    _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
+    _core->addComponent(enemy, ECS::Components::AI{enemyType});
+    return enemy;
+}
+
+std::size_t Rtype::Game::createPlayer(float pos_x, float pos_y)
+{
+    std::size_t player = _core->createEntity();
+    _core->addComponent(player, ECS::Components::Position{pos_x, pos_y});
+    _core->addComponent(player, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
+    _core->addComponent(player, ECS::Components::Scale{1.0f});
+    _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
+    _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(player, ECS::Components::Input{});
+    _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
+    return player;
+}
+
+void Rtype::Game::createOtherPlayer(float pos_x, float pos_y)
+{
+    std::size_t otherPlayer = _core->createEntity();
+    _core->addComponent(otherPlayer, ECS::Components::Position{pos_x, pos_y});
+    _core->addComponent(otherPlayer, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
+    _core->addComponent(otherPlayer, ECS::Components::Scale{1.0f});
+    _core->addComponent(otherPlayer, ECS::Components::Velocity{0.0f, 0.0f});
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
+    _core->addComponent(otherPlayer, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
+}
+
 void Rtype::Game::run(const std::string &serverAddr, const int serverPort)
 {
     _udpClient = std::make_unique<Rtype::udpClient>(serverAddr, serverPort);// Added
+    createPlayer(-10.0f, 0.0f);
+    createOtherPlayer(-10.0f, 0.0f);
+    createEnemy(PATAPATA, 10.0f, 2.0f);
+    createEnemy(PATAPATA, 13.0f, -2.0f);
     while (!_window.ShouldClose() && _isRunning) {
         update();
         render();

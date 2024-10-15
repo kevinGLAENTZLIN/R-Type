@@ -55,7 +55,6 @@ set(LIB_SOURCES
     ./System/UpdateVelocityPataPata/UpdateVelocityPataPata.cpp
     ./System/ProjectileCollision/ProjectileCollision.cpp
     ./System/InputUpdates/InputUpdates.cpp
-    ./Game/Game.cpp
     ./Component/Render2D/Render2D.cpp
     ./Component/Render3D/Render3D.cpp
     ./System/Render2D/Render2D.cpp
@@ -106,10 +105,10 @@ target_include_directories(${NAME_LIB} PUBLIC
 )
 
 # Compiler le main.cpp seulement en mode Debug
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
-    add_executable(${NAME_DEBUG_EXE} main.cpp)
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+ #   set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}")
+  #  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
+   # add_executable(${NAME_DEBUG_EXE} main.cpp)
 
-    target_link_libraries(${NAME_DEBUG_EXE} PRIVATE ${NAME_LIB})
-endif()
+    #target_link_libraries(${NAME_DEBUG_EXE} PRIVATE ${NAME_LIB})
+#endif()

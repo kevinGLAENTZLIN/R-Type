@@ -12,7 +12,7 @@ void Rtype::Command::GameInfo::Games_available::set_client(udp::endpoint endpoin
     _endpoint = endpoint;
 }
 
-void Rtype::Command::GameInfo::Games_available::set_server(udp::endpoint endpoint, std::vector<Rtype::Game_info> games)
+void Rtype::Command::GameInfo::Games_available::set_server(udp::endpoint endpoint, std::vector<std::shared_ptr<Rtype::Game_info>> games)
 {
     _endpoint = endpoint;
     _games = games;

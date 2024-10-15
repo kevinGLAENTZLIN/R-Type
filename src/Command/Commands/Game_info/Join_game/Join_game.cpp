@@ -13,7 +13,7 @@ void Rtype::Command::GameInfo::Join_game::set_client(udp::endpoint endpoint, int
     _gameRoom = gameRoom;
 }
 
-void Rtype::Command::GameInfo::Join_game::set_server(udp::endpoint endpoint, Rtype::Game_info &game)
+void Rtype::Command::GameInfo::Join_game::set_server(udp::endpoint endpoint, std::shared_ptr<Rtype::Game_info> &game)
 {
     _endpoint = endpoint;
     _game = game;

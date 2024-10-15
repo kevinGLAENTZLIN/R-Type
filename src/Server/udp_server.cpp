@@ -60,6 +60,7 @@ int Rtype::udpServer::get_sender_id()
         id = get_available_client_id();
         _clients[id] = Rtype::client_info(id, (int)_senderEndpoint.port(), _senderEndpoint.address().to_string());
         send_to_client("Your new ID is " + std::to_string(id)); //! To refactor by the protocol control
+        connect_client_to_game(id, 4242); //! To refactor by the protocol control & for Defense purpose only
     }
     return id;
 }
@@ -102,6 +103,21 @@ void Rtype::udpServer::disconnect_client(int client_id)
     _clients.erase(client_id);
 }
 
+void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
+{
+    if (client_id == -1 || game_room <= 0 || _clients[client_id].getRoom() != -1)
+        return;
+    for (auto game = _games.begin(); game != _games.end(); ++game) {
+        if (game->get()->getRoomId() == game_room) {
+            game->get()->connectPlayer(_clients[client_id]);
+            send_to_client("Your are assign to game Room " + std::to_string(game_room)); //! To refactor by the protocol control
+            return;
+        }
+    }
+    Game_info tmp(game_room);
+    _games.push_back(std::make_shared<Game_info>(std::move(tmp)));
+    _games.back()->connectPlayer(_clients[client_id]);
+}
 // ! To Refactor
 void Rtype::udpServer::send_to_client(std::string msg)
 {

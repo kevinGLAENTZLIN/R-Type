@@ -10,6 +10,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <thread>
 #include "Client_info.hpp"
 
 namespace Rtype
@@ -20,11 +21,19 @@ namespace Rtype
             Game_info(int id);
             ~Game_info();
 
-            bool isGameAvailable(void);
+            Game_info(const Game_info&) = delete;
+            Game_info& operator=(const Game_info&) = delete;
+
+            Game_info(Game_info&& other) noexcept;
+            Game_info& operator=(Game_info&& other) noexcept;
+
+            void computeGame(void);
+            void computeTick(void);
 
             int gameStatus(void);
-
             int getLevel(void);
+            int getRoomId(void);
+            bool isGameAvailable(void);
 
             void connectPlayer(Rtype::client_info &player);
             void disconnectPlayer(int id);
@@ -34,6 +43,8 @@ namespace Rtype
             int _id;
             int _level;
             int _nbMaxPlayer;
+            unsigned int _tick;
+            std::thread _tickThread;
             std::vector<Rtype::client_info> _players;
 
     };

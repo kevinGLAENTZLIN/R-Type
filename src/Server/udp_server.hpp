@@ -104,6 +104,8 @@ namespace Rtype {
              */
             void disconnect_client(int client_id);
 
+            void connect_client_to_game(int client_id, int game_room);
+
             // ! To Refactor
             /**
              * @brief Sends a message to a client.
@@ -279,7 +281,7 @@ namespace Rtype {
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
             std::map<int, Rtype::client_info> _clients;
-            std::vector<Rtype::Game_info> _games;
+            std::vector<std::shared_ptr<Rtype::Game_info>> _games;
             Rtype::Command::Command_invoker _commandInvoker;
             Rtype::Command::Factory _commandFactory;
     };

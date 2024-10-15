@@ -50,17 +50,18 @@ set(LIB_SOURCES
     ./Component/Scale/Scale.cpp
     ./Component/Volume/Volume.cpp
     ./Component/Input/Input.cpp
-    ./System/Velocity/Velocity.cpp
-    ./System/Collision/Collision.cpp
-    ./System/UpdateVelocityPataPata/UpdateVelocityPataPata.cpp
-    ./System/ProjectileCollision/ProjectileCollision.cpp
-    ./System/InputUpdates/InputUpdates.cpp
     ./Component/Render2D/Render2D.cpp
     ./Component/Render3D/Render3D.cpp
+    ./Component/AI/AI.cpp
+    ./System/Velocity/Velocity.cpp
+    ./System/Collision/Collision.cpp
+    ./System/UpdateVelocityAI/UpdateVelocityAI.cpp
+    ./System/ProjectileCollision/ProjectileCollision.cpp
+    ./System/InputUpdates/InputUpdates.cpp
     ./System/Render2D/Render2D.cpp
     ./System/Render3D/Render3D.cpp
-    ./RessourcePool/RessourcePool.cpp
     ./System/Background/Background.cpp
+    ./RessourcePool/RessourcePool.cpp
 
 )
 # Créer la bibliothèque
@@ -94,6 +95,7 @@ target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Text
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Volume
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Projectile
+    ${CMAKE_CURRENT_SOURCE_DIR}Component/AI
     ${CMAKE_CURRENT_SOURCE_DIR}System
     ${CMAKE_CURRENT_SOURCE_DIR}System/ButtonClick
     ${CMAKE_CURRENT_SOURCE_DIR}System/SystemManager

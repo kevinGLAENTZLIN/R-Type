@@ -20,7 +20,7 @@
 #include "../../ECS/Component/Input/Input.hh"
 #include "../../ECS/Component/Projectile/Projectile.hh"
 #include "../../ECS/Component/Background/Background.hpp"
-#include "../../ECS/Component/Patapata/Patapata.hpp"
+#include "../../ECS/Component/AI/AI.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -31,8 +31,7 @@
 #include "../../ECS/System/Render3D/Render3D.hh"
 #include "../../ECS/System/Render2D/Render2D.hh"
 #include "../../ECS/System/Background/Background.hh"
-
-#include "../../ECS/System/UpdateVelocityPataPata/UpdateVelocityPataPata.hh"
+#include "../../ECS/System/UpdateVelocityAI/UpdateVelocityAI.hh"
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 

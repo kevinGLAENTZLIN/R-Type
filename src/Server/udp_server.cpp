@@ -13,7 +13,7 @@
 #include "udp_server.hpp"
 
 Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port):
-    _socket(io_service, udp::endpoint(udp::v4(), port)), _clients(), _games(),
+    _socket(std::make_shared<udp::socket>(udp::socket(io_service, udp::endpoint(udp::v4(), port)))), _clients(), _games(),
     _commandInvoker("Server"), _commandFactory()
 {
     Utils::ParametersMap::init_map();
@@ -23,7 +23,7 @@ Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port):
 
 void Rtype::udpServer::read_clients()
 {
-    _socket.async_receive_from(boost::asio::buffer(_data, max_length), _senderEndpoint,
+    _socket->async_receive_from(boost::asio::buffer(_data, max_length), _senderEndpoint,
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         if (!ec && recvd_bytes > 0 && recvd_bytes < max_length) {
             std::memset(_data + recvd_bytes, 0, max_length - recvd_bytes);
@@ -102,38 +102,42 @@ void Rtype::udpServer::disconnect_client(int client_id)
     _clients.erase(client_id);
 }
 
+// ! To Refactor
 void Rtype::udpServer::send_to_client(std::string msg)
 {
-    _socket.async_send_to(boost::asio::buffer(msg), _senderEndpoint,
+    _socket->async_send_to(boost::asio::buffer(msg), _senderEndpoint,
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         read_clients();
     });
 }
 
+// ! To Refactor
 void Rtype::udpServer::send_to_client(std::string addr_ip, int port, std::string msg)
 {
     boost::asio::ip::port_type client_port(port);
     address client_addr(address::from_string(addr_ip));
     udp::endpoint client_endpoint(client_addr, client_port);
 
-    _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+    _socket->async_send_to(boost::asio::buffer(msg), client_endpoint,
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         read_clients();
     });
 }
 
+// ! To Refactor
 void Rtype::udpServer::send_to_client(std::pair<std::string, int> addr, std::string msg)
 {
     boost::asio::ip::port_type client_port(addr.second);
     address client_addr(address::from_string(addr.first));
     udp::endpoint client_endpoint(client_addr, client_port);
 
-    _socket.async_send_to(boost::asio::buffer(msg), client_endpoint,
+    _socket->async_send_to(boost::asio::buffer(msg), client_endpoint,
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         read_clients();
     });
 }
 
+// ! To Refactor
 void Rtype::udpServer::send_to_clients(std::string msg)
 {
     for(auto client: _clients)

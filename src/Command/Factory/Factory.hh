@@ -7,6 +7,7 @@
 
 #pragma once
 #include "../ICommand.hh"
+#include "../ACommand.hpp"
 #include "../../Utils/ParametersMap/ParametersMap.hpp"
 #include <functional>
 #include <iostream>
@@ -50,11 +51,11 @@ namespace Rtype
                 Factory();
                 ~Factory() = default;
 
-                std::unique_ptr<ICommand> createCommand(uint8_t cmd_category, uint8_t cmd_index);
+                std::unique_ptr<ACommand> createCommand(uint8_t cmd_category, uint8_t cmd_index);
 
             protected:
             private:
-                std::map<std::pair<uint8_t, uint8_t>, std::function<std::unique_ptr<ICommand>()>> _commandMap;
+                std::map<std::pair<uint8_t, uint8_t>, std::function<std::unique_ptr<ACommand>()>> _commandMap;
         };
     }
 }

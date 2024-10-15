@@ -36,7 +36,7 @@ Rtype::Command::Factory::Factory()
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Projectile), static_cast<uint8_t>(Utils::ProjectileEnum::ProjectileHit)}] = []() {return std::make_unique<Projectile::Hit>();};
 }
 
-std::unique_ptr<Rtype::Command::ICommand> Rtype::Command::Factory::createCommand(uint8_t cmd_category, uint8_t cmd_index)
+std::unique_ptr<Rtype::Command::ACommand> Rtype::Command::Factory::createCommand(uint8_t cmd_category, uint8_t cmd_index)
 {
     auto it = _commandMap.find({cmd_category, cmd_index});
 

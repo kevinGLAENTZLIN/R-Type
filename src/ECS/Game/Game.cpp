@@ -129,24 +129,6 @@ Rtype::Game::Game()
     createBackgroundLayers(2.f , "background_layer0");
     createBackgroundLayers(3.f , "background_layer1");
     createBackgroundLayers(5.f , "background_layer2");
-    // std::size_t background = _core->createEntity();
-    // _core->addComponent(background, ECS::Components::Position{0.0f, 0.0f});
-    // _core->addComponent(background, ECS::Components::Velocity{-0.0f, 0.0f});
-    // //_core->addComponent(background, ECS::Components::Background{});
-    // _core->addComponent(background, ECS::Components::Render3D{"background_layer0"});
-
-    // float oui = _ressourcePool.getTexture("background").width;
-    // std::size_t background2 = _core->createEntity();
-    // _core->addComponent(background2, ECS::Components::Position{0.0f, 0.0f});
-    // _core->addComponent(background2, ECS::Components::Velocity{-0.0f, 0.0f});
-    // //_core->addComponent(background2, ECS::Components::Background{});
-    // _core->addComponent(background2, ECS::Components::Render3D{"background_layer1"});
-
-    // std::size_t background3 = _core->createEntity();
-    // _core->addComponent(background3, ECS::Components::Position{0.0f, 0.0f});
-    // _core->addComponent(background3, ECS::Components::Velocity{-0.0f, 0.0f});
-    // //_core->addComponent(background3, ECS::Components::Background{});
-    // _core->addComponent(background3, ECS::Components::Render3D{"background_layer2"});
 }
 
 Rtype::Game::~Game()

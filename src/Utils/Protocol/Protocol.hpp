@@ -67,31 +67,6 @@ namespace Utils
         public:
             Protocol() = delete;
 
-            /**
-             * @brief Encode the msg in bytes.
-             * @tparam T The type of the function to send.
-             * @param ack The ACK number.
-             * @param info The type of the message.
-             * @param functionDefiner The function to send.
-             * @param args The list of arguments to send.
-             * @return The message to send in bytes.
-             */
-            template<Utils::FunctionIndex T>
-            static bytes CreateMsg(uint32_t ack, Utils::InfoTypeEnum info, T functionDefiner, std::vector<Utils::PrimitiveType> args)
-            {
-                bytes msg;
-
-                appendFixedSizeTypeIntoBytes(msg, ack);
-                appendFixedSizeTypeIntoBytes(msg, info);
-                appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner));
-                for (const auto &arg: args) {
-                    std::visit([&msg](auto &&value){
-                        using P = std::decay_t<decltype(value)>;
-                        appendFixedSizeTypeIntoBytes<P>(msg, value);
-                    }, arg);
-                }
-                return msg;
-            }
 
             /**
              * @brief Convert a va_list to a vector of PrimitiveType.
@@ -121,6 +96,32 @@ namespace Utils
                 }
                 va_end(params);
                 return args;
+            }
+
+            /**
+             * @brief Encode the msg in bytes.
+             * @tparam T The type of the function to send.
+             * @param ack The ACK number.
+             * @param info The type of the message.
+             * @param functionDefiner The function to send.
+             * @param args The list of arguments to send.
+             * @return The message to send in bytes.
+             */
+            template<Utils::FunctionIndex T>
+            static bytes CreateMsg(uint32_t ack, Utils::InfoTypeEnum info, T functionDefiner, std::vector<Utils::PrimitiveType> args)
+            {
+                bytes msg;
+
+                appendFixedSizeTypeIntoBytes(msg, ack);
+                appendFixedSizeTypeIntoBytes(msg, info);
+                appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner));
+                for (const auto &arg: args) {
+                    std::visit([&msg](auto &&value){
+                        using P = std::decay_t<decltype(value)>;
+                        appendFixedSizeTypeIntoBytes<P>(msg, value);
+                    }, arg);
+                }
+                return msg;
             }
 
             /**

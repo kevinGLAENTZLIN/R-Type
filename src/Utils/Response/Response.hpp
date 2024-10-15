@@ -68,6 +68,7 @@ namespace Utils
              * @return The parameter as the given type.
              */
             template<typename T>
+
             T PopParam()
             {
                 return std::any_cast<T>(RawPopParam());

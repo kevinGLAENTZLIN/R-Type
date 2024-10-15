@@ -165,6 +165,30 @@ namespace Utils
                 return _parametersMap[{function_type, function_index}].second.length();
             }
 
+                        /**
+             * @brief Get the number of parameters on the server side.
+             * @param function_type The category of the function.
+             * @param function_index The index of the function.
+             * @return The number of parameters expected by the server.
+             */
+            template <FunctionIndex T>
+            static int getNbParameterPerFunctionServer(InfoTypeEnum function_type, T function_index)
+            {
+                return _parametersMap[{function_type, static_cast<uint8_t>(function_index)}].first.length();
+            }
+
+            /**
+             * @brief Get the number of parameters on the client side.
+             * @param function_type The category of the function.
+             * @param function_index The index of the function.
+             * @return The number of parameters expected by the client.
+             */
+            template <FunctionIndex T>
+            static int getNbParameterPerFunctionClient(InfoTypeEnum function_type, T function_index)
+            {
+                return _parametersMap[{function_type, static_cast<uint8_t>(function_index)}].second.length();
+            }
+
             /**
              * @brief Get the parameter types for a server function.
              * @param function_type The category of the function.
@@ -185,6 +209,30 @@ namespace Utils
             static std::string getParameterTypePerFunctionClient(InfoTypeEnum function_type, uint8_t function_index)
             {
                 return _parametersMap[{function_type, function_index}].second;
+            }
+
+                        /**
+             * @brief Get the parameter types for a server function.
+             * @param function_type The category of the function.
+             * @param function_index The index of the function.
+             * @return The parameter types expected by the server as a string.
+             */
+            template <FunctionIndex T>
+            static std::string getParameterTypePerFunctionServer(InfoTypeEnum function_type, T function_index)
+            {
+                return _parametersMap[{function_type, static_cast<uint8_t>(function_index)}].first;
+            }
+
+            /**
+             * @brief Get the parameter types for a client function.
+             * @param function_type The category of the function.
+             * @param function_index The index of the function.
+             * @return The parameter types expected by the client as a string.
+             */
+            template <FunctionIndex T>
+            static std::string getParameterTypePerFunctionClient(InfoTypeEnum function_type, T function_index)
+            {
+                return _parametersMap[{function_type, static_cast<uint8_t>(function_index)}].second;
             }
 
         private:

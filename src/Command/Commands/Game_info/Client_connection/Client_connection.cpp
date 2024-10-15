@@ -24,12 +24,12 @@ Rtype::Command::GameInfo::Client_connection::~Client_connection()
 
 void Rtype::Command::GameInfo::Client_connection::execute_client_side()
 {
-	// Do Something who will be executed by the Server
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected);
 }
 
 void Rtype::Command::GameInfo::Client_connection::execute_server_side()
 {
-	// Do Something who will be executed by the Client
+	// Do Something who will be executed by the Client + resultat de get_available_client_id
 }
 
 int Rtype::Command::GameInfo::Client_connection::get_available_client_id()

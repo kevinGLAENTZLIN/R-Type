@@ -40,7 +40,7 @@ namespace Utils
 
             /**
              * @brief Appends a fixed-size type into a bytes vector.
-             * 
+             *
              * @tparam T have to be Primitive type.
              * @param msg The bytes vector to append the value to.
              * @param value The value to append.
@@ -55,14 +55,14 @@ namespace Utils
 
             /**
              * @brief Extracts a fixed-size type from a bytes vector.
-             * 
+             *
              * @param offset The offset to start extracting from.
              * @param msg The bytes vector to extract the value from.
              * @param type_ The type of the value to extract.
              * @return The extracted value in a std::any.
              */
             static std::any newParam(std::size_t &offset, bytes msg, char type_);
-            
+
 
         public:
             Protocol() = delete;
@@ -92,7 +92,7 @@ namespace Utils
                 }
                 return msg;
             }
-            
+
             /**
              * @brief Convert a va_list to a vector of PrimitiveType.
              * @param params The va_list to convert.
@@ -104,10 +104,10 @@ namespace Utils
                 for (const char c: params_type) {
                     switch (c) {
                         case 'b':
-                            args.push_back(va_arg(params, bool));
+                            args.push_back(va_arg(params, int));
                             break;
                         case 'c':
-                            args.push_back(va_arg(params, char));
+                            args.push_back(va_arg(params, int));
                             break;
                         case 'i':
                             args.push_back(va_arg(params, int));
@@ -132,5 +132,5 @@ namespace Utils
             static Response ParseMsg(bool isClient, bytes &msg);
         };
     } // namespace Network
-    
+
 } // namespace Utils

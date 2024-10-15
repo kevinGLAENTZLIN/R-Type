@@ -28,7 +28,13 @@ ECS::Components::Render3D& ECS::Components::Render3D::operator=(const Render3D& 
 
 void ECS::Components::Render3D::render(raylib::Model &model, raylib::Vector3 position, raylib::Vector3 rotation, raylib::Vector3 scale)
 {
-    model.Draw(position, rotation, 0.0f, scale, _color);
+    raylib::Matrix rotationMatrix = MatrixRotateXYZ(raylib::Vector3(
+        rotation.x * DEG2RAD,
+        rotation.y * DEG2RAD,
+        rotation.z * DEG2RAD
+    ));
+    model.SetTransform(rotationMatrix);
+    model.Draw(position, scale.x, _color);
 }
 
 const raylib::Color& ECS::Components::Render3D::getColor() const

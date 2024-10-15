@@ -7,24 +7,28 @@
 #pragma once
 
 #include <iostream>
+#include <tuple>
 
 namespace ECS {
     namespace Components {
 
         class Position {
         public:
-            Position(float x, float y);
+            Position(float x, float y, float z = 0);
             ~Position() = default;
 
             float getX() const;
             float getY() const;
+            float getZ() const;
             void setX(float x);
             void setY(float y);
+            void setZ(float z);
             std::pair<float, float> getPosPair() const;
-
+            std::tuple<float, float, float> getPosition() const;
         private:
             float _x;
             float _y;
+            float _z;
         };
 
         inline std::ostream & operator<< (std::ostream & stream, const Position & position) {

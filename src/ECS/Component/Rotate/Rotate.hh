@@ -16,17 +16,18 @@ namespace ECS {
             Rotate(float x, float y, float z);
             ~Rotate() = default;
 
-            float getRotateX() const;
-            float getRotateY() const;
-            float getRotateZ() const;
-            void setRotateX(float x);
-            void setRotateY(float y);
-            void setRotateZ(float z);
+            float getRoll() const;
+            float getPitch() const;
+            float getYaw() const;
+            void setRotate(float roll, float pitch, float yaw);
+            void setRoll(float roll);
+            void setPitch(float pitch);
+            void setYaw(float yaw);
 
         private:
-            float _x;
-            float _y;
-            float _z;
+            float _roll;
+            float _pitch;
+            float _yaw;
         };
     }
 }

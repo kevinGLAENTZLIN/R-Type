@@ -10,7 +10,7 @@
 #include <string>
 #include <algorithm>
 #include <filesystem>
-
+#include "raylib-cpp.hpp"
 #include "../Component/Position/Position.hpp"
 #include "../Component/Hitbox/Hitbox.hh"
 
@@ -34,5 +34,6 @@ namespace ECS {
             const ECS::Components::Hitbox &hitboxB);
 
         static FileType getRaylibFileType(const std::string& path);
+        static std::pair<float, float> getModelSize(const raylib::Model &model);
     };
 }

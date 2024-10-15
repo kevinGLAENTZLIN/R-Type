@@ -8,6 +8,8 @@
 
 void ECS::Systems::SystemRender3D::update(
     ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
+    ECS::ComponentManager::SparseArray<ECS::Components::Rotate> &rotates,
+    ECS::ComponentManager::SparseArray<ECS::Components::Scale> &scales,
     ECS::ComponentManager::SparseArray<ECS::Components::Render3D> &renders,
     std::vector<std::size_t> &entities,
     ECS::RessourcePool &ressourcePool,
@@ -23,7 +25,7 @@ void ECS::Systems::SystemRender3D::update(
         }
         auto &position = positions[entity].value();
         auto &render = renders[entity].value();
-        raylib::Vector3 pos(position.getX() , 0, position.getY());
+        raylib::Vector3 pos(position.getX() , position.getZ(), position.getY());
         const std::string path = render.getPath();
 
         render.render(ressourcePool.getModel(render.getPath()), pos, rotation, scale);

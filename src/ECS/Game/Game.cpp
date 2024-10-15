@@ -23,6 +23,8 @@ Rtype::Game::Game()
     _ressourcePool.addModel("./resources/Disco.obj");
     _ressourcePool.addTexture("./resources/background.png");
     _core->registerComponent<ECS::Components::Position>();
+    _core->registerComponent<ECS::Components::Rotate>();
+    _core->registerComponent<ECS::Components::Scale>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
@@ -69,6 +71,10 @@ Rtype::Game::Game()
     Signature renderSignature3D;
     renderSignature3D.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    renderSignature3D.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Rotate>());
+    renderSignature3D.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Scale>());
     renderSignature3D.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Render3D>());
     _core->setSystemSignature<ECS::Systems::SystemRender3D>(renderSignature3D);

@@ -10,6 +10,8 @@
 #include "../System/System.hpp"
 #include "../../Component/ComponentManager/SparseArray.hpp"
 #include "../../Component/Position/Position.hpp"
+#include "../../Component/Rotate/Rotate.hh"
+#include "../../Component/Scale/Scale.hh"
 #include "../../Component/Render3D/Render3D.hh"
 #include "../../RessourcePool/RessourcePool.hh"
 #include "../../Utils/Utils.hh"
@@ -23,10 +25,12 @@ namespace ECS {
             ~SystemRender3D() = default;
 
             void update(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
+                        ECS::ComponentManager::SparseArray<ECS::Components::Rotate> &rotates,
+                        ECS::ComponentManager::SparseArray<ECS::Components::Scale> &scales,
                         ECS::ComponentManager::SparseArray<ECS::Components::Render3D> &renders,
                         std::vector<std::size_t> &entities,
                         ECS::RessourcePool &ressourcePool,
-                        raylib::Camera3D &camera);;
+                        raylib::Camera3D &camera);
         };
     }
 }

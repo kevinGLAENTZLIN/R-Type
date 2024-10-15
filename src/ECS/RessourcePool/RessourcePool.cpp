@@ -11,8 +11,8 @@
 ECS::RessourcePool::RessourcePool()
 {}
 
-ECS::RessourcePool::~RessourcePool()
-{}
+// ECS::RessourcePool::~RessourcePool()
+// {}
 
 void ECS::RessourcePool::UnloadAll()
 {

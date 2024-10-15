@@ -48,7 +48,6 @@ namespace Rtype {
         void run(const std::string &serverAddr, const int serverPort);
 
     private:
-        ECS::RessourcePool _ressourcePool;
         void createProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath);
@@ -59,5 +58,6 @@ namespace Rtype {
         std::unique_ptr<Rtype::udpClient> _udpClient;
         raylib::Window _window;
         raylib::Camera3D _camera;
+        ECS::RessourcePool _ressourcePool;
     };
 };

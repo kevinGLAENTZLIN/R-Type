@@ -15,16 +15,5 @@ int main(int argc, char **argv)
     }
     Rtype::Game game;
     game.run(argv[1], std::stoi(argv[2]));
-    // try {
-    //     boost::asio::io_service io_service;
-    //     Rtype::udpClient client(io_service, argv[1], std::stoi(argv[2]));
-    //     io_service.run();
-    // } catch (std::exception &error) {
-    //     std::cerr << "Exception: " << error.what() << "\n";
-    // }
-    // if (argv[3] != NULL)
-    //     for (int i = 0; i < 5; i++)
-    //         client.send_data(argv[3]);
-    // std::this_thread::sleep_for(std::chrono::seconds(3));
     return 0;
 }

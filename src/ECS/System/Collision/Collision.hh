@@ -50,23 +50,6 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
                 std::vector<std::size_t> & entities);
-
-            /**
-            * @brief Static function to handle projectile collisions with other entities.
-            *
-            * This function checks for collisions between projectiles and other entities,
-            * ensuring that projectile hit detection is managed independently from regular entity collisions.
-            *
-            * @param positions SparseArray of Position components of the entities.
-            * @param hitboxes SparseArray of Hitbox components of the entities.
-            * @param projectiles Vector of projectile entity IDs to check for collisions.
-            * @param entities Vector of other entity IDs to check for collisions with the projectiles.
-            * @return void.
-            */
-            static void projectileIsHit(
-                ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
-                ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
-                std::vector<std::size_t> & projectiles, std::vector<std::size_t> & entities);
         };
     }
 }

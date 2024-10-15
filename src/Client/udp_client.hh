@@ -36,7 +36,7 @@ namespace Rtype {
              * @param serverAddr Server's IP address.
              * @param serverPort Server's port.
              */
-            udpClient(boost::asio::io_service& io_service, const std::string &serverAddr, const int serverPort);
+            udpClient(const std::string &serverAddr, const int serverPort);// Added
             
             /**
              * @brief Destructor for the udpClient class.
@@ -52,7 +52,7 @@ namespace Rtype {
             /**
              * @brief Run the IO context.
              */
-            // void run();
+            void run();// Added
 
         private:
             /**
@@ -67,9 +67,11 @@ namespace Rtype {
             void received_data_handler(std::size_t bytes_recv);
 
             int _id;
+            boost::asio::io_context _ioContext;// Added
             std::shared_ptr<udp::socket> _socket;
             udp::endpoint _serverEndpoint;
             std::array<char, 1024> _receiverBuffer;
+            std::thread _receiverThread;// Added
             Rtype::Command::Command_invoker _commandInvoker;
             Rtype::Command::Factory _commandFactory;
     };

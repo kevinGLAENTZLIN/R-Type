@@ -12,23 +12,29 @@
  * @brief Implementation of the Rtype::udpClient class for UDP communication with a server.
  */
 
-Rtype::udpClient::udpClient(boost::asio::io_service& io_service, const std::string &serverAddr, const int serverPort)
-    : _id(-1), _socket(std::make_shared<udp::socket>(udp::socket(io_service, udp::endpoint(udp::v4(), 0)))),
+Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
+    : _id(-1), _ioContext(), _socket(std::make_shared<udp::socket>(udp::socket(_ioContext, udp::endpoint(udp::v4(), 0)))),
+      _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
       _commandInvoker("Client"), _commandFactory()
 {
+    _receiverThread = std::thread([this]() { _ioContext.run(); });// Added
     read_server();
     send_data("New client trying to connect to the server."); //! To refactor by the protocol control
 }
 
 Rtype::udpClient::~udpClient()
 {
+    _ioContext.stop();// Added
+    if (_receiverThread.joinable()) {// Added
+        _receiverThread.join();// Added
+    }
     send_data("Client is disconnecting."); //! To refactor by the protocol control
 }
 
-// void Rtype::udpClient::run()
-// {
-//     _ioContext.run();
-// }
+void Rtype::udpClient::run()// Added
+{
+    _ioContext.run();
+}
 
 void Rtype::udpClient::send_data(const std::string &data)
 {

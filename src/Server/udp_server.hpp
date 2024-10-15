@@ -40,6 +40,11 @@ namespace Rtype {
              * @param port The port on which the server will listen.
              */
             udpServer(boost::asio::io_service& io_service, short port);
+            
+            /**
+             * @brief Destructor for the udpServer class.
+             */
+            ~udpServer() = default;
 
             /**
              * @brief Read asynchronously data from clients.

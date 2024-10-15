@@ -25,12 +25,3 @@ target_include_directories(${NAME_LIB_UTILS} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Protocol
     ${CMAKE_CURRENT_SOURCE_DIR}Response
 )
-
-#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
- #  set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
-  # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
-   #add_executable(${NAME_DEBUG_EXE} main.cpp)
-
-   # file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
-    #target_link_libraries(${NAME_DEBUG_EXE} PRIVATE ${NAME_LIB_UTILS})
-#endif()

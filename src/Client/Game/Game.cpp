@@ -29,6 +29,8 @@ Rtype::Game::Game()
     _ressourcePool.addTexture("background_layer2");
 
     _core->registerComponent<ECS::Components::Position>();
+    _core->registerComponent<ECS::Components::Rotate>();
+    _core->registerComponent<ECS::Components::Scale>();
     _core->registerComponent<ECS::Components::Velocity>();
     _core->registerComponent<ECS::Components::Hitbox>();
     _core->registerComponent<ECS::Components::Input>();
@@ -79,6 +81,10 @@ Rtype::Game::Game()
     renderSignature3D.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
     renderSignature3D.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Rotate>());
+    renderSignature3D.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Scale>());
+    renderSignature3D.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Render3D>());
     _core->setSystemSignature<ECS::Systems::SystemRender3D>(renderSignature3D);
 
@@ -105,6 +111,8 @@ Rtype::Game::Game()
 
     std::size_t player = _core->createEntity();
     _core->addComponent(player, ECS::Components::Position{-10.0f, 0.0f});
+    _core->addComponent(player, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
+    _core->addComponent(player, ECS::Components::Scale{1.0f});
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
@@ -114,6 +122,8 @@ Rtype::Game::Game()
     TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t pataPata1 = _core->createEntity();
     _core->addComponent(pataPata1, ECS::Components::Position{10.0f, 2.0f});
+    _core->addComponent(pataPata1, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(pataPata1, ECS::Components::Scale{1.0f});
     _core->addComponent(pataPata1, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(pataPata1, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(pataPata1, ECS::Components::Render3D{"enemy_one"});
@@ -121,6 +131,8 @@ Rtype::Game::Game()
 
     std::size_t pataPata2 = _core->createEntity();
     _core->addComponent(pataPata2, ECS::Components::Position{13.0f, -3.0f});
+    _core->addComponent(pataPata2, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(pataPata2, ECS::Components::Scale{1.0f});
     _core->addComponent(pataPata2, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(pataPata2, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(pataPata2, ECS::Components::Render3D{"enemy_one"});
@@ -175,6 +187,8 @@ void Rtype::Game::createProjectile(std::size_t entityID)
 
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
     _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
+    _core->addComponent(projectile, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Scale{1.0f});
     _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
@@ -258,25 +272,20 @@ void Rtype::Game::render()
 {
     BeginDrawing();
     _window.ClearBackground(RAYWHITE);
-
-    auto &positions = _core->getComponents<ECS::Components::Position>();
-    auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
-    auto &velocities = _core->getComponents<ECS::Components::Velocity>();
-
-    auto toDraw = _core->getEntitiesWithComponent<ECS::Components::Position, ECS::Components::Hitbox>();
-
     auto renderSystem2D = _core->getSystem<ECS::Systems::SystemRender2D>();
     auto renderEntities2D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender2D>());
 
     auto renderSystem3D = _core->getSystem<ECS::Systems::SystemRender3D>();
     auto renderEntities3D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender3D>());
 
-
     renderSystem2D->update(_core->getComponents<ECS::Components::Position>(),
                         _core->getComponents<ECS::Components::Render2D>(),
                         renderEntities2D,
                         _ressourcePool);
+
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
+                        _core->getComponents<ECS::Components::Rotate>(),
+                        _core->getComponents<ECS::Components::Scale>(),
                         _core->getComponents<ECS::Components::Render3D>(),
                         renderEntities3D,
                         _ressourcePool,

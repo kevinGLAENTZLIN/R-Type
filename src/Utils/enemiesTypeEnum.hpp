@@ -6,10 +6,7 @@
 */
 #pragma once
 
-namespace ECS {
-
-    typedef enum enemiesTypeEnum_e {
-        PATAPATA = 0,
-        BINK = 1
-    } enemiesTypeEnum_t;
-}
+typedef enum enemiesTypeEnum_e {
+    PATAPATA = 0,
+    BINK = 1
+} enemiesTypeEnum_t;

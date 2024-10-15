@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "../../../ICommand.hh"
-#include "../../../../Server/Client_info.hh"
+#include "../../../ACommand.hpp"
+#include "../../../../Server/Client_info.hpp"
 
 namespace Rtype
 {
@@ -15,7 +15,7 @@ namespace Rtype
     {
         namespace Projectile
         {
-            class Hit: public ICommand{
+            class Hit: public ACommand{
                 public:
                     Hit() = default;
                     ~Hit();

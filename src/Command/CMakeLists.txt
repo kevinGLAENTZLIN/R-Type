@@ -44,6 +44,7 @@ set_target_properties(${NAME_LIB_CMD} PROPERTIES
 message(${NAME_LIB_CMD})
 
 target_link_libraries(${NAME_LIB_CMD} PRIVATE Boost::asio)
+target_link_libraries(${NAME_LIB_CMD} PRIVATE ${NAME_LIB_CMD})
 
 target_include_directories(${NAME_LIB_CMD} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}

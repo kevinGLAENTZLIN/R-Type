@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "../../../ICommand.hh"
-#include "../../../../Server/Client_info.hh"
+#include "../../../ACommand.hpp"
+#include "../../../../Server/Client_info.hpp"
 
 namespace Rtype
 {
@@ -15,7 +15,7 @@ namespace Rtype
     {
         namespace Player
         {
-            class Hit_wall: public ICommand{
+            class Hit_wall: public ACommand{
                 public:
                     Hit_wall() = default;
                     ~Hit_wall();

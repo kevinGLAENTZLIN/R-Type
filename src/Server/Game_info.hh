@@ -10,7 +10,7 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include "Client_info.hh"
+#include "Client_info.hpp"
 
 namespace Rtype
 {

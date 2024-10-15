@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "../../../ICommand.hh"
-#include "../../../../Server/Client_info.hh"
+#include "../../../ACommand.hpp"
+#include "../../../../Server/Client_info.hpp"
 
 namespace Rtype
 {
@@ -15,7 +15,7 @@ namespace Rtype
     {
         namespace Player
         {
-            class Score: public ICommand{
+            class Score: public ACommand{
                 public:
                     Score() = default;
                     ~Score();

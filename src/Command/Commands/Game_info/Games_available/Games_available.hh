@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "../../../ICommand.hh"
+#include "../../../ACommand.hpp"
 #include "../../../../Server/Game_info.hh"
 
 namespace Rtype
@@ -15,7 +15,7 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Games_available: public ICommand{
+            class Games_available: public ACommand{
                 public:
                     Games_available() = default;
                     ~Games_available();

@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "../../../ICommand.hh"
-#include "../../../../Server/Client_info.hh"
+#include "../../../ACommand.hpp"
+#include "../../../../Server/Client_info.hpp"
 
 namespace Rtype
 {
@@ -15,7 +15,7 @@ namespace Rtype
     {
         namespace Player
         {
-            class Die: public ICommand{
+            class Die: public ACommand{
                 public:
                     Die() = default;
                     ~Die();

@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "../../../ICommand.hh"
+#include "../../../ACommand.hpp"
 #include "../../../../Server/Game_info.hh"
 #include <map>
 
@@ -16,7 +16,7 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Client_connection: public ICommand{
+            class Client_connection: public ACommand{
                 public:
                     Client_connection() = default;
                     ~Client_connection();

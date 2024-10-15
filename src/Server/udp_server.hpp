@@ -19,6 +19,7 @@
 #include <boost/asio.hpp>
 #include "Client_info.hpp"
 #include "Game_info.hh"
+#include "../Utils/ParametersMap/ParametersMap.hpp"
 #include "../Command/Factory/Factory.hh"
 #include "../Command/Invoker/Command_invoker.hh"
 

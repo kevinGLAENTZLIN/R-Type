@@ -20,6 +20,7 @@
 #include "../Component/Input/Input.hh"
 #include "../Component/Projectile/Projectile.hh"
 #include "../Component/Background/Background.hpp"
+#include "../Component/Patapata/Patapata.hpp"
 
 #include "../System/SystemManager/SystemManager.hpp"
 
@@ -29,6 +30,9 @@
 #include "../System/InputUpdates/InputUpdates.hh"
 #include "../System/Render3D/Render3D.hh"
 #include "../System/Render2D/Render2D.hh"
+#include "../System/Background/Background.hh"
+
+#include "../System/UpdateVelocityPataPata/UpdateVelocityPataPata.hh"
 
 #include "../RessourcePool/RessourcePool.hh"
 #include "raylib-cpp.hpp"
@@ -46,6 +50,8 @@ namespace Rtype {
     private:
         ECS::RessourcePool _ressourcePool;
         void createProjectile(std::size_t entityID);
+        void destroyProjectile(std::size_t entityID);
+        void createBackgroundLayers(float speed, std::string modelPath);
         void update();
         void render();
         bool _isRunning;

@@ -19,6 +19,8 @@ namespace ECS {
 
             float getX() const;
             float getY() const;
+            void setX(float x);
+            void setY(float y);
             std::pair<float, float> getVelPair() const;
 
             void setVelPair(std::pair<float, float> vel);

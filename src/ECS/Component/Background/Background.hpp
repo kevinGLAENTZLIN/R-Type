@@ -14,10 +14,19 @@ namespace ECS {
 
         class Background {
         public:
-            Background() = default;
+            Background(float width, float speed) {
+                _width = width;
+                _speed = speed;
+            }
             ~Background() = default;
+            void setWidth(float width) { _width = width; }
+            void setSpeed(float speed) { _speed = speed; }
+            float getWidth() const { return _width; }
+            float getSpeed() const { return _speed; }
 
         private:
+            float _width;
+            float _speed;
         };
     }
 }

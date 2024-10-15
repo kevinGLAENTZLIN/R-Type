@@ -18,7 +18,7 @@ add_subdirectory(src/ECS)
 add_subdirectory(src/Command)
 add_subdirectory(src/Client)
 add_subdirectory(src/Server)
-# add_subdirectory(src/Utils)
+add_subdirectory(src/Utils)
 
 # Testing
 enable_testing()

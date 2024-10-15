@@ -12,6 +12,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <filesystem>
+
 
 namespace ECS {
     class RessourcePool {
@@ -30,6 +33,5 @@ namespace ECS {
             std::map<const std::string, raylib::Model> _models;
             std::map<const std::string, raylib::Texture> _texturesModels;
             std::map<const std::string, raylib::Texture> _textures;
-            std::map<const std::string, raylib::Image> _texturesImages;
     };
 }

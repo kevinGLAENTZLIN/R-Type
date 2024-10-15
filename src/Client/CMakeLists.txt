@@ -33,6 +33,9 @@ set(CLIENT_SOURCES
     ./main.cpp
     ./Game/Game.cpp
     ./udp_client.cpp
+    # ./Network/udp_client.cpp
+    ../Server/Client_info.cpp
+    ../Server/Game_info.cpp
 )
 
 find_package(boost_asio CONFIG REQUIRED)
@@ -45,6 +48,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(${NAME_CLIENT} PUBLIC Boost::asio)
     target_link_libraries(${NAME_CLIENT} PUBLIC raylib raylib_cpp ${NAME_LIB})
     target_link_libraries(${NAME_CLIENT} PRIVATE ${NAME_LIB_CMD})
+    target_link_libraries(${NAME_CLIENT} PRIVATE ${NAME_LIB_UTILS})
 else()
     add_executable(${NAME_CLIENT} ${CLIENT_SOURCES})
 
@@ -53,6 +57,8 @@ else()
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
     target_link_libraries(${NAME_CLIENT} PUBLIC Boost::asio)
     target_link_libraries(${NAME_CLIENT} PUBLIC raylib raylib_cpp ${NAME_LIB})
+    target_link_libraries(${NAME_CLIENT} PRIVATE ${NAME_LIB_CMD})
+    target_link_libraries(${NAME_CLIENT} PRIVATE ${NAME_LIB_UTILS})
 endif()
 
 if(WIN32)

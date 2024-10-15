@@ -138,8 +138,10 @@ Rtype::Game::~Game()
 
 void Rtype::Game::run(const std::string &serverAddr, const int serverPort)
 {
-    _udpClient = std::make_unique<Rtype::udpClient>(serverAddr, serverPort);
-
+    boost::asio::io_service io_service;
+    
+    _udpClient = std::make_unique<Rtype::udpClient>(io_service, serverAddr, serverPort);
+    io_service.run();
     while (!_window.ShouldClose() && _isRunning) {
         update();
         render();

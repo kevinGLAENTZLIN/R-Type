@@ -17,6 +17,9 @@
 #include <thread>
 #include <vector>
 #include <array>
+#include "../../Utils/ParametersMap/ParametersMap.hpp"
+#include "../../Command/Factory/Factory.hh"
+#include "../../Command/Invoker/Command_invoker.hh"
 
 using boost::asio::ip::udp;
 
@@ -33,7 +36,7 @@ namespace Rtype {
              * @param serverAddr Server's IP address.
              * @param serverPort Server's port.
              */
-            udpClient(const std::string &serverAddr, const int serverPort);
+            udpClient(boost::asio::io_service& io_service, const std::string &serverAddr, const int serverPort);
             
             /**
              * @brief Destructor for the udpClient class.
@@ -49,7 +52,7 @@ namespace Rtype {
             /**
              * @brief Run the IO context.
              */
-            void run();
+            // void run();
 
         private:
             /**
@@ -64,11 +67,10 @@ namespace Rtype {
             void received_data_handler(std::size_t bytes_recv);
 
             int _id;
-            boost::asio::io_context _ioContext;
-            udp::socket _socket;
+            std::shared_ptr<udp::socket> _socket;
             udp::endpoint _serverEndpoint;
-            udp::endpoint _senderEndpoint;
             std::array<char, 1024> _receiverBuffer;
-            std::thread _receiverThread;
+            Rtype::Command::Command_invoker _commandInvoker;
+            Rtype::Command::Factory _commandFactory;
     };
 }

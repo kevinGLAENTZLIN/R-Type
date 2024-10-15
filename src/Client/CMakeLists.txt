@@ -43,6 +43,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Debug")
     target_link_libraries(${NAME_CLIENT} PUBLIC Boost::asio)
     target_link_libraries(${NAME_CLIENT} PUBLIC raylib raylib_cpp ${NAME_LIB})
+    target_link_libraries(${NAME_CLIENT} PRIVATE ${NAME_LIB_CMD})
 else()
     add_executable(${NAME_CLIENT} ${CLIENT_SOURCES})
 

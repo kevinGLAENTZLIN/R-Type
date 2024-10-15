@@ -29,7 +29,7 @@ if (NOT raylib_cpp_FOUND)
     FetchContent_MakeAvailable(raylib_cpp)
 endif()
 
-set(NAME_LIB ${RTYPE})
+set(NAME_LIB ${RTYPE} CACHE INTERNAL "")
 set(NAME_DEBUG_EXE "${RTYPE}-ECS-Debug")
 
 set(LIB_SOURCES

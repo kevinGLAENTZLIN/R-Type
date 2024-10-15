@@ -20,6 +20,7 @@ namespace Rtype
                 virtual ~ICommand() {}
                 virtual void execute_client_side() = 0;
                 virtual void execute_server_side() = 0;
+                virtual void setOrigins(std::string origins) = 0;
         };
     }
 }

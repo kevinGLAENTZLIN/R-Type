@@ -33,5 +33,6 @@ void Rtype::Command::Command_invoker::executeCommand()
 
 void Rtype::Command::Command_invoker::addCommand(std::shared_ptr<ICommand> cmd)
 {
+    cmd->setOrigins(_invokerType);
     _commandStack.push(cmd);
 }

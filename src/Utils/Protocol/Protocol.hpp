@@ -16,6 +16,8 @@
 #include <vector>
 #include <cstring>
 #include <any>
+#include <cstdarg>
+#include <variant>
 #include "../Response/Response.hpp"
 
 namespace Utils
@@ -50,6 +52,7 @@ namespace Utils
                 std::memcpy(converted_value.data(), &value, sizeof(T));
                 msg.insert(msg.end(), converted_value.begin(), converted_value.end());
             }
+
             /**
              * @brief Extracts a fixed-size type from a bytes vector.
              * 
@@ -73,17 +76,51 @@ namespace Utils
              * @param args The list of arguments to send.
              * @return The message to send in bytes.
              */
-            template<Utils::FunctionIndex T, typename... Args>
-            static bytes CreateMsg(uint32_t ack, Utils::InfoTypeEnum info, T functionDefiner, Args... args)
+            template<Utils::FunctionIndex T>
+            static bytes CreateMsg(uint32_t ack, Utils::InfoTypeEnum info, T functionDefiner, std::vector<Utils::PrimitiveType> args)
             {
                 bytes msg;
 
                 appendFixedSizeTypeIntoBytes(msg, ack);
                 appendFixedSizeTypeIntoBytes(msg, info);
                 appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner));
-                (appendFixedSizeTypeIntoBytes(msg, args), ...);
-
+                for (const auto &arg: args) {
+                    std::visit([&msg](auto &&value){
+                        using P = std::decay_t<decltype(value)>;
+                        appendFixedSizeTypeIntoBytes<P>(msg, value);
+                    }, arg);
+                }
                 return msg;
+            }
+            
+            /**
+             * @brief Convert a va_list to a vector of PrimitiveType.
+             * @param params The va_list to convert.
+             * @param params_type The types of the parameters.
+             * @return The vector of PrimitiveType.
+             */
+            static std::vector<Utils::PrimitiveType>  va_listToVector(va_list params, std::string params_type) {
+                std::vector<Utils::PrimitiveType> args;
+                for (const char c: params_type) {
+                    switch (c) {
+                        case 'b':
+                            args.push_back(va_arg(params, bool));
+                            break;
+                        case 'c':
+                            args.push_back(va_arg(params, char));
+                            break;
+                        case 'i':
+                            args.push_back(va_arg(params, int));
+                            break;
+                        case 'f':
+                            args.push_back(va_arg(params, double));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                va_end(params);
+                return args;
             }
 
             /**

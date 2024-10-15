@@ -37,7 +37,7 @@ namespace Rtype
                     _ack = ack;
                 }
 
-            private:
+            protected:
                 /**
                  * @brief Sends a command to the last sender client.
                  * 

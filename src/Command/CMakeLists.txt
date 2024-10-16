@@ -28,6 +28,7 @@ set(LIB_CMD_SRC
     ./Commands/Player/Spawn/Spawn.cpp
     ./Invoker/Command_invoker.cpp
     ./Factory/Factory.cpp
+    ../Utils/ParametersMap/ParametersMap.cpp
 )
 
 
@@ -77,4 +78,5 @@ target_include_directories(${NAME_LIB_CMD} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Player/Spawn
     ${CMAKE_CURRENT_SOURCE_DIR}/Invoker
     ${CMAKE_CURRENT_SOURCE_DIR}/Factory
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Utils/ParametersMap
 )

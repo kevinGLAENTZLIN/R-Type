@@ -7,6 +7,8 @@
 
 #include "./Protocol.hpp"
 #include "../Response/Response.hpp"
+#include "../Utils/Protocol/Protocol.hpp"
+
 
 namespace Utils
 {

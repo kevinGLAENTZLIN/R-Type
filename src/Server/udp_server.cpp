@@ -23,6 +23,9 @@ Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port):
 
 void Rtype::udpServer::read_clients()
 {
+    Utils::Network::Response clientResponse;
+    Utils::Network::bytes data;
+
     _socket->async_receive_from(boost::asio::buffer(_data, max_length), _senderEndpoint,
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         if (!ec && recvd_bytes > 0 && recvd_bytes < max_length) {
@@ -31,6 +34,8 @@ void Rtype::udpServer::read_clients()
         } else
             read_clients();
     });
+    data = Utils::Network::bytes(std::begin(_data), std::end(_data));
+    clientResponse = Utils::Network::Protocol::ParseMsg(false, data);
 }
 
 void Rtype::udpServer::received_data_handler(std::size_t recvd_bytes)

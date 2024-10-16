@@ -6,6 +6,7 @@
 */
 
 #include "udp_client.hh"
+#include "../Utils/Protocol/Protocol.hpp"
 
 /**
  * @file udp_client.cpp
@@ -54,6 +55,8 @@ void Rtype::udpClient::send_data(const std::string &data)
 void Rtype::udpClient::read_server()
 {
     udp::endpoint sender_endpoint;
+    Utils::Network::Response clientResponse;
+    Utils::Network::bytes data;
 
     _socket->async_receive_from(boost::asio::buffer(_receiverBuffer), sender_endpoint,
     [this](const boost::system::error_code& error, std::size_t bytes_recv) {
@@ -62,6 +65,8 @@ void Rtype::udpClient::read_server()
         }
         read_server();
     });
+    data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
+    clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
 }
 
 void Rtype::udpClient::received_data_handler(std::size_t bytes_recv)

@@ -21,7 +21,7 @@ namespace Rtype
                     ~Game_result();
 
                     void set_client();
-                    void set_server(udp::endpoint endpoint, Rtype::Game_info game);
+                    void set_server(udp::endpoint endpoint, std::shared_ptr<Rtype::Game_info> game);
 
                     void execute_client_side();
                     void execute_server_side();
@@ -29,7 +29,7 @@ namespace Rtype
                 protected:
                 private:
                 udp::endpoint _endpoint;
-                Rtype::Game_info _game;
+                std::shared_ptr<Rtype::Game_info> _game;
             };
         }
     }

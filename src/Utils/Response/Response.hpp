@@ -38,6 +38,7 @@ namespace Utils
              * @param list_params The list of parameters.
              */
             Response(uint32_t ACK, Utils::InfoTypeEnum infoType, uint8_t infoFunction, std::vector<std::any> list_params);
+            Response() {};
             ~Response() = default;
 
             /**
@@ -68,6 +69,7 @@ namespace Utils
              * @return The parameter as the given type.
              */
             template<typename T>
+
             T PopParam()
             {
                 return std::any_cast<T>(RawPopParam());

@@ -7,36 +7,43 @@
 
 #include "Rotate.hh"
 
-ECS::Components::Rotate::Rotate(float x, float y, float z):
-    _x(x), _y(y), _z(z)
+ECS::Components::Rotate::Rotate(float roll, float pitch, float yaw):
+    _roll(roll), _pitch(pitch), _yaw(yaw)
 {}
 
-float ECS::Components::Rotate::getRotateX() const
+float ECS::Components::Rotate::getRoll() const
 {
-    return _x;
+    return _roll;
 }
 
-float ECS::Components::Rotate::getRotateY() const
+float ECS::Components::Rotate::getPitch() const
 {
-    return _y;
+    return _pitch;
 }
 
-float ECS::Components::Rotate::getRotateZ() const
+float ECS::Components::Rotate::getYaw() const
 {
-    return _z;
+    return _yaw;
 }
 
-void ECS::Components::Rotate::setRotateX(float x)
+void ECS::Components::Rotate::setRotate(float roll, float pitch, float yaw)
 {
-    _x = x;
+    _roll = roll;
+    _pitch = pitch;
+    _yaw = yaw;
 }
 
-void ECS::Components::Rotate::setRotateY(float y)
+void ECS::Components::Rotate::setRoll(float roll)
 {
-    _y = y;
+    _roll = roll;
 }
 
-void ECS::Components::Rotate::setRotateZ(float z)
+void ECS::Components::Rotate::setPitch(float pitch)
 {
-    _z = z;
+    _pitch = pitch;
+}
+
+void ECS::Components::Rotate::setYaw(float yaw)
+{
+    _yaw = yaw;
 }

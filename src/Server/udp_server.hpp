@@ -20,6 +20,7 @@
 #include "Client_info.hpp"
 #include "Game_info.hh"
 #include "../Utils/ParametersMap/ParametersMap.hpp"
+#include "../Utils/Response/Response.hpp"
 #include "../Command/Factory/Factory.hh"
 #include "../Command/Invoker/Command_invoker.hh"
 
@@ -40,6 +41,11 @@ namespace Rtype {
              * @param port The port on which the server will listen.
              */
             udpServer(boost::asio::io_service& io_service, short port);
+            
+            /**
+             * @brief Destructor for the udpServer class.
+             */
+            ~udpServer() = default;
 
             /**
              * @brief Read asynchronously data from clients.
@@ -98,6 +104,28 @@ namespace Rtype {
              * @param client_id Client's ID.
              */
             void disconnect_client(int client_id);
+
+            void connect_client_to_game(int client_id, int game_room);
+
+            template <typename T>
+            std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
+                static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
+
+                T* derived = dynamic_cast<T*>(base.get());
+                if (derived) {
+                    base.release();
+                    return std::unique_ptr<T>(derived);
+                } else
+                    return nullptr;
+            }
+
+            void handleResponse(Utils::Network::Response clientResponse); //! Temporary: will be probably refactor by a kind of factory of functions 
+            void handleGameInfo(Utils::Network::Response clientResponse);
+            void handlePlayer(Utils::Network::Response clientResponse) {}; // temp empty
+            void handleEnemy(Utils::Network::Response clientResponse) {}; // temp empty
+            void handleBoss(Utils::Network::Response clientResponse) {}; // temp empty
+            void handlePowerUp(Utils::Network::Response clientResponse) {}; // temp empty
+            void handleProjectile(Utils::Network::Response clientResponse) {}; // temp empty
 
             // ! To Refactor
             /**
@@ -273,8 +301,8 @@ namespace Rtype {
             udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
-            std::map<int, Rtype::client_info> _clients;
-            std::vector<Rtype::Game_info> _games;
+            std::map<int, std::shared_ptr<Rtype::client_info>> _clients;
+            std::vector<std::shared_ptr<Rtype::Game_info>> _games;
             Rtype::Command::Command_invoker _commandInvoker;
             Rtype::Command::Factory _commandFactory;
     };

@@ -7,7 +7,7 @@
 
 #include "Attack.hh"
 
-void Rtype::Command::Enemy::Attack::set_server(std::map<int, Rtype::client_info> players, int mobID)
+void Rtype::Command::Enemy::Attack::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int mobID)
 {
     _players = players;
     _mobID = mobID;

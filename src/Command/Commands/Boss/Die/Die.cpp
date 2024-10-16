@@ -7,7 +7,7 @@
 
 #include "Die.hh"
 
-void Rtype::Command::Boss::Die::set_server(std::map<int, Rtype::client_info> players, int bossType)
+void Rtype::Command::Boss::Die::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int bossType)
 {
     _players = players;
     _bossType = bossType;

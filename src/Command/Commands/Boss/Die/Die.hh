@@ -20,7 +20,7 @@ namespace Rtype
                     Die() = default;
                     ~Die();
 
-                    void set_server(std::map<int, Rtype::client_info> players, int bossType);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int bossType);
                     void set_client();
 
                     void execute_client_side();
@@ -28,7 +28,7 @@ namespace Rtype
             
                 protected:
                 private:
-                    std::map<int, Rtype::client_info> _players;
+                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _bossType;
             };
         }

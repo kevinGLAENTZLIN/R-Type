@@ -7,7 +7,7 @@
 
 #include "Spawn.hh"
 
-void Rtype::Command::Player::Spawn::set_server(std::map<int, Rtype::client_info> players, int playerID, int x, int y)
+void Rtype::Command::Player::Spawn::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, int x, int y)
 {
     _players = players;
     _playerID = playerID;
@@ -25,6 +25,13 @@ Rtype::Command::Player::Spawn::~Spawn()
 
 void Rtype::Command::Player::Spawn::execute_client_side()
 {
+    _players[_playerID]->setX(_x);
+    _players[_playerID]->setX(_y);
+    for (auto player: _players) {
+        _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
+        sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerSpawnOnGame, _playerID, _x, _y);
+    }
+    _game->createPlayer(_playerID, _x * 1.f, _y * 1.f);
 }
 
 void Rtype::Command::Player::Spawn::execute_server_side()

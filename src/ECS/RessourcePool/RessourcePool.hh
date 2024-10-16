@@ -18,20 +18,20 @@
 
 namespace ECS {
     class RessourcePool {
-        public:
-            RessourcePool();
-            ~RessourcePool();
+    public:
+        RessourcePool();
+        ~RessourcePool() = default;
 
-            raylib::Model &getModel(std::string modelPath);
-            raylib::Texture &getTexture(std::string texturePath);
+        raylib::Model &getModel(std::string modelPath);
+        raylib::Texture &getTexture(std::string texturePath);
 
-            void addModel(const std::string &modelPath);
-            void addTexture(const std::string &TexturePath);
-            void UnloadAll();
-        private:
+        void addModel(const std::string &modelPath);
+        void addTexture(const std::string &TexturePath);
+        void UnloadAll();
+    private:
 
-            std::map<const std::string, raylib::Model> _models;
-            std::map<const std::string, raylib::Texture> _texturesModels;
-            std::map<const std::string, raylib::Texture> _textures;
+        std::map<const std::string, raylib::Model> _models;
+        std::map<const std::string, raylib::Texture> _texturesModels;
+        std::map<const std::string, raylib::Texture> _textures;
     };
 }

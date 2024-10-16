@@ -5,8 +5,8 @@
 ** Response.cpp
 */
 
-#include "Protocol/Protocol.hpp"
-#include "Response/Response.hpp"
+#include "../Protocol/Protocol.hpp"
+#include "./Response.hpp"
 
 namespace Utils
 {

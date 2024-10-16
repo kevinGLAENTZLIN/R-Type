@@ -5,14 +5,23 @@
 ** Protocol.cpp
 */
 
-#include "Protocol/Protocol.hpp"
-#include "Response/Response.hpp"
+#include "./Protocol.hpp"
+#include "../Response/Response.hpp"
+#include "../Utils/Protocol/Protocol.hpp"
+
 
 namespace Utils
 {
     namespace Network
     {
         
+        /**
+         * @brief Read a fixed-size type from a bytes vector.
+         * @param offset The offset to start reading from.
+         * @param msg The bytes vector to read from.
+         * @param type The type to read.
+         * @return The value read as a std::any.
+         */
         std::any Protocol::newParam(std::size_t &offset, bytes msg, char type_)
         {
             char char_placeholder;
@@ -44,6 +53,12 @@ namespace Utils
             }
         }
 
+        /**
+         * @brief Parse the message received.
+         * @param isClient A boolean to know if the message is read by the client or the server.
+         * @param msg The message to parse.
+         * @return The response object.
+         */
         Response Protocol::ParseMsg(bool isClient, bytes &msg)
         {
             uint32_t ack = 0;

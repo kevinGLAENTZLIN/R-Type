@@ -8,21 +8,23 @@
 #include "ProjectileCollision.hh"
 #include "../../Utils/Utils.hh"
 
-std::size_t ECS::Systems::ProjectileCollision::projectileIsHit(
+std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
     ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
     ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> &hitboxes,
     std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities)
 {
     bool selfCollision = false;
+    std::vector<std::size_t> entityCollided;
 
     for (std::size_t j = 0; j < projectileEntities.size(); ++j) {
         std::size_t projectile = projectileEntities[j];
         auto &projectilePos = positions[projectile].value();
         auto &projectileHitbox = hitboxes[projectile].value();
 
+        entityCollided.push_back(projectile);
         if (projectilePos.getX() >= 11.0 || projectilePos.getX() <= -11.0)
-            return projectile;
-        
+            return entityCollided;
+
         for (std::size_t i = 0; i < entities.size(); ++i) {           
             for (std::size_t temp = 0; temp < projectileEntities.size(); temp++)
                 if (entities[i] == projectileEntities[temp]) {
@@ -37,9 +39,13 @@ std::size_t ECS::Systems::ProjectileCollision::projectileIsHit(
             auto &entityPos = positions[entity].value();
             auto &entityHitbox = hitboxes[entity].value();
 
-            if (ECS::Utils::checkCollision(entityPos, entityHitbox, projectilePos, projectileHitbox))
-                return projectile;
+            if (ECS::Utils::checkCollision(entityPos, entityHitbox, projectilePos, projectileHitbox)) {
+                entityCollided.push_back(entity);
+                return entityCollided;
+            }
         }
+        entityCollided.clear();
     }
-    return 100000;
+    entityCollided.clear();
+    return entityCollided;
 }

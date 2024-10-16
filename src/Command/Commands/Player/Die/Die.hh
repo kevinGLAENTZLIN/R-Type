@@ -21,14 +21,14 @@ namespace Rtype
                     ~Die();
 
                     void set_client();
-                    void set_server(std::map<int, Rtype::client_info> players, int playerID);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID);
 
                     void execute_client_side();
                     void execute_server_side();
             
                 protected:
                 private:
-                    std::map<int, Rtype::client_info> _players;
+                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _playerID;
             };
         }

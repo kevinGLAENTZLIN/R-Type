@@ -7,7 +7,7 @@
 
 #include "Power_up.hh"
 
-void Rtype::Command::Player::Power_up::set_server(std::map<int, Rtype::client_info> players, int playerID, int powerUpID)
+void Rtype::Command::Player::Power_up::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, int powerUpID)
 {
     _players = players;
     _playerID = playerID;

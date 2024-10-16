@@ -7,7 +7,7 @@
 
 #include "Die.hh"
 
-void Rtype::Command::Player::Die::set_server(std::map<int, Rtype::client_info> players, int playerID)
+void Rtype::Command::Player::Die::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID)
 {
     _players = players;
     _playerID = playerID;

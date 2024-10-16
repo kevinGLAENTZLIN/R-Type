@@ -50,18 +50,18 @@ set(LIB_SOURCES
     ./Component/Scale/Scale.cpp
     ./Component/Volume/Volume.cpp
     ./Component/Input/Input.cpp
-    ./System/Velocity/Velocity.cpp
-    ./System/Collision/Collision.cpp
-    ./System/UpdateVelocityPataPata/UpdateVelocityPataPata.cpp
-    ./System/ProjectileCollision/ProjectileCollision.cpp
-    ./System/InputUpdates/InputUpdates.cpp
-    ./Game/Game.cpp
     ./Component/Render2D/Render2D.cpp
     ./Component/Render3D/Render3D.cpp
+    ./Component/AI/AI.cpp
+    ./System/Velocity/Velocity.cpp
+    ./System/Collision/Collision.cpp
+    ./System/UpdateVelocityAI/UpdateVelocityAI.cpp
+    ./System/ProjectileCollision/ProjectileCollision.cpp
+    ./System/InputUpdates/InputUpdates.cpp
     ./System/Render2D/Render2D.cpp
     ./System/Render3D/Render3D.cpp
-    ./RessourcePool/RessourcePool.cpp
     ./System/Background/Background.cpp
+    ./RessourcePool/RessourcePool.cpp
 
 )
 # Créer la bibliothèque
@@ -95,6 +95,7 @@ target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Text
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Volume
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Projectile
+    ${CMAKE_CURRENT_SOURCE_DIR}Component/AI
     ${CMAKE_CURRENT_SOURCE_DIR}System
     ${CMAKE_CURRENT_SOURCE_DIR}System/ButtonClick
     ${CMAKE_CURRENT_SOURCE_DIR}System/SystemManager
@@ -106,10 +107,10 @@ target_include_directories(${NAME_LIB} PUBLIC
 )
 
 # Compiler le main.cpp seulement en mode Debug
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
-    add_executable(${NAME_DEBUG_EXE} main.cpp)
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+ #   set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}")
+  #  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
+   # add_executable(${NAME_DEBUG_EXE} main.cpp)
 
-    target_link_libraries(${NAME_DEBUG_EXE} PRIVATE ${NAME_LIB})
-endif()
+    #target_link_libraries(${NAME_DEBUG_EXE} PRIVATE ${NAME_LIB})
+#endif()

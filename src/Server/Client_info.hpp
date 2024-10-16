@@ -13,6 +13,10 @@
 #include <map>
 #include <vector>
 #include "../Utils/ParametersMap/ParametersMap.hpp"
+#include <boost/asio.hpp>
+
+using boost::asio::ip::udp;
+using boost::asio::ip::address;
 
 /**
  * @file Client_info.cpp

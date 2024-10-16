@@ -20,7 +20,7 @@ namespace Rtype
                     Spawn() = default;
                     ~Spawn();
 
-                    void set_server(std::map<int, Rtype::client_info> players, int playerID, int x, int y);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, int x, int y);
                     void set_client();
 
                     void execute_client_side();
@@ -28,7 +28,7 @@ namespace Rtype
 
                 protected:
                 private:
-                    std::map<int, Rtype::client_info> _players;
+                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _playerID;
                     int _x;
                     int _y;

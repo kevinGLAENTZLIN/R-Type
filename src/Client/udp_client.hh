@@ -55,6 +55,11 @@ namespace Rtype {
          */
         void run();// Added
 
+        /**
+         * @brief Handle the response from the server.
+         * @param clientResponse The response from the server.
+         */
+        void handleResponse(Utils::Network::Response clientResponse);
     private:
         /**
          * @brief Receiving data from server.

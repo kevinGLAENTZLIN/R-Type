@@ -67,6 +67,17 @@ void Rtype::udpClient::read_server()
     });
     data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
     clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
+    handleResponse(clientResponse);
+}
+
+void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
+{
+    Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
+    uint8_t cmd_index = clientResponse.GetInfoFunction();
+
+    if (cmd_category == Utils::InfoTypeEnum::GameInfo && cmd_index == static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)) {
+        _id = clientResponse.PopParam<int>();
+    }
 }
 
 void Rtype::udpClient::received_data_handler(std::size_t bytes_recv)

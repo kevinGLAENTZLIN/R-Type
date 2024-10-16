@@ -29,7 +29,7 @@ void Rtype::Command::GameInfo::Client_connection::execute_client_side()
 
 void Rtype::Command::GameInfo::Client_connection::execute_server_side()
 {
-	// Do Something who will be executed by the Client + resultat de get_available_client_id
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected, get_available_client_id());
 }
 
 int Rtype::Command::GameInfo::Client_connection::get_available_client_id()

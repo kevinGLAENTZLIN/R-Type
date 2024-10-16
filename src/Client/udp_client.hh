@@ -20,7 +20,7 @@
 #include "../Utils/ParametersMap/ParametersMap.hpp"
 #include "../Command/Factory/Factory.hh"
 #include "../Command/Invoker/Command_invoker.hh"
-#include "Game/Game.hh"
+#include "./Game/Game.hh"
 
 using boost::asio::ip::udp;
 

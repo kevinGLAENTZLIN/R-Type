@@ -11,11 +11,13 @@
 #include <cstdarg>
 #include <map>
 #include <vector>
+#include <memory>
 #include <boost/asio.hpp>
 #include "./ICommand.hh"
 #include "../Utils/ParametersMap/ParametersMap.hpp"
 #include "../Utils/Protocol/Protocol.hpp"
 #include "../Server/Client_info.hpp"
+#include "../Client/Game/Game.hh"
 
 using boost::asio::ip::udp;
 
@@ -36,6 +38,14 @@ namespace Rtype
                     _senderSocket = sender_socket;
                     _endpoint = endpoint;
                     _ack = ack;
+                }
+
+                void setCommonPart(std::shared_ptr<udp::socket> sender_socket, udp::endpoint endpoint, int ack, std::shared_ptr<Rtype::Game> game)
+                {
+                    _senderSocket = sender_socket;
+                    _endpoint = endpoint;
+                    _ack = ack;
+                    _game = game;
                 }
 
                 void setCommonPart(std::shared_ptr<udp::socket> sender_socket, udp::endpoint endpoint, std::map<int, std::tuple<Utils::InfoTypeEnum, uint8_t, std::vector<std::string>>> &history, int &ack)
@@ -154,6 +164,7 @@ namespace Rtype
                 std::map<int, std::tuple<Utils::InfoTypeEnum, uint8_t, std::vector<std::string>>> _history; // [Ack, (cmd_type, cmd_index, vector_params)]
                 int _ack;
                 std::string _origins;
+                std::shared_ptr<Rtype::Game> _game;
         };
     }
 }

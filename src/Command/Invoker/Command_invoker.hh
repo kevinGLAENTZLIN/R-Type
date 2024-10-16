@@ -22,12 +22,12 @@ namespace Rtype
 
                 void executeCommand();
 
-                void addCommand(std::shared_ptr<ACommand> cmd);
+                void addCommand(std::unique_ptr<ACommand> cmd);
 
             protected:
             private:
                 std::string _invokerType;
-                std::stack<std::shared_ptr<ACommand>> _commandStack;
+                std::stack<std::unique_ptr<ACommand>> _commandStack;
         };
     }
 }

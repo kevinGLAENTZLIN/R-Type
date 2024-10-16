@@ -8,34 +8,47 @@
 #include "udp_client.hh"
 #include "../Utils/Protocol/Protocol.hpp"
 
-/**
- * @file udp_client.cpp
- * @brief Implementation of the Rtype::udpClient class for UDP communication with a server.
- */
-
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
-    : _id(-1), _ioContext(), _socket(std::make_shared<udp::socket>(udp::socket(_ioContext, udp::endpoint(udp::v4(), 0)))),
+    : _id(-1), _ioContext(), _socket(std::make_shared<udp::socket>(_ioContext, udp::endpoint(udp::v4(), 0))),
       _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
       _commandInvoker("Client"), _commandFactory(), _game(Rtype::Game())
 {
-    _receiverThread = std::thread([this]() { _ioContext.run(); });// Added
+    _receiverThread = std::thread([this]() { _ioContext.run(); });
     read_server();
-    send_data("New client trying to connect to the server."); //! To refactor by the protocol control
+    send_data("New client trying to connect to the server.");
 }
 
 Rtype::udpClient::~udpClient()
 {
-    _ioContext.stop();// Added
-    if (_receiverThread.joinable()) {// Added
-        _receiverThread.join();// Added
+    if (_socket->is_open()) {
+        _socket->cancel();
+        _socket->close();
     }
-    send_data("Client is disconnecting."); //! To refactor by the protocol control
+    _ioContext.stop();
+    if (_receiverThread.joinable()) {
+        _receiverThread.join();
+    }
+    if (_networkThread.joinable()) {
+        _networkThread.join();
+    }
+
+    std::cout << "Client disconnected successfully." << std::endl;
 }
 
-void Rtype::udpClient::run()// Added
+void Rtype::udpClient::run()
+{
+    _networkThread = std::thread([this]() {
+        this->runNetwork();
+    });
+    std::cout << "Starting game loop..." << std::endl;
+    sleep(1);
+    std::cout << "Starting game loop..." << std::endl;
+    _game.run();
+}
+
+void Rtype::udpClient::runNetwork()
 {
     _ioContext.run();
-    _game.run();
 }
 
 void Rtype::udpClient::send_data(const std::string &data)
@@ -62,8 +75,15 @@ void Rtype::udpClient::read_server()
     [this](const boost::system::error_code& error, std::size_t bytes_recv) {
         if (!error && bytes_recv > 0) {
             received_data_handler(bytes_recv);
+        } else if (error == boost::asio::error::operation_aborted) {
+            std::cout << "Receive operation aborted." << std::endl;
+        } else if (error) {
+            std::cerr << "Error receiving data: " << error.message() << std::endl;
         }
-        read_server();
+
+        if (!error) {
+            read_server();
+        }
     });
     data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
     clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
@@ -83,9 +103,9 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 void Rtype::udpClient::received_data_handler(std::size_t bytes_recv)
 {
     std::string msg(_receiverBuffer.data(), bytes_recv);
-
     std::cout << "Received from server: [" << msg << "]" << std::endl;
-    if (std::strncmp("Your new ID is ", msg.c_str(), 15) == 0) { //! To refactor by the protocol control
+
+    if (std::strncmp("Your new ID is ", msg.c_str(), 15) == 0) {
         _id = atoi(msg.c_str() + 15);
     }
 }

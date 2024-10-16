@@ -171,10 +171,10 @@ void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 
 void Rtype::Game::run()
 {
-    // createPlayer(-10.0f, 0.0f);
-    // createOtherPlayer(-10.0f, 0.0f);
-    // createEnemy(PATAPATA, 10.0f, 2.0f);
-    // createEnemy(PATAPATA, 13.0f, -2.0f);
+    createPlayer(0, -10.0f, 0.0f);
+    createOtherPlayer(1, -10.0f, 0.0f);
+    createEnemy(PATAPATA, 10.0f, 2.0f);
+    createEnemy(PATAPATA, 13.0f, -2.0f);
     while (!_window.ShouldClose() && _isRunning) {
         update();
         render();

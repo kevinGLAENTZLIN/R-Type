@@ -160,9 +160,8 @@ void Rtype::Game::createOtherPlayer(float pos_x, float pos_y)
     _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
 }
 
-void Rtype::Game::run(const std::string &serverAddr, const int serverPort)
+void Rtype::Game::run()
 {
-    _udpClient = std::make_unique<Rtype::udpClient>(serverAddr, serverPort);// Added
     createPlayer(-10.0f, 0.0f);
     createOtherPlayer(-10.0f, 0.0f);
     createEnemy(PATAPATA, 10.0f, 2.0f);

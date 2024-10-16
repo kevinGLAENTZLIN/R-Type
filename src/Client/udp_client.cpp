@@ -15,7 +15,7 @@
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
     : _id(-1), _ioContext(), _socket(std::make_shared<udp::socket>(udp::socket(_ioContext, udp::endpoint(udp::v4(), 0)))),
       _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
-      _commandInvoker("Client"), _commandFactory()
+      _commandInvoker("Client"), _commandFactory(), _game(Rtype::Game())
 {
     _receiverThread = std::thread([this]() { _ioContext.run(); });// Added
     read_server();
@@ -34,6 +34,7 @@ Rtype::udpClient::~udpClient()
 void Rtype::udpClient::run()// Added
 {
     _ioContext.run();
+    _game.run();
 }
 
 void Rtype::udpClient::send_data(const std::string &data)

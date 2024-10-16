@@ -22,7 +22,7 @@ namespace Rtype
                     ~Client_connection();
 
                     void set_client(udp::endpoint endpoint);
-                    void set_server(udp::endpoint endpoint, std::map<int, Rtype::client_info> &clients);
+                    void set_server(udp::endpoint endpoint, std::map<int, std::shared_ptr<Rtype::client_info>> &clients);
 
                     void execute_client_side();
                     void execute_server_side();
@@ -32,7 +32,7 @@ namespace Rtype
                     int get_available_client_id();
 
                     udp::endpoint _endpoint;
-                    std::map<int, Rtype::client_info> _clients;
+                    std::map<int, std::shared_ptr<Rtype::client_info>> _clients;
             };
         }
     }

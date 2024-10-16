@@ -5,7 +5,7 @@
 ** Protocol.cpp
 */
 
-#include "Protocol/Protocol.hpp"
+#include "./Protocol.hpp"
 #include "../Response/Response.hpp"
 
 namespace Utils

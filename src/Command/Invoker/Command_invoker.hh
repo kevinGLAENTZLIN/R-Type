@@ -9,7 +9,7 @@
 #include <iostream> 
 #include <stack>
 #include <string>
-#include "../ICommand.hh"
+#include "../ACommand.hpp"
 
 namespace Rtype
 {
@@ -22,12 +22,12 @@ namespace Rtype
 
                 void executeCommand();
 
-                void addCommand(std::shared_ptr<ICommand> cmd);
+                void addCommand(std::shared_ptr<ACommand> cmd);
 
             protected:
             private:
                 std::string _invokerType;
-                std::stack<std::shared_ptr<ICommand>> _commandStack;
+                std::stack<std::shared_ptr<ACommand>> _commandStack;
         };
     }
 }

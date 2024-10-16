@@ -10,6 +10,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <memory>
 #include <thread>
 #include "Client_info.hpp"
 
@@ -35,7 +36,7 @@ namespace Rtype
             int getRoomId(void);
             bool isGameAvailable(void);
 
-            void connectPlayer(Rtype::client_info &player);
+            void connectPlayer(std::shared_ptr<Rtype::client_info> player);
             void disconnectPlayer(int id);
 
         protected:
@@ -45,7 +46,7 @@ namespace Rtype
             int _nbMaxPlayer;
             unsigned int _tick;
             std::thread _tickThread;
-            std::vector<Rtype::client_info> _players;
+            std::vector<std::shared_ptr<Rtype::client_info>> _players;
 
     };
 }

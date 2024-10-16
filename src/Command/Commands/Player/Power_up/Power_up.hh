@@ -20,7 +20,7 @@ namespace Rtype
                     Power_up() = default;
                     ~Power_up();
 
-                    void set_server(std::map<int, Rtype::client_info> players, int playerID, int powerUpID);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, int powerUpID);
                     void set_client(udp::endpoint endpoint, int powerUpID);
 
                     void execute_client_side();
@@ -29,7 +29,7 @@ namespace Rtype
                 protected:
                 private:
                     udp::endpoint _endpoint;
-                    std::map<int, Rtype::client_info> _players;
+                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _playerID;
                     int _powerUpID;
             };

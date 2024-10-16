@@ -30,6 +30,13 @@ namespace Rtype
                 virtual void execute_client_side() = 0;
                 virtual void execute_server_side() = 0;
 
+                void setCommonPart(std::shared_ptr<udp::socket> sender_socket, udp::endpoint endpoint, int ack)
+                {
+                    _senderSocket = sender_socket;
+                    _endpoint = endpoint;
+                    _ack = ack;
+                }
+
                 void setCommonPart(std::shared_ptr<udp::socket> sender_socket, udp::endpoint endpoint, std::map<int, std::tuple<Utils::InfoTypeEnum, uint8_t, std::vector<std::string>>> &history, int &ack)
                 {
                     _senderSocket = sender_socket;
@@ -64,11 +71,11 @@ namespace Rtype
 
                         va_start(params, function_index);
                         va_copy(params_copy, params);
-                        if (!_history.empty())
-                            std::cerr << "Warning, the history has not been dev" << std::endl;
-                            // pushCmdToHistory(function_type, function_index, params);
-                        else
-                            std::cerr << "Warning, the history has not been set" << std::endl;
+                        // if (!_history.empty())
+                        //     std::cerr << "Warning, the history has not been dev" << std::endl;
+                        //     // pushCmdToHistory(function_type, function_index, params);
+                        // else
+                        //     std::cerr << "Warning, the history has not been set" << std::endl;
                         msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
                         va_end(params);
                         _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,

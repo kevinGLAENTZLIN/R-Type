@@ -12,7 +12,7 @@ void Rtype::Command::GameInfo::Client_connection::set_client(udp::endpoint endpo
 	_endpoint = endpoint;
 }
 
-void Rtype::Command::GameInfo::Client_connection::set_server(udp::endpoint endpoint, std::map<int, Rtype::client_info> &clients)
+void Rtype::Command::GameInfo::Client_connection::set_server(udp::endpoint endpoint, std::map<int, std::shared_ptr<Rtype::client_info>> &clients)
 {
 	_endpoint = endpoint;
     _clients = clients;
@@ -39,7 +39,7 @@ int Rtype::Command::GameInfo::Client_connection::get_available_client_id()
     for (int i = 0; i < INT32_MAX; i++) {
         available = true;
         for (auto client: _clients)
-            available &= client.second.getId() != i;
+            available &= client.second->getId() != i;
         if (available)
             return i;
     }

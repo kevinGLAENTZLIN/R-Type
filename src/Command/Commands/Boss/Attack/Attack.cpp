@@ -7,7 +7,7 @@
 
 #include "Attack.hh"
 
-void Rtype::Command::Boss::Attack::set_server(std::map<int, Rtype::client_info> players, int bossType, int bossAttackType)
+void Rtype::Command::Boss::Attack::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int bossType, int bossAttackType)
 {
     _players = players;
     _bossType = bossType;

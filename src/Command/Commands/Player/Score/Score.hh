@@ -20,7 +20,7 @@ namespace Rtype
                     Score() = default;
                     ~Score();
 
-                    void set_server(std::map<int, Rtype::client_info> players, int score);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int score);
                     void set_client(udp::endpoint endpoint);
 
                     void execute_client_side();
@@ -29,7 +29,7 @@ namespace Rtype
                 protected:
                 private:
                     udp::endpoint _endpoint;
-                    std::map<int, Rtype::client_info> _players;
+                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _score;
             };
         }

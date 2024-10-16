@@ -7,7 +7,7 @@
 
 #include "Spawn.hh"
 
-void Rtype::Command::Player::Spawn::set_server(std::map<int, Rtype::client_info> players, int playerID, int x, int y)
+void Rtype::Command::Player::Spawn::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, int x, int y)
 {
     _players = players;
     _playerID = playerID;

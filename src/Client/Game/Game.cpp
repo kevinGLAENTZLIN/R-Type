@@ -137,11 +137,11 @@ std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, f
 void Rtype::Game::movePlayer(int id, float x, float y)
 {
     auto &velocity = _core->getComponent<ECS::Components::Velocity>(_mapID[id]);
-    velocity.x = x;
-    velocity.y = y;
+    velocity.setX(x);
+    velocity.setY(y);
 }
 
-std::size_t Rtype::Game::createPlayer(float pos_x, float pos_y)
+std::size_t Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t player = _core->createEntity();
@@ -152,6 +152,7 @@ std::size_t Rtype::Game::createPlayer(float pos_x, float pos_y)
     _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(player, ECS::Components::Input{});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
+    _mapID[id] = player;
     return player;
 }
 
@@ -170,10 +171,10 @@ void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 
 void Rtype::Game::run()
 {
-    createPlayer(-10.0f, 0.0f);
-    createOtherPlayer(-10.0f, 0.0f);
-    createEnemy(PATAPATA, 10.0f, 2.0f);
-    createEnemy(PATAPATA, 13.0f, -2.0f);
+    // createPlayer(-10.0f, 0.0f);
+    // createOtherPlayer(-10.0f, 0.0f);
+    // createEnemy(PATAPATA, 10.0f, 2.0f);
+    // createEnemy(PATAPATA, 13.0f, -2.0f);
     while (!_window.ShouldClose() && _isRunning) {
         update();
         render();

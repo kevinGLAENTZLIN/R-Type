@@ -5,7 +5,7 @@
 ** main
 */
 
-#include "Game/Game.hh"
+#include "udp_client.hh"
 
 int main(int argc, char **argv)
 {
@@ -13,7 +13,7 @@ int main(int argc, char **argv)
         std::cout << "Usage: udp_client [server] [port] <Message>" << std::endl;
         return 84;
     }
-    Rtype::Game game;
-    game.run(argv[1], std::stoi(argv[2]));
+    Rtype::udpClient localClient(argv[1], std::atoi(argv[2]));
+    localClient.run();
     return 0;
 }

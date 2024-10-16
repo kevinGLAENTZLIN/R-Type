@@ -6,6 +6,7 @@
 */
 
 #include "udp_client.hh"
+#include "../Utils/Protocol/Protocol.hpp"
 
 /**
  * @file udp_client.cpp
@@ -15,7 +16,7 @@
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
     : _id(-1), _ioContext(), _socket(std::make_shared<udp::socket>(udp::socket(_ioContext, udp::endpoint(udp::v4(), 0)))),
       _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
-      _commandInvoker("Client"), _commandFactory()
+      _commandInvoker("Client"), _commandFactory(), _game(Rtype::Game())
 {
     _receiverThread = std::thread([this]() { _ioContext.run(); });// Added
     read_server();
@@ -34,6 +35,7 @@ Rtype::udpClient::~udpClient()
 void Rtype::udpClient::run()// Added
 {
     _ioContext.run();
+    _game.run();
 }
 
 void Rtype::udpClient::send_data(const std::string &data)
@@ -53,6 +55,8 @@ void Rtype::udpClient::send_data(const std::string &data)
 void Rtype::udpClient::read_server()
 {
     udp::endpoint sender_endpoint;
+    Utils::Network::Response clientResponse;
+    Utils::Network::bytes data;
 
     _socket->async_receive_from(boost::asio::buffer(_receiverBuffer), sender_endpoint,
     [this](const boost::system::error_code& error, std::size_t bytes_recv) {
@@ -61,6 +65,8 @@ void Rtype::udpClient::read_server()
         }
         read_server();
     });
+    data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
+    clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
 }
 
 void Rtype::udpClient::received_data_handler(std::size_t bytes_recv)

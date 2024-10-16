@@ -7,7 +7,7 @@ set(SERVER_SOURCES
     ./udp_server.cpp
     ./main.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils/ParametersMap/ParametersMap.cpp
-    # ${CMAKE_SOURCE_DIR}/src/Utils/Protocol/Protocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/Utils/Protocol/Protocol.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils/Response/Response.cpp
 )
 

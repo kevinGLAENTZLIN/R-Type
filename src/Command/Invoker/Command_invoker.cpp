@@ -31,8 +31,8 @@ void Rtype::Command::Command_invoker::executeCommand()
     
 }
 
-void Rtype::Command::Command_invoker::addCommand(std::shared_ptr<ACommand> cmd)
+void Rtype::Command::Command_invoker::addCommand(std::unique_ptr<ACommand> cmd)
 {
     cmd->setOrigins(_invokerType);
-    _commandStack.push(cmd);
+    _commandStack.push(std::move(cmd));
 }

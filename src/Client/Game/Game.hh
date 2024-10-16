@@ -35,9 +35,6 @@
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
-#include "../udp_client.hh"
-// #include "../Network/udp_client.hh"
-
 #include "../../Utils/enemiesTypeEnum.hpp"
 #include <cstddef>
 
@@ -47,7 +44,7 @@ namespace Rtype {
         Game();
         ~Game();
 
-        void run(const std::string &serverAddr, const int serverPort);
+        void run();
         std::size_t createPlayer(float pos_x, float pos_y);
         void createOtherPlayer(float pos_x, float pos_y);
         std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
@@ -60,7 +57,7 @@ namespace Rtype {
         void render();
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
-        std::unique_ptr<Rtype::udpClient> _udpClient;
+//        std::unique_ptr<Rtype::udpClient> _udpClient;
         raylib::Window _window;
         raylib::Camera3D _camera;
         ECS::RessourcePool _ressourcePool;

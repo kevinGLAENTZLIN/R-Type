@@ -23,6 +23,9 @@ Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port):
 
 void Rtype::udpServer::read_clients()
 {
+    Utils::Network::Response clientResponse;
+    Utils::Network::bytes data;
+
     _socket->async_receive_from(boost::asio::buffer(_data, max_length), _senderEndpoint,
     [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
         if (!ec && recvd_bytes > 0 && recvd_bytes < max_length) {
@@ -31,6 +34,8 @@ void Rtype::udpServer::read_clients()
         } else
             read_clients();
     });
+    data = Utils::Network::bytes(std::begin(_data), std::end(_data));
+    clientResponse = Utils::Network::Protocol::ParseMsg(false, data);
 }
 
 void Rtype::udpServer::received_data_handler(std::size_t recvd_bytes)
@@ -119,18 +124,6 @@ void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
     _games.back()->connectPlayer(_clients[client_id]);
 }
 
-// void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
-// {
-//     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
-//     uint8_t cmd_index = clientResponse.GetInfoFunction();
-//     // std::unique_ptr<Rtype::Command::ACommand> cmd;
-
-//     if (cmd_category == Utils::InfoTypeEnum::GameInfo &&
-//         cmd_index == static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)) { //! issue of cast from ACommand to a specific class
-//             std::unique_ptr<Command::GameInfo::Client_connection> cmd = dynamic_cast<std::unique_ptr<Command::GameInfo::Client_connection>>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)));
-//         }
-// }
-
 void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
@@ -141,7 +134,7 @@ void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
         cmd->set_server(_senderEndpoint, _clients);
         cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
         //! To Fix by EVAN the Goat of stranger things: 
-        //! _commandInvoker.addCommand(std::make_shared<Rtype::Command::GameInfo::Client_connection>(std::move(cmd)));
+        _commandInvoker.addCommand(std::move(cmd));
     }
 }
 

@@ -20,6 +20,7 @@
 #include "../../Utils/ParametersMap/ParametersMap.hpp"
 #include "../../Command/Factory/Factory.hh"
 #include "../../Command/Invoker/Command_invoker.hh"
+#include "Game/Game.hh"
 
 using boost::asio::ip::udp;
 
@@ -30,49 +31,52 @@ namespace Rtype {
      */
     class udpClient
     {
-        public:
-            /**
-             * @brief Constructor for the udpClient class.
-             * @param serverAddr Server's IP address.
-             * @param serverPort Server's port.
-             */
-            udpClient(const std::string &serverAddr, const int serverPort);// Added
+    public:
+        /**
+         * @brief Constructor for the udpClient class.
+         * @param serverAddr Server's IP address.
+         * @param serverPort Server's port.
+         */
+        udpClient(const std::string &serverAddr, const int serverPort);// Added
             
-            /**
-             * @brief Destructor for the udpClient class.
-             */
-            ~udpClient();
+        /**
+         * @brief Destructor for the udpClient class.
+         */
+        ~udpClient();
 
-            /**
-             * @brief Send data to the server.
-             * @param data The data to send.
-             */
-            void send_data(const std::string &data);
+        /**
+         * @brief Send data to the server.
+         * @param data The data to send.
+         */
+        void send_data(const std::string &data);
             
-            /**
-             * @brief Run the IO context.
-             */
-            void run();// Added
+        /**
+         * @brief Run the IO context.
+         */
+        void run();// Added
 
-        private:
-            /**
-             * @brief Receiving data from server.
-             */
-            void read_server();
+    private:
+        /**
+         * @brief Receiving data from server.
+         */
+        void read_server();
             
-            /**
-             * @brief Handle the received data from server.
-             * @param bytes_recv Number of bytes received from server.
-             */
-            void received_data_handler(std::size_t bytes_recv);
+        /**
+         * @brief Handle the received data from server.
+         * @param bytes_recv Number of bytes received from server.
+         */
+        void received_data_handler(std::size_t bytes_recv);
 
-            int _id;
-            boost::asio::io_context _ioContext;// Added
-            std::shared_ptr<udp::socket> _socket;
-            udp::endpoint _serverEndpoint;
-            std::array<char, 1024> _receiverBuffer;
-            std::thread _receiverThread;// Added
-            Rtype::Command::Command_invoker _commandInvoker;
-            Rtype::Command::Factory _commandFactory;
+        void runGame();
+
+        int _id;
+        boost::asio::io_context _ioContext;// Added
+        std::shared_ptr<udp::socket> _socket;
+        udp::endpoint _serverEndpoint;
+        std::array<char, 1024> _receiverBuffer;
+        std::thread _receiverThread;// Added
+        Rtype::Command::Command_invoker _commandInvoker;
+        Rtype::Command::Factory _commandFactory;
+        Rtype::Game _game;
     };
 }

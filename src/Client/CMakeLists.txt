@@ -36,6 +36,8 @@ set(CLIENT_SOURCES
     # ./Network/udp_client.cpp
     ../Server/Client_info.cpp
     ../Server/Game_info.cpp
+    ../Utils/Protocol/Protocol.cpp
+    ../Utils/Response/Response.cpp
 )
 
 find_package(boost_asio CONFIG REQUIRED)

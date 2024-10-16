@@ -134,6 +134,13 @@ std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, f
     return enemy;
 }
 
+void Rtype::Game::movePlayer(int id, float x, float y)
+{
+    auto &velocity = _core->getComponent<ECS::Components::Velocity>(_mapID[id]);
+    velocity.x = x;
+    velocity.y = y;
+}
+
 std::size_t Rtype::Game::createPlayer(float pos_x, float pos_y)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
@@ -148,7 +155,7 @@ std::size_t Rtype::Game::createPlayer(float pos_x, float pos_y)
     return player;
 }
 
-void Rtype::Game::createOtherPlayer(float pos_x, float pos_y)
+void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
     std::size_t otherPlayer = _core->createEntity();
     _core->addComponent(otherPlayer, ECS::Components::Position{pos_x, pos_y});
@@ -158,6 +165,7 @@ void Rtype::Game::createOtherPlayer(float pos_x, float pos_y)
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     _core->addComponent(otherPlayer, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
+    _mapID[id] = otherPlayer;
 }
 
 void Rtype::Game::run()

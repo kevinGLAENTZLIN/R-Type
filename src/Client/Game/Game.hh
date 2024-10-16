@@ -37,6 +37,7 @@
 
 #include "../../Utils/enemiesTypeEnum.hpp"
 #include <cstddef>
+#include <utility>
 
 namespace Rtype {
     class Game {
@@ -46,8 +47,9 @@ namespace Rtype {
 
         void run();
         std::size_t createPlayer(float pos_x, float pos_y);
-        void createOtherPlayer(float pos_x, float pos_y);
+        void createOtherPlayer(int id, float pos_x, float pos_y);
         std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
+        void movePlayer(int id, float x, float y);
 
     private:
         void createProjectile(std::size_t entityID);
@@ -60,6 +62,7 @@ namespace Rtype {
 //        std::unique_ptr<Rtype::udpClient> _udpClient;
         raylib::Window _window;
         raylib::Camera3D _camera;
+        std::map<int, std::size_t> _mapID;
         ECS::RessourcePool _ressourcePool;
     };
 };

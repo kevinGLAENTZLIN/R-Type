@@ -127,17 +127,32 @@ void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
 void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
-    uint8_t cmd_index = clientResponse.GetInfoFunction();
 
-    if (cmd_category == Utils::InfoTypeEnum::GameInfo && cmd_index == static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)) {
-        std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_commandFactory.createCommand(static_cast<uint8_t>(cmd_category), cmd_index));
-        cmd->set_server(_senderEndpoint, _clients);
-        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
-        //! To Fix by EVAN the Goat of stranger things: 
-        _commandInvoker.addCommand(std::move(cmd));
+    switch (cmd_category)
+    {
+    case Utils::InfoTypeEnum::GameInfo:
+        handleGameInfo(clientResponse);
+        break;
+    default:
+        break;
     }
 }
 
+void Rtype::udpServer::handleGameInfo(Utils::Network::Response clientResponse)
+{
+    Utils::GameInfoEnum cmd_index = static_cast<Utils::GameInfoEnum>(clientResponse.GetInfoFunction());
+
+    switch (cmd_index)
+    {
+    case Utils::GameInfoEnum::NewClientConnected :
+        std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(cmd_index)));
+        cmd->set_server(_senderEndpoint, _clients);
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        // ! To Fix by EVAN the Goat of stranger things: 
+        _commandInvoker.addCommand(std::move(cmd));
+        break;
+    }
+}
 
 
 // ! To Refactor

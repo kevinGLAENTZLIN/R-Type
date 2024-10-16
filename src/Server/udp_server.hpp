@@ -120,6 +120,12 @@ namespace Rtype {
             }
 
             void handleResponse(Utils::Network::Response clientResponse); //! Temporary: will be probably refactor by a kind of factory of functions 
+            void handleGameInfo(Utils::Network::Response clientResponse);
+            void handlePlayer(Utils::Network::Response clientResponse) {}; // temp empty
+            void handleEnemy(Utils::Network::Response clientResponse) {}; // temp empty
+            void handleBoss(Utils::Network::Response clientResponse) {}; // temp empty
+            void handlePowerUp(Utils::Network::Response clientResponse) {}; // temp empty
+            void handleProjectile(Utils::Network::Response clientResponse) {}; // temp empty
 
             // ! To Refactor
             /**

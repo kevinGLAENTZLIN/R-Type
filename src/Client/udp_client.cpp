@@ -93,10 +93,26 @@ void Rtype::udpClient::read_server()
 void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
-    uint8_t cmd_index = clientResponse.GetInfoFunction();
 
-    if (cmd_category == Utils::InfoTypeEnum::GameInfo && cmd_index == static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)) {
+    switch (cmd_category) {
+    case Utils::InfoTypeEnum::GameInfo:
+        handleGameInfo(clientResponse);
+        break;
+    default:
+        break;
+    }
+}
+
+void Rtype::udpClient::handleGameInfo(Utils::Network::Response clientResponse)
+{
+    Utils::GameInfoEnum cmd_index = static_cast<Utils::GameInfoEnum>(clientResponse.GetInfoFunction());
+
+    switch (cmd_index) {
+    case Utils::GameInfoEnum::NewClientConnected:
         _id = clientResponse.PopParam<int>();
+        break;
+    default:
+        break;
     }
 }
 

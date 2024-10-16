@@ -55,15 +55,22 @@ namespace Rtype {
          */
         void run();  // This will now spawn two threads: one for game, one for network.
 
+    private:
+        void read_server();
+
+        void received_data_handler(std::size_t bytes_recv);
         /**
          * @brief Handle the response from the server.
          * @param clientResponse The response from the server.
          */
         void handleResponse(Utils::Network::Response clientResponse);
-    private:
-        void read_server();
+        void handleGameInfo(Utils::Network::Response clientResponse);
+        void handlePlayer(Utils::Network::Response clientResponse) {}; //temp empty
+        void handleEnemy(Utils::Network::Response clientResponse) {}; //temp empty
+        void handleBoss(Utils::Network::Response clientResponse) {}; //temp empty
+        void handlePowerUp(Utils::Network::Response clientResponse) {}; //temp empty
+        void handleProjectile(Utils::Network::Response clientResponse) {}; //temp empty
 
-        void received_data_handler(std::size_t bytes_recv);
 
         /**
          * @brief Run the IO context.

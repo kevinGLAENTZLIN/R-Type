@@ -50,16 +50,16 @@ namespace Rtype {
         void createOtherPlayer(int id, float pos_x, float pos_y);
         std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
         void movePlayer(int id, float x, float y);
+        void createEnemyProjectile(int id);
 
     private:
-        void createProjectile(std::size_t entityID);
+        void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath);
         void update();
         void render();
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
-//        std::unique_ptr<Rtype::udpClient> _udpClient;
         raylib::Window _window;
         raylib::Camera3D _camera;
         std::map<int, std::size_t> _mapID;

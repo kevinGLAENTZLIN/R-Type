@@ -124,6 +124,7 @@ std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, f
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t enemy = _core->createEntity();
+    std::cout << "enemy created -> " << enemy << std::endl;
     _core->addComponent(enemy, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(enemy, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Scale{1.0f});
@@ -131,6 +132,7 @@ std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, f
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType});
+    _mapID[enemy] = enemy;
     return enemy;
 }
 
@@ -177,6 +179,8 @@ void Rtype::Game::run()
     createEnemy(PATAPATA, 13.0f, -2.0f);
     while (!_window.ShouldClose() && _isRunning) {
         update();
+        createEnemyProjectile(11);
+        createEnemyProjectile(12);
         render();
     }
 }
@@ -194,7 +198,39 @@ std::vector<std::size_t> getAllInputs() {
     return vec;
 }
 
-void Rtype::Game::createProjectile(std::size_t entityID)
+void Rtype::Game::createEnemyProjectile(int id)
+{
+    auto &positions = _core->getComponents<ECS::Components::Position>();
+    auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
+
+    if (!positions[_mapID[id]].has_value()) {
+        std::cerr << "Enemy " << id << " does not have a valid position!" << std::endl;
+        return;
+    }
+
+    const ECS::Components::Position &enemyPos = positions[_mapID[id]].value();
+    const ECS::Components::Hitbox &enemyHitbox = hitboxes[_mapID[id]].value();
+
+    std::size_t projectile = _core->createEntity();
+
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
+
+    float projectileStartX = enemyPos.getX() - (enemyHitbox.getWidth() / 2) - TmpHitbox.first;
+
+    _core->addComponent(projectile, ECS::Components::Position{
+        projectileStartX,
+        enemyPos.getY()
+    });
+    _core->addComponent(projectile, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Scale{1.0f});
+    _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+
+    _core->addComponent(projectile, ECS::Components::Velocity{-0.2f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Projectile{});
+    _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+}
+
+void Rtype::Game::createPlayerProjectile(std::size_t entityID)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
@@ -274,7 +310,7 @@ void Rtype::Game::update() {
                            velocityEntities);
 
     if (entityID <= 10000)
-        createProjectile(entityID);
+        createPlayerProjectile(entityID);
 
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),

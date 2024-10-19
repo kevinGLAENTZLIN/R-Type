@@ -13,7 +13,7 @@ on:
       - "ga-ignore**"
 
 jobs:
-  build_and_test:
+  prepare:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -28,23 +28,55 @@ jobs:
             libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config \
             libglfw3-dev libgl1-mesa-dev ninja-build
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v7
+      - name: Cache vcpkg
+        uses: actions/cache@v3
+        id: vcpkg-cache
         with:
-          vcpkgGitCommitId: "2023.11.20"
-          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          path: |
+            ${{ github.workspace }}/vcpkg
+            !${{ github.workspace }}/vcpkg/buildtrees
+            !${{ github.workspace }}/vcpkg/packages
+            !${{ github.workspace }}/vcpkg/downloads
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
-      - name: Cache vcpkg packages
+      - name: Install vcpkg
+        if: steps.vcpkg-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+
+      - name: Install vcpkg dependencies
+        run: |
+          ./vcpkg/vcpkg install
+
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Restore vcpkg cache
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/vcpkg
+          path: |
+            ${{ github.workspace }}/vcpkg
+            !${{ github.workspace }}/vcpkg/buildtrees
+            !${{ github.workspace }}/vcpkg/packages
+            !${{ github.workspace }}/vcpkg/downloads
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+
+      - name: Cache CMake build
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/build
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
           restore-keys: |
-            ${{ runner.os }}-vcpkg-
+            ${{ runner.os }}-cmake-
 
       - name: Configure CMake
         run: |
-          cmake -B ${{github.workspace}}/build -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake -GNinja
+          cmake -B ${{github.workspace}}/build -S ${{github.workspace}} -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake -GNinja
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config Release
@@ -65,13 +97,26 @@ jobs:
           fi
           echo "All required binaries are present"
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Restore CMake build cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/build
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+
       - name: Run Tests
         run: |
           cd ${{github.workspace}}/build
           ctest -C Release --output-on-failure
 
   push_to_mirror:
-    needs: build_and_test
+    needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:

@@ -13,7 +13,7 @@ on:
       - "ga-ignore**"
 
 jobs:
-  build_and_test:
+  prepare:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -21,15 +21,55 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cache vcpkg
+        uses: actions/cache@v3
+        id: vcpkg-cache
+        with:
+          path: |
+            ./vcpkg
+            /usr/local/share/vcpkg/installed
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+
+      - name: Install vcpkg
+        if: steps.vcpkg-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/microsoft/vcpkg
+          ./vcpkg/bootstrap-vcpkg.sh
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        id: dep-cache
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('**/packages.txt') }}
+
       - name: Install Dependencies
+        if: steps.dep-cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
-      - name: download vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg
-          ./vcpkg/bootstrap-vcpkg.sh
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Restore vcpkg cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./vcpkg
+            /usr/local/share/vcpkg/installed
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+
+      - name: Restore Dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('**/packages.txt') }}
+
       - name: Build Project
         run: |
           echo "./vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
@@ -37,6 +77,15 @@ jobs:
           ./build.sh Init
           ./build.sh Release
           ./build.sh Build
+
+      - name: Cache Build
+        uses: actions/cache@v3
+        with:
+          path: |
+            /home/runner/work/R-Type/R-Type/lib
+            /home/runner/work/R-Type/R-Type/r-type_client
+            /home/runner/work/R-Type/R-Type/r-type_server
+          key: ${{ runner.os }}-build-${{ github.sha }}
 
       - name: Check Binaries
         run: |
@@ -53,10 +102,26 @@ jobs:
             exit 1
           fi
           echo "All required binaries are present"
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Restore Build Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            /home/runner/work/R-Type/R-Type/lib
+            /home/runner/work/R-Type/R-Type/r-type_client
+            /home/runner/work/R-Type/R-Type/r-type_server
+          key: ${{ runner.os }}-build-${{ github.sha }}
+
       - name: Run Tests
         run: |
           ./build.sh Test
-
   push_to_mirror:
     needs: build_and_test
     runs-on: ubuntu-latest

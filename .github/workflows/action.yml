@@ -27,7 +27,7 @@ jobs:
         with:
           path: |
             ./vcpkg
-            /usr/local/share/vcpkg/installed
+            ~/.cache/vcpkg
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
       - name: Install vcpkg
@@ -36,18 +36,37 @@ jobs:
           git clone https://github.com/microsoft/vcpkg
           ./vcpkg/bootstrap-vcpkg.sh
 
+      - name: Verify vcpkg installation
+        run: |
+          if [ -d "./vcpkg" ]; then
+            echo "vcpkg directory exists"
+            ls -la ./vcpkg
+          else
+            echo "vcpkg directory does not exist"
+          fi
+          if [ -f "./vcpkg/vcpkg" ]; then
+            echo "vcpkg executable exists"
+          else
+            echo "vcpkg executable does not exist"
+          fi
+
       - name: Cache Dependencies
         uses: actions/cache@v3
         id: dep-cache
         with:
-          path: /var/cache/apt/archives
+          path: ~/.cache/apt
           key: ${{ runner.os }}-apt-${{ hashFiles('**/packages.txt') }}
 
       - name: Install Dependencies
         if: steps.dep-cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
+          sudo apt-get install -y cmake build-essential \
+            libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config \
+            libglfw3-dev libgl1-mesa-dev
+          mkdir -p ~/.cache/apt
+          sudo cp -R /var/cache/apt/archives ~/.cache/apt
+          sudo chown -R $USER:$USER ~/.cache/apt
 
   build:
     needs: prepare
@@ -61,13 +80,13 @@ jobs:
         with:
           path: |
             ./vcpkg
-            /usr/local/share/vcpkg/installed
+            ~/.cache/vcpkg
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
       - name: Restore Dependencies cache
         uses: actions/cache@v3
         with:
-          path: /var/cache/apt/archives
+          path: ~/.cache/apt
           key: ${{ runner.os }}-apt-${{ hashFiles('**/packages.txt') }}
 
       - name: Build Project

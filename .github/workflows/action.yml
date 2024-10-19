@@ -122,8 +122,9 @@ jobs:
       - name: Run Tests
         run: |
           ./build.sh Test
+
   push_to_mirror:
-    needs: build_and_test
+    needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:

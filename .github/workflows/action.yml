@@ -13,7 +13,7 @@ on:
       - "ga-ignore**"
 
 jobs:
-  prepare:
+  build_and_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -21,129 +21,57 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache vcpkg
-        uses: actions/cache@v3
-        id: vcpkg-cache
-        with:
-          path: |
-            ./vcpkg
-            ~/.cache/vcpkg
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
-
-      - name: Install vcpkg
-        if: steps.vcpkg-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone https://github.com/microsoft/vcpkg
-          ./vcpkg/bootstrap-vcpkg.sh
-
-      - name: Verify vcpkg installation
-        run: |
-          if [ -d "./vcpkg" ]; then
-            echo "vcpkg directory exists"
-            ls -la ./vcpkg
-          else
-            echo "vcpkg directory does not exist"
-          fi
-          if [ -f "./vcpkg/vcpkg" ]; then
-            echo "vcpkg executable exists"
-          else
-            echo "vcpkg executable does not exist"
-          fi
-
-      - name: Cache Dependencies
-        uses: actions/cache@v3
-        id: dep-cache
-        with:
-          path: ~/.cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/packages.txt') }}
-
-      - name: Install Dependencies
-        if: steps.dep-cache.outputs.cache-hit != 'true'
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake build-essential \
             libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config \
-            libglfw3-dev libgl1-mesa-dev
-          mkdir -p ~/.cache/apt
-          sudo cp -R /var/cache/apt/archives ~/.cache/apt
-          sudo chown -R $USER:$USER ~/.cache/apt
+            libglfw3-dev libgl1-mesa-dev ninja-build
 
-  build:
-    needs: prepare
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v7
+        with:
+          vcpkgGitCommitId: "2023.11.20"
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
 
-      - name: Restore vcpkg cache
+      - name: Cache vcpkg packages
         uses: actions/cache@v3
         with:
-          path: |
-            ./vcpkg
-            ~/.cache/vcpkg
+          path: ${{ github.workspace }}/vcpkg
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
 
-      - name: Restore Dependencies cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/packages.txt') }}
-
-      - name: Build Project
+      - name: Configure CMake
         run: |
-          echo "./vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
-          chmod +x build.sh
-          ./build.sh Init
-          ./build.sh Release
-          ./build.sh Build
+          cmake -B ${{github.workspace}}/build -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake -GNinja
 
-      - name: Cache Build
-        uses: actions/cache@v3
-        with:
-          path: |
-            /home/runner/work/R-Type/R-Type/lib
-            /home/runner/work/R-Type/R-Type/r-type_client
-            /home/runner/work/R-Type/R-Type/r-type_server
-          key: ${{ runner.os }}-build-${{ github.sha }}
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config Release
 
       - name: Check Binaries
         run: |
-          if [ ! -f "/home/runner/work/R-Type/R-Type/lib/libr-type.a" ]; then
+          if [ ! -f "${{github.workspace}}/build/lib/libr-type.a" ]; then
             echo "r-type.a not found"
             exit 1
           fi
-          if [ ! -f "/home/runner/work/R-Type/R-Type/r-type_client" ]; then
+          if [ ! -f "${{github.workspace}}/build/r-type_client" ]; then
             echo "r-type_client not found"
             exit 1
           fi
-          if [ ! -f "/home/runner/work/R-Type/R-Type/r-type_server" ]; then
+          if [ ! -f "${{github.workspace}}/build/r-type_server" ]; then
             echo "r-type_server not found"
             exit 1
           fi
           echo "All required binaries are present"
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Restore Build Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            /home/runner/work/R-Type/R-Type/lib
-            /home/runner/work/R-Type/R-Type/r-type_client
-            /home/runner/work/R-Type/R-Type/r-type_server
-          key: ${{ runner.os }}-build-${{ github.sha }}
-
       - name: Run Tests
         run: |
-          ./build.sh Test
+          cd ${{github.workspace}}/build
+          ctest -C Release --output-on-failure
 
   push_to_mirror:
-    needs: test
+    needs: build_and_test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:

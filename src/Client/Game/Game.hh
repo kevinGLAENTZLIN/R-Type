@@ -21,6 +21,7 @@
 #include "../../ECS/Component/Projectile/Projectile.hh"
 #include "../../ECS/Component/Background/Background.hpp"
 #include "../../ECS/Component/AI/AI.hh"
+#include "../../ECS/Component/Button/Button.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -32,14 +33,20 @@
 #include "../../ECS/System/Render2D/Render2D.hh"
 #include "../../ECS/System/Background/Background.hh"
 #include "../../ECS/System/UpdateVelocityAI/UpdateVelocityAI.hh"
+#include "../../ECS/System/RenderText/RenderText.hh"
+#include "../../ECS/System/RenderButton/RenderButton.hh"
+#include "../../ECS/System/ButtonClick/ButtonClick.hh"
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
 #include "../../Utils/enemiesTypeEnum.hpp"
-#include <cstddef>
-#include <utility>
 
 namespace Rtype {
+    enum GameState {
+        MENU,
+        PLAY,
+    };
+
     class Game {
     public:
         Game();
@@ -57,7 +64,14 @@ namespace Rtype {
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath);
         void update();
+        void updateMenu();
         void render();
+        void renderMenu();
+        void switchState(GameState newState);
+        void initMenu(void);
+        void initGame(void);
+
+        GameState _currentState;
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;

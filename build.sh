@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# Couleurs pour les messages
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Fichier pour stocker le chemin vcpkg
 VCPKG_PATH_FILE=".vcpkg_path"
 
-# Fonction pour afficher l'aide
 show_help() {
     echo -e "${BLUE}Usage: ./build.sh [rule]${NC}"
     echo "Rules:"
@@ -24,9 +21,9 @@ show_help() {
     echo -e "  ${YELLOW}lint${NC}        - Run Clang-Tidy on the project"
     echo -e "  ${YELLOW}help${NC}        - Show this help message"
     echo -e "  ${YELLOW}clean${NC}       - Clean binaries, testing folder, and Debug folders"
+    echo -e "  ${YELLOW}full_build${NC}  - Run setup_vcpkg, init, release, and build in sequence"
 }
 
-# Fonction pour vérifier si vcpkg est configuré
 check_vcpkg_setup() {
     if [ ! -f "$VCPKG_PATH_FILE" ]; then
         echo -e "${RED}Error: vcpkg path not set. Please run './build.sh setup_vcpkg' first.${NC}"
@@ -34,7 +31,6 @@ check_vcpkg_setup() {
     fi
 }
 
-# Fonction pour configurer vcpkg
 setup_vcpkg() {
     echo -e "${BLUE}Starting vcpkg setup...${NC}"
     if [ ! -d "vcpkg" ]; then
@@ -58,7 +54,6 @@ setup_vcpkg() {
     echo -e "${BLUE}vcpkg setup completed.${NC}"
 }
 
-# Fonction pour initialiser le projet
 init_project() {
     echo -e "${BLUE}Initializing project...${NC}"
     check_vcpkg_setup
@@ -76,7 +71,6 @@ init_project() {
     echo -e "${GREEN}Project initialized successfully.${NC}"
 }
 
-# Fonction pour réinitialiser le projet
 reset_project() {
     echo -e "${BLUE}Resetting project...${NC}"
     echo -e "${YELLOW}Removing build directory...${NC}"
@@ -86,7 +80,6 @@ reset_project() {
     echo -e "${GREEN}Project reset completed.${NC}"
 }
 
-# Fonction pour configurer en mode Release
 configure_release() {
     echo -e "${BLUE}Configuring project in Release mode...${NC}"
     check_vcpkg_setup
@@ -102,7 +95,6 @@ configure_release() {
     echo -e "${GREEN}Project configured in Release mode.${NC}"
 }
 
-# Fonction pour configurer en mode Debug
 configure_debug() {
     echo -e "${BLUE}Configuring project in Debug mode...${NC}"
     check_vcpkg_setup
@@ -118,7 +110,6 @@ configure_debug() {
     echo -e "${GREEN}Project configured in Debug mode.${NC}"
 }
 
-# Fonction pour builder le projet
 build_project() {
     echo -e "${BLUE}Building project...${NC}"
     check_vcpkg_setup
@@ -133,7 +124,6 @@ build_project() {
     echo -e "${GREEN}Project build completed.${NC}"
 }
 
-# Fonction pour tester le projet
 test_project() {
     echo -e "${BLUE}Testing project...${NC}"
     check_vcpkg_setup
@@ -155,28 +145,19 @@ test_project() {
     echo -e "${GREEN}Testing project completed.${NC}"
 }
 
-# Fonction pour nettoyer le projet
 clean_project() {
     echo -e "${BLUE}Cleaning project...${NC}"
-
-    # Supprimer le dossier testing à la racine
     echo -e "${YELLOW}Removing testing directory...${NC}"
     rm -rf Testing
-
-    # Supprimer les dossiers Debug dans src
     echo -e "${YELLOW}Removing Debug folders in src...${NC}"
     find src -type d -name "Debug" -exec rm -rf {} +
-
-    # Supprimer les binaires spécifiques
     echo -e "${YELLOW}Removing specific binaries...${NC}"
     rm -rf r-type_client
     rm -rf r-type_server
     rm -rf ./lib/*
-
     echo -e "${GREEN}Project cleaned successfully.${NC}"
 }
 
-# Fonction pour exécuter Clang-Tidy
 run_clang_tidy() {
     echo -e "${BLUE}Running Clang-Tidy...${NC}"
     check_vcpkg_setup
@@ -191,14 +172,21 @@ run_clang_tidy() {
     echo -e "${GREEN}Clang-Tidy completed successfully.${NC}"
 }
 
-# Vérification des arguments
+full_build() {
+    echo -e "${BLUE}Starting full build process...${NC}"
+    setup_vcpkg
+    init_project
+    configure_release
+    build_project
+    echo -e "${GREEN}Full build process completed successfully.${NC}"
+}
+
 if [ $# -eq 0 ]; then
     echo -e "${RED}Error: No rule specified.${NC}"
     show_help
     exit 1
 fi
 
-# Traitement de la règle spécifiée
 case $1 in
     setup_vcpkg)
         setup_vcpkg
@@ -226,6 +214,9 @@ case $1 in
         ;;
     clean)
         clean_project
+        ;;
+    full_build)
+        full_build
         ;;
     help)
         show_help

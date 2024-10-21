@@ -25,11 +25,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache APT packages
-        id: cache-apt
-        uses: awalsh128/cache-apt-pkgs-action@latest
+      - name: Get APT cache directory
+        id: apt-cache-dir
+        run: echo "::set-output name=dir::$(apt-config dump | grep Dir::Cache::archives | cut -d ' ' -f 2)"
+
+      - name: Restore APT cache
+        uses: actions/cache@v3
         with:
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
+          path: ${{ steps.apt-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('apt-dependencies.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Update APT and install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Install APT Dependencies
         if: steps.cache-apt.outputs.cache-hit != 'true'

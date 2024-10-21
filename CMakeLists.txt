@@ -29,7 +29,7 @@ if(CLANG_TIDY)
     message(STATUS "Found clang-tidy: ${CLANG_TIDY}")
     set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*;-header-filter=.*;-warnings-as-errors=*")
 else()
-    message(WARNING "clang-tidy not found!")
+    message(WARNING "clang-tidy not found")
 endif()
 
 # Afficher le type de build

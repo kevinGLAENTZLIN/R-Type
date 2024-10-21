@@ -28,5 +28,14 @@ add_subdirectory(tests)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Werror -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
+# Intégrer Clang-Tidy
+find_program(CLANG_TIDY "clang-tidy")
+if(CLANG_TIDY)
+    message(STATUS "Found clang-tidy: ${CLANG_TIDY}")
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")
+else()
+    message(WARNING "clang-tidy not found!")
+endif()
+
 # Afficher le type de build
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")

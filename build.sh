@@ -21,6 +21,7 @@ show_help() {
     echo -e "  ${YELLOW}debug${NC}       - Configure CMake in Debug mode"
     echo -e "  ${YELLOW}build${NC}       - Build the project"
     echo -e "  ${YELLOW}test${NC}        - Test the project"
+    echo -e "  ${YELLOW}lint${NC}        - Run Clang-Tidy on the project"
     echo -e "  ${YELLOW}help${NC}        - Show this help message"
     echo -e "  ${YELLOW}clean${NC}       - Clean binaries, testing folder, and Debug folders"
 }
@@ -175,6 +176,21 @@ clean_project() {
     echo -e "${GREEN}Project cleaned successfully.${NC}"
 }
 
+# Fonction pour exécuter Clang-Tidy
+run_clang_tidy() {
+    echo -e "${BLUE}Running Clang-Tidy...${NC}"
+    check_vcpkg_setup
+    cd build || exit 1
+    echo -e "${YELLOW}Running Clang-Tidy on source files...${NC}"
+    cmake --build . --target clang-tidy
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: Clang-Tidy failed.${NC}"
+        exit 1
+    fi
+    cd ..
+    echo -e "${GREEN}Clang-Tidy completed successfully.${NC}"
+}
+
 # Vérification des arguments
 if [ $# -eq 0 ]; then
     echo -e "${RED}Error: No rule specified.${NC}"
@@ -204,6 +220,9 @@ case $1 in
         ;;
     test)
         test_project
+        ;;
+    lint)
+        run_clang_tidy
         ;;
     clean)
         clean_project

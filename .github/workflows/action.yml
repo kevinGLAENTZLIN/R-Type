@@ -16,8 +16,8 @@ jobs:
   cache-dependencies:
     runs-on: ubuntu-latest
     outputs:
-      cache-hit: ${{ steps.cache-vcpkg.outputs.cache-hit }}
-      apt-cache-hit: ${{ steps.cache-apt.outputs.cache-hit }}
+      cache-hit: ${{ steps.cache-apt.outputs.cache-hit }}
+      vcpkg-cache-hit: ${{ steps.cache-vcpkg.outputs.cache-hit }}
 
     steps:
       - name: Checkout Code
@@ -30,9 +30,18 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
           restore-keys: |
             ${{ runner.os }}-apt-
+
+      - name: Check APT Cache
+        run: |
+          if [ -d "/var/cache/apt" ]; then
+            echo "/var/cache/apt directory exists"
+            ls -la /var/cache/apt
+          else
+            echo "/var/cache/apt directory does not exist"
+          fi
 
       - name: Install APT Dependencies
         if: steps.cache-apt.outputs.cache-hit != 'true'
@@ -69,7 +78,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
           restore-keys: |
             ${{ runner.os }}-apt-
 
@@ -136,3 +145,7 @@ jobs:
         with:
           target_repo_url: ${{ env.MIRROR_URL }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Post GitHub Action URL
+        run: |
+          echo "GitHub Action URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

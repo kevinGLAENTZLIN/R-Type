@@ -16,7 +16,7 @@ jobs:
   cache-dependencies:
     runs-on: ubuntu-latest
     outputs:
-      cache-hit: ${{ steps.cache-apt.outputs.cache-hit }}
+      apt-cache-hit: ${{ steps.cache-apt.outputs.cache-hit }}
       vcpkg-cache-hit: ${{ steps.cache-vcpkg.outputs.cache-hit }}
 
     steps:
@@ -27,55 +27,15 @@ jobs:
 
       - name: Cache APT packages
         id: cache-apt
-        uses: actions/cache@v3
+        uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          path: /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
-          restore-keys: |
-            ${{ runner.os }}-apt-
-
-      - name: Check APT Cache
-        run: |
-          if [ -d "/var/cache/apt" ]; then
-            echo "/var/cache/apt directory exists"
-            ls -la /var/cache/apt
-          else
-            echo "/var/cache/apt directory does not exist"
-          fi
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
 
       - name: Install APT Dependencies
         if: steps.cache-apt.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
-
-      - name: Fix Permissions
-        run: |
-          sudo chown -R $USER:$USER /var/cache/apt
-          sudo chmod -R 755 /var/cache/apt
-
-      - name: Clean APT Cache
-        run: |
-          sudo apt-get clean
-
-      - name: Move Partial Directory
-        run: |
-          if [ -d "/var/cache/apt/archives/partial" ]; then
-            mv /var/cache/apt/archives/partial /var/cache/apt/archives/partial_backup
-          fi
-
-      - name: Save APT Cache
-        if: steps.cache-apt.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
-        with:
-          path: /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
-
-      - name: Restore Partial Directory
-        run: |
-          if [ -d "/var/cache/apt/archives/partial_backup" ]; then
-            mv /var/cache/apt/archives/partial_backup /var/cache/apt/archives/partial
-          fi
 
       - name: Cache vcpkg dependencies
         id: cache-vcpkg
@@ -103,12 +63,9 @@ jobs:
           fetch-depth: 0
 
       - name: Restore APT cache
-        uses: actions/cache@v3
+        uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          path: /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
-          restore-keys: |
-            ${{ runner.os }}-apt-
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
 
       - name: Restore vcpkg cache
         uses: actions/cache@v3

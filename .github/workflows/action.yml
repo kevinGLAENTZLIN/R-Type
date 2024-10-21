@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.apt-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-apt-${{ hashFiles('apt-dependencies.txt') }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
@@ -74,9 +74,12 @@ jobs:
           fetch-depth: 0
 
       - name: Restore APT cache
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: actions/cache@v3
         with:
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
+          path: ${{ steps.apt-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-apt-
 
       - name: Restore vcpkg cache
         uses: actions/cache@v3

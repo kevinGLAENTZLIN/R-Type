@@ -2,7 +2,7 @@ name: R-Type CI/CD
 run-name: R-Type Build and Test
 
 env:
-  MIRROR_URL: "git@github.com/EpitechPromo2027/B-CPP-500-MLH-5-1-rtype-hugo.bardet.git"
+  MIRROR_URL: "git@github.com:EpitechPromo2027/B-CPP-500-MLH-5-1-rtype-hugo.bardet.git"
 
 on:
   push:

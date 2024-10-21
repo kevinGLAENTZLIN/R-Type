@@ -25,9 +25,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get APT cache directory
-        id: apt-cache-dir
-        run: echo "::set-output name=dir::$(apt-config dump | grep Dir::Cache::archives | cut -d ' ' -f 2)"
+      - name: Install Apt Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Cache vcpkg dependencies
         id: cache-vcpkg

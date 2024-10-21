@@ -21,6 +21,7 @@
 #include "../../ECS/Component/Projectile/Projectile.hh"
 #include "../../ECS/Component/Background/Background.hpp"
 #include "../../ECS/Component/AI/AI.hh"
+#include "../../ECS/Component/Button/Button.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -32,34 +33,53 @@
 #include "../../ECS/System/Render2D/Render2D.hh"
 #include "../../ECS/System/Background/Background.hh"
 #include "../../ECS/System/UpdateVelocityAI/UpdateVelocityAI.hh"
+#include "../../ECS/System/RenderText/RenderText.hh"
+#include "../../ECS/System/RenderButton/RenderButton.hh"
+#include "../../ECS/System/ButtonClick/ButtonClick.hh"
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
 #include "../../Utils/enemiesTypeEnum.hpp"
-#include <cstddef>
-#include <utility>
 
 namespace Rtype {
+    enum GameState {
+        MENU,
+        PLAY,
+    };
+
     class Game {
     public:
         Game();
         ~Game();
 
         void run();
-        std::size_t createPlayer(int id, float pos_x, float pos_y);
+        void createPlayer(int id, float pos_x, float pos_y);
         void createOtherPlayer(int id, float pos_x, float pos_y);
-        std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
+        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
         void movePlayer(int id, float x, float y);
+        void createEnemyProjectile(int id);
 
     private:
-        void createProjectile(std::size_t entityID);
+        void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
-        void createBackgroundLayers(float speed, std::string modelPath);
+        void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
         void update();
+        void updateMenu();
         void render();
+        void renderMenu();
+        void switchState(GameState newState);
+        void initMenu(void);
+        void initGame(void);
+        void joinGame(void);
+        void initOptions(void);
+        void joinGameID(void);
+        void initPlayOption(void);
+        void destroyEntityMenu(void);
+        void destroyEntityLayer(void);
+
+        GameState _currentState;
         bool _isRunning;
         std::unique_ptr<ECS::Core::Core> _core;
-//        std::unique_ptr<Rtype::udpClient> _udpClient;
         raylib::Window _window;
         raylib::Camera3D _camera;
         std::map<int, std::size_t> _mapID;

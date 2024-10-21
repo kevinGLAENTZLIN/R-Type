@@ -15,7 +15,7 @@
  * @return void.
  */
 ECS::Components::Position::Position(float x, float y, float z):
-    _x(x), _y(y), _z(z)
+    _x(x),_xOriginalPos(x), _yOriginalPos(y), _zOriginalPos(z), _y(y), _z(z)
 {}
 
 /**
@@ -50,6 +50,39 @@ float ECS::Components::Position::getY() const
 float ECS::Components::Position::getZ() const
 {
     return _z;
+}
+
+/**
+ * @brief Getter _X to Position component.
+ *
+ * @tparam void.
+ * @return Float based on private attribute _xOriginalPos which represent original position in row of an position entity.
+ */
+float ECS::Components::Position::getOriginalX() const
+{
+    return _xOriginalPos;
+}
+
+/**
+ * @brief Getter _Y to Position component.
+ *
+ * @tparam void.
+ * @return Float based on private attribute _yOriginalPos which represent original position in column of an position entity.
+ */
+float ECS::Components::Position::getOriginalY() const
+{
+    return _yOriginalPos;
+}
+
+/**
+ * @brief Getter _Z to Position component.
+ *
+ * @tparam void.
+ * @return Float based on private attribute _zOriginalPos which represent original position in depth of an position entity.
+ */
+float ECS::Components::Position::getOriginalZ() const
+{
+    return _zOriginalPos;
 }
 
 /**

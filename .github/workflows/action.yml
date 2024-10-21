@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache-hit: ${{ steps.cache-vcpkg.outputs.cache-hit }}
+      apt-cache-hit: ${{ steps.cache-apt.outputs.cache-hit }}
 
     steps:
       - name: Checkout Code
@@ -24,20 +25,33 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cache APT packages
+        id: cache-apt
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/apt
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Install APT Dependencies
+        if: steps.cache-apt.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
+
       - name: Cache vcpkg dependencies
         id: cache-vcpkg
         uses: actions/cache@v3
         with:
-          path: vcpkg
+          path: vcpkg_installed
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-vcpkg-
 
-      - name: Install Dependencies
+      - name: Install vcpkg dependencies
         if: steps.cache-vcpkg.outputs.cache-hit != 'true'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
           git clone https://github.com/microsoft/vcpkg
           ./vcpkg/bootstrap-vcpkg.sh
           ./vcpkg/vcpkg install
@@ -51,10 +65,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Restore APT cache
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/apt
+          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
       - name: Restore vcpkg cache
         uses: actions/cache@v3
         with:
-          path: vcpkg
+          path: vcpkg_installed
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-vcpkg-

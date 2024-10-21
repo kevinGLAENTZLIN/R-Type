@@ -29,25 +29,6 @@ jobs:
         id: apt-cache-dir
         run: echo "::set-output name=dir::$(apt-config dump | grep Dir::Cache::archives | cut -d ' ' -f 2)"
 
-      - name: Restore APT cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.apt-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
-
-      - name: Update APT and install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
-
-      - name: Install APT Dependencies
-        if: steps.cache-apt.outputs.cache-hit != 'true'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
-
       - name: Cache vcpkg dependencies
         id: cache-vcpkg
         uses: actions/cache@v3
@@ -73,13 +54,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore APT cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.apt-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
-          restore-keys: |
-            ${{ runner.os }}-apt-
+      - name: Install Apt Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Restore vcpkg cache
         uses: actions/cache@v3

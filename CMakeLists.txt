@@ -27,14 +27,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 find_program(CLANG_TIDY "clang-tidy")
 if(CLANG_TIDY)
     message(STATUS "Found clang-tidy: ${CLANG_TIDY}")
-    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")
-
-    add_custom_target(
-        clang-tidy
-        COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/src/**/*.cpp
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMENT "Running clang-tidy"
-    )
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*;-header-filter=.*;-warnings-as-errors=*")
 else()
     message(WARNING "clang-tidy not found!")
 endif()

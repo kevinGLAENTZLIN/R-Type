@@ -1,0 +1,48 @@
+#include "Music.hh"
+
+ECS::Components::Musica::Musica(const std::string &filePath):
+    _isPaused(false)
+{
+    InitAudioDevice();
+    _musicStream = LoadMusicStream(filePath.c_str());
+}
+
+void ECS::Components::Musica::play()
+{
+    PlayMusicStream(_musicStream);
+}
+
+void ECS::Components::Musica::playFrom(float startTime)
+{
+    SeekMusicStream(_musicStream, startTime);
+    PlayMusicStream(_musicStream);
+}
+
+void ECS::Components::Musica::stop()
+{
+    StopMusicStream(_musicStream);
+}
+
+void ECS::Components::Musica::pause()
+{
+    PauseMusicStream(_musicStream);
+    _isPaused = true;
+}
+
+void ECS::Components::Musica::resume()
+{
+    if (_isPaused) {
+        ResumeMusicStream(_musicStream);
+        _isPaused = false;
+    }
+}
+
+void ECS::Components::Musica::update()
+{
+    UpdateMusicStream(_musicStream);
+}
+
+float ECS::Components::Musica::getTimePlayed() const
+{
+    return GetMusicTimePlayed(_musicStream) / GetMusicTimeLength(_musicStream);
+}

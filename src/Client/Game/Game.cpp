@@ -48,6 +48,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::AI>();
     _core->registerComponent<ECS::Components::Text>();
     _core->registerComponent<ECS::Components::Button>();
+    _core->registerComponent<ECS::Components::Musica>();
 
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
@@ -321,6 +322,9 @@ void Rtype::Game::initGame(void)
 {
     destroyEntityMenu();
     destroyEntityLayer();
+    createMusic("./resources/stage1/stage1.mp3", "stage1");
+    auto &musicStage1 = getMusicComponent("stage1");
+    musicStage1.play();
     createBackgroundLayers(2.f , "background_layer0", 3);
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
@@ -330,11 +334,28 @@ void Rtype::Game::initGame(void)
     createEnemy(PATAPATA, 13.0f, -2.0f);
 }
 
+void Rtype::Game::createMusic(std::string path, std::string name)
+{
+    std::size_t musicEntity = _core->createEntity();
+
+    _core->addComponent(musicEntity, ECS::Components::Musica{path});
+    _mapEntityMusic[name] = musicEntity;
+}
+
+ECS::Components::Musica &Rtype::Game::getMusicComponent(std::string name)
+{
+    return _core->getComponent<ECS::Components::Musica>(_mapEntityMusic[name]);
+}
+
 void Rtype::Game::run() {
     initMenu();
+    createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
+    auto &musicComponent = getMusicComponent("menu");
+    musicComponent.play();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
             case MENU:
+                musicComponent.update();
                 updateMenu();
                 renderMenu();
                 break;

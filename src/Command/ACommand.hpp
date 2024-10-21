@@ -12,6 +12,9 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <ctime>
+#include <iomanip>
+#include <chrono>
 #include <boost/asio.hpp>
 #include "./ICommand.hh"
 #include "../Utils/ParametersMap/ParametersMap.hpp"
@@ -20,6 +23,8 @@
 #include "../Client/Game/Game.hh"
 
 using boost::asio::ip::udp;
+
+#define CONSOLE_INFO(a, b) std::cout << "\033[1;31m[" << [](){ auto now = std::chrono::system_clock::now(); std::time_t now_time_t = std::chrono::system_clock::to_time_t(now); return std::put_time(std::localtime(&now_time_t), "%H:%M:%S"); }() << "]" << a << b << "\033[0m" << std::endl;
 
 namespace Rtype
 {
@@ -75,24 +80,22 @@ namespace Rtype
                 template <Utils::FunctionIndex T>
                 void sendToEndpoint(Utils::InfoTypeEnum function_type, T function_index, ...)
                 {
-                        va_list params;
-                        va_list params_copy;
-                        Utils::Network::bytes msg;
-                        std::string params_type = getParamsType(function_type, function_index);
+                    va_list params;
+                    va_list params_copy;
+                    Utils::Network::bytes msg;
+                    std::string params_type = getParamsType(function_type, function_index);
 
-                        va_start(params, function_index);
-                        va_copy(params_copy, params);
-                        // if (!_history.empty())
-                        //     std::cerr << "Warning, the history has not been dev" << std::endl;
-                        //     // pushCmdToHistory(function_type, function_index, params);
-                        // else
-                        //     std::cerr << "Warning, the history has not been set" << std::endl;
-                        msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
-                        va_end(params);
-                        _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
-                        [this] (boost::system::error_code ec, std::size_t recvd_bytes) {
-                            std::cout << "I have no idea if I have to do stuff to make it works" << std::endl;
-                        });
+                    va_start(params, function_index);
+                    va_copy(params_copy, params);
+                    // if (!_history.empty())
+                    //     std::cerr << "Warning, the history has not been dev" << std::endl;
+                    //     // pushCmdToHistory(function_type, function_index, params);
+                    // else
+                    //     std::cerr << "Warning, the history has not been set" << std::endl;
+                    msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
+                    va_end(params);
+                    _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
+                    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
                 }
 
                 /**
@@ -108,11 +111,11 @@ namespace Rtype
                 std::string getParamsType(Utils::InfoTypeEnum function_type, T function_index) const
                 {
                     std::string params_type;
-                    // Utils::ParametersMap::init_map();
+                    Utils::ParametersMap::init_map();
 
-                    if (_origins == "server")
+                    if (_origins == "Server")
                         params_type = Utils::ParametersMap::getParameterTypePerFunctionClient(function_type, static_cast<uint8_t>(function_index));
-                    else if (_origins == "client")
+                    else if (_origins == "Client")
                         params_type = Utils::ParametersMap::getParameterTypePerFunctionServer(function_type, static_cast<uint8_t>(function_index));
                     else
                         throw std::runtime_error("Unknown origin");

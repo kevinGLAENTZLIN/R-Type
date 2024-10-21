@@ -7,7 +7,7 @@
 
 #pragma once
 #include <iostream> 
-#include <stack>
+#include <queue>
 #include <string>
 #include "../ACommand.hpp"
 
@@ -27,7 +27,7 @@ namespace Rtype
             protected:
             private:
                 std::string _invokerType;
-                std::stack<std::unique_ptr<ACommand>> _commandStack;
+                std::queue<std::unique_ptr<ACommand>> _commandQueue;
         };
     }
 }

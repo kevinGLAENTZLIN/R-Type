@@ -5,17 +5,17 @@
 ** udp_client
 */
 
-#include "udp_client.hh"
+#include "udp_client.hpp"
 #include "../Utils/Protocol/Protocol.hpp"
 
-Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
-    : _id(-1), _ioContext(), _socket(std::make_shared<udp::socket>(_ioContext, udp::endpoint(udp::v4(), 0))),
-      _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
-      _commandInvoker("Client"), _commandFactory(), _game(Rtype::Game())
+Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort):
+    _id(-1), _ackToSend(0), _ackToReceive(0), 
+    _ioContext(), _socket(std::make_shared<udp::socket>(_ioContext, udp::endpoint(udp::v4(), 0))),
+    _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
+    _commandInvoker("Client"), _commandFactory(), _game()
 {
-    _receiverThread = std::thread([this]() { _ioContext.run(); });
+    connectClient();
     read_server();
-    send_data("New client trying to connect to the server.");
 }
 
 Rtype::udpClient::~udpClient()
@@ -25,9 +25,6 @@ Rtype::udpClient::~udpClient()
         _socket->close();
     }
     _ioContext.stop();
-    if (_receiverThread.joinable()) {
-        _receiverThread.join();
-    }
     if (_networkThread.joinable()) {
         _networkThread.join();
     }
@@ -40,9 +37,6 @@ void Rtype::udpClient::run()
     _networkThread = std::thread([this]() {
         this->runNetwork();
     });
-    std::cout << "Starting game loop..." << std::endl;
-    sleep(1);
-    std::cout << "Starting game loop..." << std::endl;
     _game.run();
 }
 
@@ -51,43 +45,25 @@ void Rtype::udpClient::runNetwork()
     _ioContext.run();
 }
 
-void Rtype::udpClient::send_data(const std::string &data)
-{
-    std::string message = std::to_string(_id) + ": " + data;
-
-    _socket->async_send_to(boost::asio::buffer(message), _serverEndpoint,
-    [](const boost::system::error_code& error, std::size_t bytes_transferred) {
-        if (error) {
-            std::cerr << "Send failed: " << error.message() << std::endl;
-        } else {
-            std::cout << "Sent " << bytes_transferred << " bytes" << std::endl;
-        }
-    });
-}
 
 void Rtype::udpClient::read_server()
 {
     udp::endpoint sender_endpoint;
-    Utils::Network::Response clientResponse;
-    Utils::Network::bytes data;
 
+    _commandInvoker.executeCommand();
     _socket->async_receive_from(boost::asio::buffer(_receiverBuffer), sender_endpoint,
     [this](const boost::system::error_code& error, std::size_t bytes_recv) {
-        if (!error && bytes_recv > 0) {
-            received_data_handler(bytes_recv);
-        } else if (error == boost::asio::error::operation_aborted) {
-            std::cout << "Receive operation aborted." << std::endl;
-        } else if (error) {
-            std::cerr << "Error receiving data: " << error.message() << std::endl;
-        }
+        Utils::Network::Response clientResponse;
+        Utils::Network::bytes data;
 
-        if (!error) {
-            read_server();
-        }
+        if (!error && bytes_recv > 0) {
+            data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
+            clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
+            handleResponse(clientResponse);
+        } else if (error)
+            std::cerr << "Error receiving data: " << error.message() << std::endl;
+        read_server();
     });
-    data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
-    clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
-    handleResponse(clientResponse);
 }
 
 void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
@@ -110,18 +86,17 @@ void Rtype::udpClient::handleGameInfo(Utils::Network::Response clientResponse)
     switch (cmd_index) {
     case Utils::GameInfoEnum::NewClientConnected:
         _id = clientResponse.PopParam<int>();
+        CONSOLE_INFO("Id set on client: ", _id);
         break;
     default:
         break;
     }
 }
 
-void Rtype::udpClient::received_data_handler(std::size_t bytes_recv)
+void Rtype::udpClient::connectClient()
 {
-    std::string msg(_receiverBuffer.data(), bytes_recv);
-    std::cout << "Received from server: [" << msg << "]" << std::endl;
-
-    if (std::strncmp("Your new ID is ", msg.c_str(), 15) == 0) {
-        _id = atoi(msg.c_str() + 15);
-    }
+    std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd_connection = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Client_connection, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected);
+    cmd_connection->set_client(_serverEndpoint);
+    cmd_connection->setCommonPart(_socket, _serverEndpoint, _ackToSend);
+    _commandInvoker.addCommand(std::move(cmd_connection));
 }

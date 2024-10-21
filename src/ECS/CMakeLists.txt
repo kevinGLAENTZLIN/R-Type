@@ -52,6 +52,7 @@ set(LIB_SOURCES
     ./Component/Input/Input.cpp
     ./Component/Render2D/Render2D.cpp
     ./Component/Render3D/Render3D.cpp
+    ./Component/Button/Button.cpp
     ./Component/AI/AI.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
@@ -61,6 +62,9 @@ set(LIB_SOURCES
     ./System/Render2D/Render2D.cpp
     ./System/Render3D/Render3D.cpp
     ./System/Background/Background.cpp
+    ./System/RenderText/RenderText.cpp
+    ./System/ButtonClick/ButtonClick.cpp
+    ./System/RenderButton/RenderButton.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )

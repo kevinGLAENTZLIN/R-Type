@@ -1,0 +1,22 @@
+{
+    "enemy": {
+        "type": "PATAPATA",
+        "position": {
+            "x": 100.0,
+            "y": 200.0
+        },
+        "model": "enemy_one",
+        "time minute": 3,
+        "time second": 0
+    },
+    "enemy2": {
+        "type": "PATAPATA",
+        "position": {
+            "x": 150.0,
+            "y": 300.0
+        },
+        "model": "enemy_one",
+        "time minute": 1,
+        "time second": 0
+    }
+}

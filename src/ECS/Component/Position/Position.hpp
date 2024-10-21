@@ -20,12 +20,18 @@ namespace ECS {
             float getX() const;
             float getY() const;
             float getZ() const;
+            float getOriginalX() const;
+            float getOriginalY() const;
+            float getOriginalZ() const;
             void setX(float x);
             void setY(float y);
             void setZ(float z);
             std::pair<float, float> getPosPair() const;
             std::tuple<float, float, float> getPosition() const;
         private:
+            float _xOriginalPos;
+            float _yOriginalPos;
+            float _zOriginalPos;
             float _x;
             float _y;
             float _z;

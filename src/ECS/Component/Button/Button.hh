@@ -19,7 +19,9 @@ namespace ECS {
             ~Button() = default;
 
             Rectangle getBounds() const;
+            Rectangle getOriginalBounds() const;
             void setBounds(const Rectangle &bounds);
+            void setOriginalBounds(const Rectangle &bounds);
 
             bool isSelected() const;
             void setSelected(bool isSelected);
@@ -31,6 +33,7 @@ namespace ECS {
 
         private:
             Rectangle _bounds;
+            Rectangle _originalBounds;
             bool _isSelected;
             std::function<void()> _onClick;
         };

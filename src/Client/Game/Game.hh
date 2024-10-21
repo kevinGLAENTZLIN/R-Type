@@ -53,16 +53,16 @@ namespace Rtype {
         ~Game();
 
         void run();
-        std::size_t createPlayer(int id, float pos_x, float pos_y);
+        void createPlayer(int id, float pos_x, float pos_y);
         void createOtherPlayer(int id, float pos_x, float pos_y);
-        std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
+        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
         void movePlayer(int id, float x, float y);
         void createEnemyProjectile(int id);
 
     private:
         void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
-        void createBackgroundLayers(float speed, std::string modelPath);
+        void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
         void update();
         void updateMenu();
         void render();
@@ -70,6 +70,12 @@ namespace Rtype {
         void switchState(GameState newState);
         void initMenu(void);
         void initGame(void);
+        void joinGame(void);
+        void initOptions(void);
+        void joinGameID(void);
+        void initPlayOption(void);
+        void destroyEntityMenu(void);
+        void destroyEntityLayer(void);
 
         GameState _currentState;
         bool _isRunning;

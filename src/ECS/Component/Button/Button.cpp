@@ -9,7 +9,7 @@
 
 
 ECS::Components::Button::Button(const Rectangle &bounds, bool isSelected, std::function<void()> onClick)
-            : _bounds(bounds), _isSelected(false), _onClick(onClick)
+            : _bounds(bounds), _originalBounds(bounds), _isSelected(false), _onClick(onClick)
 {}
 
 Rectangle ECS::Components::Button::getBounds() const
@@ -17,9 +17,19 @@ Rectangle ECS::Components::Button::getBounds() const
     return _bounds;
 }
 
+Rectangle ECS::Components::Button::getOriginalBounds() const
+{
+    return _originalBounds;
+}
+
 void ECS::Components::Button::setBounds(const Rectangle &bounds)
 {
     _bounds = bounds;
+}
+
+void ECS::Components::Button::setOriginalBounds(const Rectangle &bounds)
+{
+    _originalBounds = bounds;
 }
 
 bool ECS::Components::Button::isSelected() const

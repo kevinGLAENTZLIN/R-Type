@@ -9,6 +9,7 @@
 #include "Game.hh"
 #include <cstddef>
 #include<unistd.h>
+#include <vector>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -23,10 +24,12 @@ Rtype::Game::Game()
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
     _window.Init(1280, 720, "R-Type Game");
+    SetWindowMinSize(1280, 720);
     _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
     _ressourcePool.addModel("ship_yellow");
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
+    _ressourcePool.addTexture("bg_menu");
     _ressourcePool.addTexture("background");
     _ressourcePool.addTexture("background_layer0");
     _ressourcePool.addTexture("background_layer1");
@@ -138,10 +141,6 @@ Rtype::Game::Game()
     buttonClickSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
-
-    createBackgroundLayers(2.f , "background_layer0");
-    createBackgroundLayers(3.f , "background_layer1");
-    createBackgroundLayers(5.f , "background_layer2");
 }
 
 Rtype::Game::~Game()
@@ -149,7 +148,7 @@ Rtype::Game::~Game()
     _ressourcePool.UnloadAll();
 }
 
-std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y)
+void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t enemy = _core->createEntity();
@@ -161,7 +160,6 @@ std::size_t Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, f
     _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType});
     _mapID[enemy] = enemy;
-    return enemy;
 }
 
 void Rtype::Game::movePlayer(int id, float x, float y)
@@ -171,7 +169,7 @@ void Rtype::Game::movePlayer(int id, float x, float y)
     velocity.setY(y);
 }
 
-std::size_t Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
+void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t player = _core->createEntity();
@@ -183,7 +181,6 @@ std::size_t Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
     _core->addComponent(player, ECS::Components::Input{});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
     _mapID[id] = player;
-    return player;
 }
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
@@ -199,29 +196,134 @@ void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
     _mapID[id] = otherPlayer;
 }
 
+void Rtype::Game::destroyEntityMenu(void)
+{
+    std::vector<std::size_t> entitiesMenu = _core->getEntitiesWithComponent<ECS::Components::Button>();
+
+    for (auto &entity : entitiesMenu)
+        _core->destroyEntity(entity);
+}
+
+void Rtype::Game::destroyEntityLayer(void)
+{
+    std::vector<std::size_t> entitiesLayer = _core->getEntitiesWithComponent<ECS::Components::Background>();
+
+    for (auto &entity : entitiesLayer)
+        _core->destroyEntity(entity);
+}
+
+void Rtype::Game::initOptions(void)
+{
+    destroyEntityMenu();
+    destroyEntityLayer();
+
+    std::size_t back = _core->createEntity();
+    _core->addComponent(back, ECS::Components::Position{400, 200});
+    _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
+    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+        initMenu();
+    }});
+    createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
+void Rtype::Game::joinGame(void)
+{
+    destroyEntityMenu();
+    destroyEntityLayer();
+
+    std::size_t back = _core->createEntity();
+    _core->addComponent(back, ECS::Components::Position{400, 200});
+    _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
+    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+        initPlayOption();
+    }});
+    createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
+void Rtype::Game::joinGameID(void)
+{
+    destroyEntityMenu();
+    destroyEntityLayer();
+
+    std::size_t back = _core->createEntity();
+    _core->addComponent(back, ECS::Components::Position{400, 200});
+    _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
+    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+        initPlayOption();
+    }});
+    createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
+void Rtype::Game::initPlayOption(void)
+{
+    destroyEntityMenu();
+    destroyEntityLayer();
+
+    std::size_t createGame = _core->createEntity();
+    _core->addComponent(createGame, ECS::Components::Position{400, 200});
+    _core->addComponent(createGame, ECS::Components::Text{"Create Game", 30, RAYWHITE});
+    _core->addComponent(createGame, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+        initGame();
+    }});
+
+    std::size_t joinGameEntity = _core->createEntity();
+    _core->addComponent(joinGameEntity, ECS::Components::Position{400, 300});
+    _core->addComponent(joinGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
+    _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+        joinGame();
+    }});
+
+    std::size_t joinGameId = _core->createEntity();
+    _core->addComponent(joinGameId, ECS::Components::Position{400, 400});
+    _core->addComponent(joinGameId, ECS::Components::Text{"Join Game by ID", 30, RAYWHITE});
+    _core->addComponent(joinGameId, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
+        joinGameID();
+    }});
+
+    std::size_t back = _core->createEntity();
+        _core->addComponent(back, ECS::Components::Position{400, 500});
+        _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
+        _core->addComponent(back, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        initMenu();
+    }});
+    createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
 void Rtype::Game::initMenu(void)
 {
-    std::size_t text = _core->createEntity();
-    _core->addComponent(text, ECS::Components::Position{10.0, 10.0});
-    _core->addComponent(text, ECS::Components::Text{"Hello World", 20, RAYWHITE});
+    destroyEntityMenu();
+    destroyEntityLayer();
 
     std::size_t startGameButton = _core->createEntity();
-    _core->addComponent(startGameButton, ECS::Components::Position{400, 300});
-    _core->addComponent(startGameButton, ECS::Components::Text{"Start Game", 30, RAYWHITE});
-    _core->addComponent(startGameButton, ECS::Components::Button{Rectangle{400, 300, 200, 50}, true, [this]() {
-        initGame();
+    _core->addComponent(startGameButton, ECS::Components::Position{400, 200});
+    _core->addComponent(startGameButton, ECS::Components::Text{"Play", 30, RAYWHITE});
+    _core->addComponent(startGameButton, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+        initPlayOption();
+    }});
+
+    std::size_t option = _core->createEntity();
+    _core->addComponent(option, ECS::Components::Position{400, 300});
+    _core->addComponent(option, ECS::Components::Text{"Option", 30, RAYWHITE});
+    _core->addComponent(option, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+        initOptions();
     }});
 
     std::size_t quitButton = _core->createEntity();
     _core->addComponent(quitButton, ECS::Components::Position{400, 400});
     _core->addComponent(quitButton, ECS::Components::Text{"Quit", 30, RAYWHITE});
-    _core->addComponent(quitButton, ECS::Components::Button{Rectangle{400, 400, 200, 50}, true, [this]() {
+    _core->addComponent(quitButton, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
         _isRunning = false;
     }});
+    createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
 void Rtype::Game::initGame(void)
 {
+    destroyEntityMenu();
+    destroyEntityLayer();
+    createBackgroundLayers(2.f , "background_layer0", 3);
+    createBackgroundLayers(3.f , "background_layer1", 3);
+    createBackgroundLayers(5.f , "background_layer2", 3);
     switchState(GameState::PLAY);
     createPlayer(0, -10.0f, 0.0f);
     createEnemy(PATAPATA, 10.0f, 2.0f);
@@ -246,6 +348,7 @@ void Rtype::Game::run() {
 
 std::vector<std::size_t> getAllInputs() {
     std::vector<std::size_t> vec;
+
     if (IsKeyDown(KEY_RIGHT))
         vec.push_back(1);
     if (IsKeyDown(KEY_UP))
@@ -323,11 +426,11 @@ void Rtype::Game::destroyProjectile(std::size_t entityID)
     _core->destroyEntity(entityID);
 }
 
-void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath)
+void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel)
 {
     float width = _ressourcePool.getTexture(modelPath).GetWidth();
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < numberOfPanel; i++) {
         std::size_t background = _core->createEntity();
 
         _core->addComponent(background, ECS::Components::Position{0.0f + (width * i) - 1, 0.0f});
@@ -404,27 +507,61 @@ void Rtype::Game::update() {
 void Rtype::Game::renderMenu() {
     BeginDrawing();
     _window.ClearBackground(BLACK);
+
+    float currentWidth = GetScreenWidth();
+    float currentHeight = GetScreenHeight();
+
+    float scaleX = currentWidth / 1280.0f;
+    float scaleY = currentHeight / 720.0f;
+
     auto renderSystemText = _core->getSystem<ECS::Systems::RenderTextSystem>();
     auto renderButtons = _core->getSystem<ECS::Systems::RenderButtonSystem>();
+    auto renderSystem2D = _core->getSystem<ECS::Systems::SystemRender2D>();
 
+    auto renderEntities2D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender2D>());
     auto renderEntitiesText  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::RenderTextSystem>());
     auto renderEntitiesButton  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::RenderButtonSystem>());
 
+    for (auto entity : renderEntitiesButton) {
+        auto &buttonPosition = _core->getComponent<ECS::Components::Position>(entity);
+        auto &buttonComponent = _core->getComponent<ECS::Components::Button>(entity);
+        float x = buttonPosition.getOriginalX();
+        float y = buttonPosition.getOriginalY();
+        Rectangle rect = buttonComponent.getOriginalBounds();
+
+        buttonPosition.setX(x * scaleX);
+        buttonPosition.setY(y * scaleY);
+        rect.x *= scaleX;
+        rect.y *= scaleY;
+        buttonComponent.setBounds(rect);
+    }
+
+    renderSystem2D->update(_core->getComponents<ECS::Components::Position>(),
+                           _core->getComponents<ECS::Components::Render2D>(),
+                           renderEntities2D,
+                           _ressourcePool);
+
     renderSystemText->update(_core->getComponents<ECS::Components::Text>(),
-                        _core->getComponents<ECS::Components::Position>(),
-                        renderEntitiesText);
+                             _core->getComponents<ECS::Components::Position>(),
+                             renderEntitiesText);
 
     renderButtons->update(_core->getComponents<ECS::Components::Button>(),
-                        _core->getComponents<ECS::Components::Text>(),
-                        _core->getComponents<ECS::Components::Position>(),
-                        renderEntitiesButton);
+                          _core->getComponents<ECS::Components::Text>(),
+                          _core->getComponents<ECS::Components::Position>(),
+                          renderEntitiesButton);
     EndDrawing();
 }
 
-void Rtype::Game::render()
-{
+void Rtype::Game::render() {
     BeginDrawing();
     _window.ClearBackground(RAYWHITE);
+
+    float currentWidth = GetScreenWidth();
+    float currentHeight = GetScreenHeight();
+
+    float scaleX = currentWidth / 1280.0f;
+    float scaleY = currentHeight / 720.0f;
+
     auto renderSystem2D = _core->getSystem<ECS::Systems::SystemRender2D>();
     auto renderEntities2D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender2D>());
 
@@ -432,16 +569,17 @@ void Rtype::Game::render()
     auto renderEntities3D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender3D>());
 
     renderSystem2D->update(_core->getComponents<ECS::Components::Position>(),
-                        _core->getComponents<ECS::Components::Render2D>(),
-                        renderEntities2D,
-                        _ressourcePool);
+                           _core->getComponents<ECS::Components::Render2D>(),
+                           renderEntities2D,
+                           _ressourcePool);
 
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
-                        _core->getComponents<ECS::Components::Rotate>(),
-                        _core->getComponents<ECS::Components::Scale>(),
-                        _core->getComponents<ECS::Components::Render3D>(),
-                        renderEntities3D,
-                        _ressourcePool,
-                        _camera);
+                           _core->getComponents<ECS::Components::Rotate>(),
+                           _core->getComponents<ECS::Components::Scale>(),
+                           _core->getComponents<ECS::Components::Render3D>(),
+                           renderEntities3D,
+                           _ressourcePool,
+                           _camera);
+
     EndDrawing();
 }

@@ -64,6 +64,8 @@ jobs:
         with:
           path: /var/cache/apt
           key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
+          exclude: |
+            /var/cache/apt/archives/partial
 
       - name: Cache vcpkg dependencies
         id: cache-vcpkg

@@ -81,13 +81,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-vcpkg-
 
+      - name: Setup vcpkg
+        run: ./build.sh setup_vcpkg
+
+      - name: Initialize Project
+        run: ./build.sh init
+
+      - name: Configure Release
+        run: ./build.sh release
+
       - name: Build Project
-        run: |
-          echo "./vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
-          chmod +x build.sh
-          ./build.sh Init
-          ./build.sh Release
-          ./build.sh Build
+        run: ./build.sh build
 
       - name: Check Binaries
         run: |
@@ -115,9 +119,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Tests
-        run: |
-          chmod +x build.sh
-          ./build.sh Test
+        run: ./build.sh test
 
   push_to_mirror:
     needs: test

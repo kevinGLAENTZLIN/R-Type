@@ -58,14 +58,24 @@ jobs:
         run: |
           sudo apt-get clean
 
+      - name: Move Partial Directory
+        run: |
+          if [ -d "/var/cache/apt/archives/partial" ]; then
+            mv /var/cache/apt/archives/partial /var/cache/apt/archives/partial_backup
+          fi
+
       - name: Save APT Cache
         if: steps.cache-apt.outputs.cache-hit != 'true'
         uses: actions/cache@v3
         with:
           path: /var/cache/apt
           key: ${{ runner.os }}-apt-${{ hashFiles('vcpkg.json') }}-v1
-          exclude: |
-            /var/cache/apt/archives/partial
+
+      - name: Restore Partial Directory
+        run: |
+          if [ -d "/var/cache/apt/archives/partial_backup" ]; then
+            mv /var/cache/apt/archives/partial_backup /var/cache/apt/archives/partial
+          fi
 
       - name: Cache vcpkg dependencies
         id: cache-vcpkg

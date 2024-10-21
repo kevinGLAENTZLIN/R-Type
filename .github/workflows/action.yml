@@ -2,7 +2,7 @@ name: R-Type CI/CD
 run-name: R-Type Build and Test
 
 env:
-  MIRROR_URL: "git@github.com:EpitechPromo2027/B-CPP-500-MLH-5-1-rtype-hugo.bardet.git"
+  MIRROR_URL: "git@github.com/EpitechPromo2027/B-CPP-500-MLH-5-1-rtype-hugo.bardet.git"
 
 on:
   push:
@@ -13,116 +13,89 @@ on:
       - "ga-ignore**"
 
 jobs:
-  prepare:
+  cache-dependencies:
     runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache-vcpkg.outputs.cache-hit }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Install system dependencies
+      - name: Cache vcpkg dependencies
+        id: cache-vcpkg
+        uses: actions/cache@v3
+        with:
+          path: vcpkg
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: Install Dependencies
+        if: steps.cache-vcpkg.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential \
-            libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config \
-            libglfw3-dev libgl1-mesa-dev ninja-build \
-            libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
-
-      - name: Setup Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v3
-
-      - name: Cache vcpkg
-        uses: actions/cache@v3
-        id: vcpkg-cache
-        with:
-          path: |
-            ${{ github.workspace }}/vcpkg
-            !${{ github.workspace }}/vcpkg/buildtrees
-            !${{ github.workspace }}/vcpkg/packages
-            !${{ github.workspace }}/vcpkg/downloads
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
-
-      - name: Install vcpkg
-        if: steps.vcpkg-cache.outputs.cache-hit != 'true'
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
+          sudo apt-get install -y cmake build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
+          git clone https://github.com/microsoft/vcpkg
           ./vcpkg/bootstrap-vcpkg.sh
-
-      - name: Install vcpkg dependencies
-        run: |
           ./vcpkg/vcpkg install
 
   build:
-    needs: prepare
     runs-on: ubuntu-latest
+    needs: cache-dependencies
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Restore vcpkg cache
         uses: actions/cache@v3
         with:
-          path: |
-            ${{ github.workspace }}/vcpkg
-            !${{ github.workspace }}/vcpkg/buildtrees
-            !${{ github.workspace }}/vcpkg/packages
-            !${{ github.workspace }}/vcpkg/downloads
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
-
-      - name: Setup Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v3
-
-      - name: Cache CMake build
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/build
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+          path: vcpkg
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            ${{ runner.os }}-cmake-
+            ${{ runner.os }}-vcpkg-
 
-      - name: Configure CMake
+      - name: Build Project
         run: |
-          cmake -B ${{github.workspace}}/build -S ${{github.workspace}} \
-            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-            -GNinja
-
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build --config Release
+          echo "./vcpkg/scripts/buildsystems/vcpkg.cmake" > .vcpkg_path
+          chmod +x build.sh
+          ./build.sh Init
+          ./build.sh Release
+          ./build.sh Build
 
       - name: Check Binaries
         run: |
-          if [ ! -f "${{github.workspace}}/build/lib/libr-type.a" ]; then
+          if [ ! -f "/home/runner/work/R-Type/R-Type/lib/libr-type.a" ]; then
             echo "r-type.a not found"
             exit 1
           fi
-          if [ ! -f "${{github.workspace}}/build/r-type_client" ]; then
+          if [ ! -f "/home/runner/work/R-Type/R-Type/r-type_client" ]; then
             echo "r-type_client not found"
             exit 1
           fi
-          if [ ! -f "${{github.workspace}}/build/r-type_server" ]; then
+          if [ ! -f "/home/runner/work/R-Type/R-Type/r-type_server" ]; then
             echo "r-type_server not found"
             exit 1
           fi
           echo "All required binaries are present"
 
   test:
-    needs: build
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Restore CMake build cache
-        uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/build
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+          fetch-depth: 0
 
       - name: Run Tests
         run: |
-          cd ${{github.workspace}}/build
-          ctest -C Release --output-on-failure
+          chmod +x build.sh
+          ./build.sh Test
 
   push_to_mirror:
     needs: test
@@ -133,8 +106,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: Push to Mirror
         uses: pixta-dev/repository-mirroring-action@v1.1.1
         with:
-          target_repo_url: ${{env.MIRROR_URL}}
-          ssh_private_key: ${{secrets.SSH_PRIVATE_KEY}}
+          target_repo_url: ${{ env.MIRROR_URL }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}

@@ -65,6 +65,7 @@ set(LIB_SOURCES
     ./System/RenderText/RenderText.cpp
     ./System/ButtonClick/ButtonClick.cpp
     ./System/RenderButton/RenderButton.cpp
+    ./System/GetDeadEntities/GetDeadEntities.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )

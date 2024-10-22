@@ -36,6 +36,7 @@
 #include "../../ECS/System/RenderText/RenderText.hh"
 #include "../../ECS/System/RenderButton/RenderButton.hh"
 #include "../../ECS/System/ButtonClick/ButtonClick.hh"
+#include "../../ECS/System/GetDeadEntities/GetDeadEntities.hh"
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 

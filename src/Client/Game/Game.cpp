@@ -48,6 +48,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::AI>();
     _core->registerComponent<ECS::Components::Text>();
     _core->registerComponent<ECS::Components::Button>();
+    _core->registerComponent<ECS::Components::Health>();
 
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
@@ -60,6 +61,7 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::RenderTextSystem>();
     _core->registerSystem<ECS::Systems::RenderButtonSystem>();
     _core->registerSystem<ECS::Systems::ButtonClickSystem>();
+    _core->registerSystem<ECS::Systems::GetDeadEntities>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -141,6 +143,13 @@ Rtype::Game::Game()
     buttonClickSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
+
+    Signature getDeadEntitiesSignature;
+    getDeadEntitiesSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Health>());
+    getDeadEntitiesSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
+    _core->setSystemSignature<ECS::Systems::GetDeadEntities>(getDeadEntitiesSignature);    
 }
 
 Rtype::Game::~Game()
@@ -159,6 +168,7 @@ void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float po
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType});
+    _core->addComponent(enemy, ECS::Components::Health{1});
     _serverToLocalEnemiesId[enemy] = enemy;
 }
 
@@ -483,15 +493,15 @@ void Rtype::Game::update() {
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
     auto backgroundSystem = _core->getSystem<ECS::Systems::SystemBackground>();
     auto AISystem = _core->getSystem<ECS::Systems::UpdateVelocityAI>();
+    auto getDeadEntitiesSystem = _core->getSystem<ECS::Systems::GetDeadEntities>();
 
-    auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
-    auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
-//    auto damageableEntities = _core->getEntitiesWithComponents<ECS::Components::Position, ECS::Components::Hitbox,
-//                                                               ECS::Components::Health>();
-    auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
-    auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
-    auto backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
-    auto AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
+    std::vector<std::size_t> velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
+    std::vector<std::size_t> collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
+    std::vector<std::size_t> projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
+    std::vector<std::size_t> inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
+    std::vector<std::size_t> backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
+    std::vector<std::size_t> AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
+    std::vector<std::size_t> damageableEntities = _core->getEntitiesWithComponent<ECS::Components::Health>();
 
     AISystem->update(_core->getComponents<ECS::Components::Velocity>(),
                      _core->getComponents<ECS::Components::Position>(),
@@ -526,8 +536,26 @@ void Rtype::Game::update() {
         _core->getComponents<ECS::Components::Hitbox>(),
         projectileEntities, collisionEntities);
 
-    for (int i = 0; i < projectileEntityId.size(); i++)
-        _core->destroyEntity(projectileEntityId[i]);
+    auto healthComponents = _core->getComponents<ECS::Components::Health>();
+    for (int i = 0; i < projectileEntityId.size(); i++) {
+        for (int j = 0; j < damageableEntities.size(); j++) {
+            if (damageableEntities[j] == projectileEntityId[i]) {
+                std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
+                _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+            }
+        }
+        for (int j = 0; j < projectileEntities.size(); j++)
+            if (projectileEntities[j] == projectileEntityId[i])
+                _core->destroyEntity(projectileEntityId[i]);
+    }
+
+    std::vector<std::size_t> deadEntities = getDeadEntitiesSystem->getDeadEntities(
+        _core->getComponents<ECS::Components::Health>(), damageableEntities);
+
+    for (std::size_t i = 0; i < deadEntities.size(); i++) {
+        _core->destroyEntity(deadEntities[i]);
+    }
+    
     if (false)
         _camera.Update(CAMERA_FREE);
 }

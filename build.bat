@@ -182,20 +182,18 @@ if "%~1"=="" (
     exit /b 1
 )
 
-if "%~1"=="setup_vcpkg" call :setup_vcpkg
-if "%~1"=="init" call :init_project
-if "%~1"=="reset" call :reset_project
-if "%~1"=="release" call :configure_release
-if "%~1"=="debug" call :configure_debug
-if "%~1"=="build" call :build_project
-if "%~1"=="test" call :test_project
-if "%~1"=="lint" call :run_clang_tidy
-if "%~1"=="clean" call :clean_project
-if "%~1"=="full_build" call :full_build
-if "%~1"=="help" call :show_help
+if "%~1"=="setup_vcpkg" goto :setup_vcpkg
+if "%~1"=="init" goto :init_project
+if "%~1"=="reset" goto :reset_project
+if "%~1"=="release" goto :configure_release
+if "%~1"=="debug" goto :configure_debug
+if "%~1"=="build" goto :build_project
+if "%~1"=="test" goto :test_project
+if "%~1"=="lint" goto :run_clang_tidy
+if "%~1"=="clean" goto :clean_project
+if "%~1"=="full_build" goto :full_build
+if "%~1"=="help" goto :show_help
 
-if not defined rule (
-    echo Error: Unknown rule '%~1'
-    call :show_help
-    exit /b 1
-)
+echo Error: Unknown rule '%~1'
+call :show_help
+exit /b 1

@@ -22,9 +22,13 @@ namespace ECS {
             void setFiring(bool isFiring);
             void flipFiring();
             bool isFiring() const;
+
+            void setCooldown(std::size_t cooldown);
+            std::size_t getCooldown() const;
         private:
             enemiesTypeEnum_t _enemyType;
             bool _isFiring;
+            std::size_t _cooldown;
         };
     }
 }

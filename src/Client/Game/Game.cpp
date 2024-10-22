@@ -14,7 +14,7 @@
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
 int menuOption = 0;
-std::vector<std::string> options = { "Start Game", "Options", "Quit" };
+std::vector<std::string> options = {"Start Game", "Options", "Quit"};
 
 Rtype::Game::Game()
     : _isRunning(true), _currentState(MENU)
@@ -25,7 +25,7 @@ Rtype::Game::Game()
     SetTargetFPS(60);
     _window.Init(1280, 720, "R-Type Game");
     SetWindowMinSize(1280, 720);
-    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+    _camera = raylib::Camera3D({0.0f, 10.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, 60.0f);
     _ressourcePool.addModel("ship_yellow");
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
@@ -62,6 +62,7 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::RenderButtonSystem>();
     _core->registerSystem<ECS::Systems::ButtonClickSystem>();
     _core->registerSystem<ECS::Systems::GetDeadEntities>();
+    _core->registerSystem<ECS::Systems::AIFiringProjectile>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -149,7 +150,14 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Health>());
     getDeadEntitiesSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
-    _core->setSystemSignature<ECS::Systems::GetDeadEntities>(getDeadEntitiesSignature);    
+    _core->setSystemSignature<ECS::Systems::GetDeadEntities>(getDeadEntitiesSignature);
+
+    Signature AIFiringProjectileSignature;
+    AIFiringProjectileSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    AIFiringProjectileSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
+    _core->setSystemSignature<ECS::Systems::AIFiringProjectile>(AIFiringProjectileSignature);
 }
 
 Rtype::Game::~Game()
@@ -364,7 +372,7 @@ void Rtype::Game::initGame(void)
     createEnemy(BUG, 13.5f, 3.25f);
     createEnemy(BUG, 14.25f, 3.25f);
 
-    createEnemy(POWARMOR, 17.0f, -4.0f);
+    createEnemy(MINIKIT, 17.0f, -4.0f);
 }
 
 void Rtype::Game::run() {
@@ -492,7 +500,8 @@ void Rtype::Game::update() {
     auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
     auto backgroundSystem = _core->getSystem<ECS::Systems::SystemBackground>();
-    auto AISystem = _core->getSystem<ECS::Systems::UpdateVelocityAI>();
+    auto AIVelocitySystem = _core->getSystem<ECS::Systems::UpdateVelocityAI>();
+    auto AIFiringProjectileSystem = _core->getSystem<ECS::Systems::AIFiringProjectile>();
     auto getDeadEntitiesSystem = _core->getSystem<ECS::Systems::GetDeadEntities>();
 
     std::vector<std::size_t> velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
@@ -503,33 +512,38 @@ void Rtype::Game::update() {
     std::vector<std::size_t> AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
     std::vector<std::size_t> damageableEntities = _core->getEntitiesWithComponent<ECS::Components::Health>();
 
-    AISystem->update(_core->getComponents<ECS::Components::Velocity>(),
-                     _core->getComponents<ECS::Components::Position>(),
-                     _core->getComponents<ECS::Components::AI>(),
-                     AIEntities, _serverToLocalPlayersId);
-
+    AIVelocitySystem->update(_core->getComponents<ECS::Components::Velocity>(),
+                             _core->getComponents<ECS::Components::Position>(),
+                             _core->getComponents<ECS::Components::AI>(),
+                             AIEntities, _serverToLocalPlayersId);
+    
+    std::vector<std::size_t> AIProjectile = AIFiringProjectileSystem->aiFiringProjectile(
+        _core->getComponents<ECS::Components::AI>(),
+        _core->getComponents<ECS::Components::Position>(),
+        AIEntities);
+    
     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
-                                     _core->getComponents<ECS::Components::Input>(),
-                                     inputEntities);
+                                                            _core->getComponents<ECS::Components::Input>(),
+                                                            inputEntities);
 
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);
 
     backgroundSystem->update(_core->getComponents<ECS::Components::Position>(),
-                            _core->getComponents<ECS::Components::Background>(),
-                            backgroundEntities);
+                             _core->getComponents<ECS::Components::Background>(),
+                             backgroundEntities);
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
                            velocityEntities);
 
-    if (entityID <= 10000)
-        createPlayerProjectile(entityID);
-
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
+
+    if (entityID <= 10000)
+        createPlayerProjectile(entityID);
 
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
@@ -555,7 +569,9 @@ void Rtype::Game::update() {
     for (std::size_t i = 0; i < deadEntities.size(); i++) {
         _core->destroyEntity(deadEntities[i]);
     }
-    
+    for (std::size_t i = 0; i < AIProjectile.size(); i++)
+        createEnemyProjectile(AIProjectile[i]);
+
     if (false)
         _camera.Update(CAMERA_FREE);
 }

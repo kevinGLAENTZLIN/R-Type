@@ -15,7 +15,7 @@
  * @return void.
  */
 ECS::Components::Position::Position(float x, float y, float z):
-    _x(x),_xOriginalPos(x), _yOriginalPos(y), _zOriginalPos(z), _y(y), _z(z)
+    _xOriginalPos(x), _yOriginalPos(y), _zOriginalPos(z), _x(x),  _y(y), _z(z)
 {}
 
 /**

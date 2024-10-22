@@ -66,6 +66,7 @@ set(LIB_SOURCES
     ./System/ButtonClick/ButtonClick.cpp
     ./System/RenderButton/RenderButton.cpp
     ./System/GetDeadEntities/GetDeadEntities.cpp
+    ./System/AIFiringProjectile/AIFiringProjectile.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )

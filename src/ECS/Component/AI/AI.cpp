@@ -7,7 +7,7 @@
 #include "AI.hh"
 
 ECS::Components::AI::AI(enemiesTypeEnum_t enemyType):
-    _enemyType(enemyType), _isFiring(false)
+    _enemyType(enemyType), _isFiring(false), _cooldown(0)
 {}
 
 enemiesTypeEnum_t ECS::Components::AI::getEnemyType() const
@@ -33,4 +33,14 @@ void ECS::Components::AI::flipFiring()
 bool ECS::Components::AI::isFiring() const
 {
     return _isFiring;
+}
+
+void ECS::Components::AI::setCooldown(std::size_t cooldown)
+{
+    _cooldown = cooldown;
+}
+
+std::size_t ECS::Components::AI::getCooldown() const
+{
+    return _cooldown;
 }

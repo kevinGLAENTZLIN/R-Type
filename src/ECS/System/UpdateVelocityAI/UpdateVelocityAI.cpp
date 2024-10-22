@@ -11,11 +11,12 @@ void ECS::Systems::UpdateVelocityAI::update (
         std::size_t aiId = entities[i];
         enemiesTypeEnum_t aiType = AIs[aiId]->getEnemyType();
 
-        if (aiType == POWARMOR) {
-            if (AIs[aiId]->isFiring())
-                break;
-            velocities[aiId]->setX(-0.1);
-            velocities[aiId]->setY(0.01);
+        if (aiType == MINIKIT) {
+            float amplitude = 0.05f;
+            float frequency = 2.0f;
+            velocities[aiId]->setX(0.05f);
+            velocities[aiId]->setY(
+                amplitude * std::sin(frequency * positions[aiId]->getX()));
         }
         if (aiType == PATAPATA) {
             float amplitude = 0.05f;
@@ -40,7 +41,16 @@ void ECS::Systems::UpdateVelocityAI::update (
                 velocities[aiId]->setY(0);
             if (AIs[aiId]->isFiring())
                 break;
-            std::size_t targetPlayer = getClosestPlayer(positions, aiId, serverToLocalPlayersId);
+            
+            std::vector<std::pair<float, float>> playersPos;
+            for (const auto& player : serverToLocalPlayersId)
+                playersPos.push_back(positions[player.second]->getPosPair());
+            std::size_t targetPlayer = ecsUtils::getClosestPlayer(
+                positions[aiId]->getPosPair(), playersPos);
+            for (const auto& player : serverToLocalPlayersId)
+                if (positions[player.second]->getPosPair() == playersPos[targetPlayer])
+                    targetPlayer = player.second;
+
             if (positions[aiId]->getX() > positions[targetPlayer]->getX())
                 velocities[aiId]->setX(-0.033);
             else
@@ -49,33 +59,3 @@ void ECS::Systems::UpdateVelocityAI::update (
     }
 }
 
-float ECS::Systems::UpdateVelocityAI::getDistance(
-    const std::optional<ECS::Components::Position> & pos1,
-    const std::optional<ECS::Components::Position> & pos2) const
-{
-    float X1 = pos1->getX();
-    float Y1 = pos1->getY();
-    float X2 = pos2->getX();
-    float Y2 = pos2->getY();
-
-    return std::sqrt((X2 - X1) * (X2 - X1) +
-                     (Y2 - Y1) * (Y2 - Y1));
-}
-
-std::size_t ECS::Systems::UpdateVelocityAI::getClosestPlayer(
-    ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
-    std::size_t ai, std::map<int, std::size_t> serverToLocalPlayersId) const
-{
-    float dist = 1000;
-    float tempDist = 0;
-    std::size_t closestId = 0;
-
-    for (const auto& player : serverToLocalPlayersId) {
-        tempDist = getDistance(positions[ai], positions[player.second]);
-        if (dist > tempDist) {
-            dist = tempDist;
-            closestId = player.second;
-        }
-    }
-    return closestId;
-}

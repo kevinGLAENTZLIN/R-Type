@@ -14,6 +14,7 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
     _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
     _commandInvoker("Client"), _commandFactory(), _game()
 {
+    setHandleMaps();
     connectClient();
     read_server();
 }
@@ -283,7 +284,6 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 void Rtype::udpClient::connectClient()
 {
     std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd_connection = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Client_connection, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected);
-    cmd_connection->set_client(_serverEndpoint);
     cmd_connection->setCommonPart(_socket, _serverEndpoint, _ackToSend);
     _commandInvoker.addCommand(std::move(cmd_connection));
 }

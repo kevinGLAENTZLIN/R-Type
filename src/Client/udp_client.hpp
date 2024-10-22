@@ -73,19 +73,6 @@ namespace Rtype {
         void handleResponse(Utils::Network::Response clientResponse);
 
         void connectClient();
-
-        template <typename T>
-        std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
-            static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
-
-            T* derived = dynamic_cast<T*>(base.get());
-            if (derived) {
-                base.release();
-                return std::unique_ptr<T>(derived);
-            } else
-                return nullptr;
-        }
-
     
         void setHandleMaps();
         void setHandleGameInfoMap();

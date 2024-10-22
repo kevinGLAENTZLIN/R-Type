@@ -370,6 +370,7 @@ void Rtype::Game::run() {
         }
     }
     CloseAudioDevice();
+
 }
 
 std::vector<std::size_t> getAllInputs() {

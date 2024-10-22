@@ -7,7 +7,7 @@
 #include "AI.hh"
 
 ECS::Components::AI::AI(enemiesTypeEnum_t enemyType):
-    _enemyType(enemyType)
+    _enemyType(enemyType), _isFiring(false)
 {}
 
 enemiesTypeEnum_t ECS::Components::AI::getEnemyType() const
@@ -18,4 +18,19 @@ enemiesTypeEnum_t ECS::Components::AI::getEnemyType() const
 void ECS::Components::AI::setEnemyType(enemiesTypeEnum_t enemyType)
 {
     _enemyType = enemyType;
+}
+
+void ECS::Components::AI::setFiring(bool isFiring)
+{
+    _isFiring = isFiring;
+}
+
+void ECS::Components::AI::flipFiring()
+{
+    _isFiring = !_isFiring;
+}
+
+bool ECS::Components::AI::isFiring() const
+{
+    return _isFiring;
 }

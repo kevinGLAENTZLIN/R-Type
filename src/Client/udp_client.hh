@@ -71,7 +71,6 @@ namespace Rtype {
         void handlePowerUp(Utils::Network::Response clientResponse) {}; //temp empty
         void handleProjectile(Utils::Network::Response clientResponse) {}; //temp empty
 
-
         /**
          * @brief Run the IO context.
          */

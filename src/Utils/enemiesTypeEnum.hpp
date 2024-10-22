@@ -6,7 +6,30 @@
 */
 #pragma once
 
+#include <iostream>
+
 typedef enum enemiesTypeEnum_e {
-    PATAPATA = 0,
-    BINK = 1
+    UNKNOWN,
+    POWARMOR,
+    PATAPATA,
+    BUG,
+    BINK,
+    SCANT
 } enemiesTypeEnum_t;
+
+class enemiesTypeUtils {
+public:
+    static enemiesTypeEnum_t getTypeFromString(const std::string & type) {
+        if (type == "POWARMOR")
+            return POWARMOR;
+        if (type == "PATAPATA")
+            return PATAPATA;
+        if (type == "BUG")
+            return BUG;
+        if (type == "BINK")
+            return BINK;
+        if (type == "SCANT")
+            return SCANT;        
+        return UNKNOWN;
+    };
+};

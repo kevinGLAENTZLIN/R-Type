@@ -19,8 +19,12 @@ namespace ECS {
             enemiesTypeEnum_t getEnemyType() const;
             void setEnemyType(enemiesTypeEnum_t enemyType);
 
+            void setFiring(bool isFiring);
+            void flipFiring();
+            bool isFiring() const;
         private:
             enemiesTypeEnum_t _enemyType;
+            bool _isFiring;
         };
     }
 }

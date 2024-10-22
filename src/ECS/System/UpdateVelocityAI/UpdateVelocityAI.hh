@@ -12,6 +12,8 @@
 #include "../../Component/Velocity/Velocity.hh"
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/AI/AI.hh"
+#include <map>
+#include <cmath>
 
 namespace ECS {
     namespace Systems {
@@ -25,7 +27,17 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Velocity> & velocities,
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
-                std::vector<std::size_t> pataPatas);
+                std::vector<std::size_t> entities,
+                const std::map<int, std::size_t> & serverToLocalPlayersId) const;
+
+        private:
+            float getDistance(
+                const std::optional<ECS::Components::Position> & pos1,
+                const std::optional<ECS::Components::Position> & pos2) const;
+            
+            std::size_t getClosestPlayer(
+                ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
+                std::size_t ai, std::map<int, std::size_t> serverToLocalPlayersId) const;
         };
     }
 }

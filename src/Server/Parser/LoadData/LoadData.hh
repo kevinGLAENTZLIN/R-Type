@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "../EnemySpawnData/EnemySpawnData.hh"
+#include "../../../Utils/enemiesTypeEnum.hpp"
 
 namespace Rtype {
 

@@ -58,6 +58,7 @@ namespace Rtype {
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
         void movePlayer(int id, float x, float y);
         void createEnemyProjectile(int id);
+        std::vector<std::size_t> getAllInputs();
 
     private:
         void createPlayerProjectile(std::size_t entityID);
@@ -82,7 +83,8 @@ namespace Rtype {
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;
-        std::map<int, std::size_t> _mapID;
+        std::map<int, std::size_t> _serverToLocalPlayersId;
+        std::map<int, std::size_t> _serverToLocalEnemiesId;
         ECS::RessourcePool _ressourcePool;
     };
 };

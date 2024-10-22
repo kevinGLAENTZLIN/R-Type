@@ -159,12 +159,12 @@ void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float po
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType});
-    _mapID[enemy] = enemy;
+    _serverToLocalEnemiesId[enemy] = enemy;
 }
 
 void Rtype::Game::movePlayer(int id, float x, float y)
 {
-    auto &velocity = _core->getComponent<ECS::Components::Velocity>(_mapID[id]);
+    auto &velocity = _core->getComponent<ECS::Components::Velocity>(_serverToLocalPlayersId[id]);
     velocity.setX(x);
     velocity.setY(y);
 }
@@ -180,20 +180,20 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
     _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(player, ECS::Components::Input{});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
-    _mapID[id] = player;
+    _serverToLocalPlayersId[id] = player;
 }
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t otherPlayer = _core->createEntity();
     _core->addComponent(otherPlayer, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(otherPlayer, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
     _core->addComponent(otherPlayer, ECS::Components::Scale{1.0f});
     _core->addComponent(otherPlayer, ECS::Components::Velocity{0.0f, 0.0f});
-    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     _core->addComponent(otherPlayer, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
-    _mapID[id] = otherPlayer;
+    _serverToLocalPlayersId[id] = otherPlayer;
 }
 
 void Rtype::Game::destroyEntityMenu(void)
@@ -326,27 +326,54 @@ void Rtype::Game::initGame(void)
     createBackgroundLayers(5.f , "background_layer2", 3);
     switchState(GameState::PLAY);
     createPlayer(0, -10.0f, 0.0f);
-    createEnemy(PATAPATA, 10.0f, 2.0f);
-    createEnemy(PATAPATA, 13.0f, -2.0f);
+    createEnemy(PATAPATA, 10.5f, -3.0f);
+    createEnemy(PATAPATA, 11.5f, -2.9f);
+    createEnemy(PATAPATA, 12.5f, -2.8f);
+    createEnemy(PATAPATA, 13.5f, -3.0f);
+    createEnemy(PATAPATA, 14.5f, -3.2f);
+
+    createEnemy(PATAPATA, 10.5f, 3.0f);
+    createEnemy(PATAPATA, 11.5f, 2.9f);
+    createEnemy(PATAPATA, 12.5f, 2.8f);
+    createEnemy(PATAPATA, 13.5f, 3.2f);
+    createEnemy(PATAPATA, 14.5f, 2.0f);
+
+    createEnemy(BUG, 10.5f, 0.25f);
+    createEnemy(BUG, 11.25f, 0.25f);
+    createEnemy(BUG, 12.0f, 0.25f);
+    createEnemy(BUG, 12.75f, 0.25f);
+    createEnemy(BUG, 13.5f, 0.25f);
+    createEnemy(BUG, 14.25f, 0.25f);
+    
+    createEnemy(BINK, -5.0f, 3.0f);
+
+    createEnemy(BUG, 10.5f, 3.25f);
+    createEnemy(BUG, 11.25f, 3.25f);
+    createEnemy(BUG, 12.0f, 3.25f);
+    createEnemy(BUG, 12.75f, 3.25f);
+    createEnemy(BUG, 13.5f, 3.25f);
+    createEnemy(BUG, 14.25f, 3.25f);
+
+    createEnemy(POWARMOR, 17.0f, -4.0f);
 }
 
 void Rtype::Game::run() {
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
-            case MENU:
-                updateMenu();
-                renderMenu();
-                break;
-            case PLAY:
-                update();
-                render();
-                break;
+        case MENU:
+            updateMenu();
+            renderMenu();
+            break;
+        case PLAY:
+            update();
+            render();
+            break;
         }
     }
 }
 
-std::vector<std::size_t> getAllInputs() {
+std::vector<std::size_t> Rtype::Game::getAllInputs() {
     std::vector<std::size_t> vec;
 
     if (IsKeyDown(KEY_RIGHT))
@@ -370,13 +397,13 @@ void Rtype::Game::createEnemyProjectile(int id)
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
-    if (!positions[_mapID[id]].has_value()) {
+    if (!positions[_serverToLocalEnemiesId[id]].has_value()) {
         std::cerr << "Enemy " << id << " does not have a valid position!" << std::endl;
         return;
     }
 
-    const ECS::Components::Position &enemyPos = positions[_mapID[id]].value();
-    const ECS::Components::Hitbox &enemyHitbox = hitboxes[_mapID[id]].value();
+    const ECS::Components::Position &enemyPos = positions[_serverToLocalEnemiesId[id]].value();
+    const ECS::Components::Hitbox &enemyHitbox = hitboxes[_serverToLocalEnemiesId[id]].value();
 
     std::size_t projectile = _core->createEntity();
 
@@ -460,6 +487,8 @@ void Rtype::Game::update() {
 
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
+    auto damageableEntities = _core->getEntitiesWithComponents<ECS::Components::Position, ECS::Components::Hitbox,
+                                                               ECS::Components::Health>();
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     auto backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
@@ -468,7 +497,7 @@ void Rtype::Game::update() {
     AISystem->update(_core->getComponents<ECS::Components::Velocity>(),
                      _core->getComponents<ECS::Components::Position>(),
                      _core->getComponents<ECS::Components::AI>(),
-                     AIEntities);
+                     AIEntities, _serverToLocalPlayersId);
 
     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                      _core->getComponents<ECS::Components::Input>(),
@@ -499,7 +528,7 @@ void Rtype::Game::update() {
         projectileEntities, collisionEntities);
 
     for (int i = 0; i < projectileEntityId.size(); i++)
-        destroyProjectile(projectileEntityId[i]);
+        _core->destroyEntity(projectileEntityId[i]);
     if (false)
         _camera.Update(CAMERA_FREE);
 }

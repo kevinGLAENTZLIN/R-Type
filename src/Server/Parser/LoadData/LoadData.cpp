@@ -32,7 +32,8 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
     for (const auto& enemyKey : root.getMemberNames()) {
         const Json::Value& enemyData = root[enemyKey];
 
-        std::string type = enemyData["type"].asString();
+        enemiesTypeEnum_t type = enemiesTypeUtils::getTypeFromString(enemyData["type"].asString());
+        int difficulty = enemyData["difficulty"].asInt();
         float positionX = enemyData["position"]["x"].asFloat();
         float positionY = enemyData["position"]["y"].asFloat();
         std::string model = enemyData["model"].asString();

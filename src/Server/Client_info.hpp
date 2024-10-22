@@ -161,6 +161,10 @@ namespace Rtype {
              */
             void setAddr(std::string address);
 
+            bool isAlive() const;
+
+            void setAliveStatus(bool is_alive);
+
             /**
              * @brief Adds a command to the client's command history.
              * 

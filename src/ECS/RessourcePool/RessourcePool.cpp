@@ -11,9 +11,6 @@
 ECS::RessourcePool::RessourcePool()
 {}
 
-// ECS::RessourcePool::~RessourcePool()
-// {}
-
 void ECS::RessourcePool::UnloadAll()
 {
     for (auto &model : _models) {
@@ -34,14 +31,32 @@ void ECS::RessourcePool::UnloadAll()
     }
 }
 
-raylib::Model& ECS::RessourcePool::getModel(std::string modelPath)
+raylib::Model& ECS::RessourcePool::getModel(const std::string &modelPath)
 {
-    return _models[modelPath];
+    return _models.at(modelPath);
 }
 
-raylib::Texture& ECS::RessourcePool::getTexture(std::string texturePath)
+raylib::Texture& ECS::RessourcePool::getTexture(const std::string &texturePath)
 {
-    return _textures[texturePath];
+    return _textures.at(texturePath);
+}
+
+raylib::Shader& ECS::RessourcePool::getShader(const std::string &shaderPath)
+{
+    return _shaders.at(shaderPath);
+}
+
+void ECS::RessourcePool::addShader(const std::string &shaderPath)
+{
+    std::string pathRessourcesVs = "./resources/shaders/" + shaderPath + ".vs";
+    std::string pathRessourcesFs = "./resources/shaders/" + shaderPath + ".fs";
+    raylib::Shader defaultShader(pathRessourcesVs, pathRessourcesFs);
+
+    defaultShader.locs[SHADER_LOC_VECTOR_VIEW] = defaultShader.GetLocation("viewPos");
+    int ambientLoc = defaultShader.GetLocation("ambient");
+    std::array<float, 4> ambientValues = {1.0f, 1.0f, 1.0f, 1.0f};
+    defaultShader.SetValue(ambientLoc, ambientValues.data(), SHADER_UNIFORM_VEC4);
+    _shaders.emplace(shaderPath, std::move(defaultShader));
 }
 
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)
@@ -60,6 +75,7 @@ void ECS::RessourcePool::addModel(const std::string &modelPath)
 
     if (std::filesystem::exists(pngTexturePath)) {
         raylib::Texture texture(pngTexturePath.c_str());
+        defaultModel.materials[0].shader = _shaders.at("lighting");
         defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
         _texturesModels.emplace(pngTexturePath, std::move(texture));
     }

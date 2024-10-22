@@ -22,6 +22,7 @@
 #include "../../ECS/Component/Background/Background.hpp"
 #include "../../ECS/Component/AI/AI.hh"
 #include "../../ECS/Component/Button/Button.hh"
+#include "../../ECS/Component/Light/Light.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -36,10 +37,13 @@
 #include "../../ECS/System/RenderText/RenderText.hh"
 #include "../../ECS/System/RenderButton/RenderButton.hh"
 #include "../../ECS/System/ButtonClick/ButtonClick.hh"
+#include "../../ECS/System/Light/Light.hh"
+
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
 #include "../../Utils/enemiesTypeEnum.hpp"
+#define MAX_LIGHTS 4
 
 namespace Rtype {
     enum GameState {
@@ -84,5 +88,7 @@ namespace Rtype {
         raylib::Camera3D _camera;
         std::map<int, std::size_t> _mapID;
         ECS::RessourcePool _ressourcePool;
+        std::size_t _nbrLight;
+        std::string _currentShaders;
     };
 };

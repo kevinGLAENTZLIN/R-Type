@@ -15,8 +15,8 @@ out vec4 finalColor;
 
 // NOTE: Add here your custom variables
 
-#define     MAX_LIGHTS              4
-#define     LIGHT_DIRECTIONAL       1
+#define     MAX_LIGHTS              100
+#define     LIGHT_DIRECTIONAL       0
 #define     LIGHT_POINT             1
 
 struct Light {
@@ -60,7 +60,7 @@ void main()
             }
 
             float NdotL = max(dot(normal, light), 0.0);
-            lightDot += lights[i].color.rgb * NdotL;
+            lightDot += lights[i].color.rgb*NdotL;
 
             float specCo = 0.0;
             if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal))), 16.0); // 16 refers to shine
@@ -68,9 +68,9 @@ void main()
         }
     }
 
-    finalColor = (texelColor * ((colDiffuse + vec4(specular, 1.0)) * vec4(lightDot, 1.0)));
-    finalColor += texelColor * (ambient / 10.0) * colDiffuse;
+    finalColor = (texelColor*((colDiffuse + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
+    finalColor += texelColor*(ambient/10.0)*colDiffuse;
 
     // Gamma correction
-    finalColor = pow(finalColor, vec4(1.0 / 2.2));
+    finalColor = pow(finalColor, vec4(1.0/2.2));
 }

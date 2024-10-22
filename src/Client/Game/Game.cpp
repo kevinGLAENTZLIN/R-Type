@@ -17,7 +17,7 @@ int menuOption = 0;
 std::vector<std::string> options = { "Start Game", "Options", "Quit" };
 
 Rtype::Game::Game()
-    : _isRunning(true), _currentState(MENU)
+    : _isRunning(true), _currentState(MENU),_nbrLight(0), _currentShaders("")
 {
     _core = std::make_unique<ECS::Core::Core>();
 
@@ -26,6 +26,7 @@ Rtype::Game::Game()
     _window.Init(1280, 720, "R-Type Game");
     SetWindowMinSize(1280, 720);
     _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+    _ressourcePool.addShader("lighting");
     _ressourcePool.addModel("ship_yellow");
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
@@ -34,7 +35,7 @@ Rtype::Game::Game()
     _ressourcePool.addTexture("background_layer0");
     _ressourcePool.addTexture("background_layer1");
     _ressourcePool.addTexture("background_layer2");
-
+    _currentShaders = "lighting";
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Rotate>();
     _core->registerComponent<ECS::Components::Scale>();
@@ -48,6 +49,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::AI>();
     _core->registerComponent<ECS::Components::Text>();
     _core->registerComponent<ECS::Components::Button>();
+    _core->registerComponent<ECS::Components::Light>();
 
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
@@ -60,6 +62,7 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::RenderTextSystem>();
     _core->registerSystem<ECS::Systems::RenderButtonSystem>();
     _core->registerSystem<ECS::Systems::ButtonClickSystem>();
+    _core->registerSystem<ECS::Systems::SystemLight>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -141,6 +144,12 @@ Rtype::Game::Game()
     buttonClickSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
+    Signature lightSignature;
+    lightSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    lightSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Light>());
+    _core->setSystemSignature<ECS::Systems::SystemLight>(lightSignature);
 }
 
 Rtype::Game::~Game()
@@ -328,6 +337,12 @@ void Rtype::Game::initGame(void)
     createPlayer(0, -10.0f, 0.0f);
     createEnemy(PATAPATA, 10.0f, 2.0f);
     createEnemy(PATAPATA, 13.0f, -2.0f);
+    std::size_t light = _core->createEntity();
+    _core->addComponent(light, ECS::Components::Position{0.0f, 10.0f});
+    _core->addComponent(light, ECS::Components::Light{"lighting", ECS::Components::LIGHT_DIRECTIONAL, { 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, {255, 255, 255, 255},});
+    auto &lightComp = _core->getComponent<ECS::Components::Light>(light);
+    lightComp.initLight(_nbrLight, _ressourcePool.getShader("lighting"));
+    _nbrLight++;
 }
 
 void Rtype::Game::run() {
@@ -419,6 +434,11 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+    _core->addComponent(projectile, ECS::Components::Light{"lighting", ECS::Components::LIGHT_POINT, {entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()}, { 0.0f, 0.0f, 0.0f }, {254, 163, 71, 255}});
+    auto &lightComp = _core->getComponent<ECS::Components::Light>(projectile);
+    lightComp.initLight(_nbrLight, _ressourcePool.getShader("lighting"));
+    _nbrLight++;
+
 }
 
 void Rtype::Game::destroyProjectile(std::size_t entityID)
@@ -457,6 +477,7 @@ void Rtype::Game::update() {
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
     auto backgroundSystem = _core->getSystem<ECS::Systems::SystemBackground>();
     auto AISystem = _core->getSystem<ECS::Systems::UpdateVelocityAI>();
+    auto lightSystem = _core->getSystem<ECS::Systems::SystemLight>();
 
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
@@ -464,6 +485,7 @@ void Rtype::Game::update() {
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     auto backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
     auto AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
+    auto LightEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemLight>());
 
     AISystem->update(_core->getComponents<ECS::Components::Velocity>(),
                      _core->getComponents<ECS::Components::Position>(),
@@ -492,6 +514,11 @@ void Rtype::Game::update() {
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
+
+    lightSystem->update(_core->getComponents<ECS::Components::Position>(),
+                       _core->getComponents<ECS::Components::Light>(),
+                       LightEntities,
+                       _ressourcePool);
 
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
@@ -579,7 +606,9 @@ void Rtype::Game::render() {
                            _core->getComponents<ECS::Components::Render3D>(),
                            renderEntities3D,
                            _ressourcePool,
-                           _camera);
+                           _camera,
+                           _currentShaders);
+
 
     EndDrawing();
 }

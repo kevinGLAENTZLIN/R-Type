@@ -5,6 +5,7 @@
 ** SystemRender3D cpp
 */
 #include "Render3D.hh"
+#include <string>
 
 void ECS::Systems::SystemRender3D::update(
     ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
@@ -13,13 +14,17 @@ void ECS::Systems::SystemRender3D::update(
     ECS::ComponentManager::SparseArray<ECS::Components::Render3D> &renders,
     std::vector<std::size_t> &entities,
     ECS::RessourcePool &ressourcePool,
-    raylib::Camera3D &camera)
+    raylib::Camera3D &camera,
+    const std::string shader)
 {
     raylib::Vector3 rotation = {0.0f, 0.0f, 0.0f};
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
     bool drawHitBox = true;
 
     camera.BeginMode();
+    if (!shader.empty()) {
+        BeginShaderMode(ressourcePool.getShader(shader));
+    }
     for (auto &entity : entities) {
         rotation = raylib::Vector3(0.0f, 0.0f, 0.0f);
         scale = raylib::Vector3(1.0f, 1.0f, 1.0f);
@@ -44,6 +49,9 @@ void ECS::Systems::SystemRender3D::update(
             DrawCubeWires(pos, TmpHitbox.first, 1.0f, TmpHitbox.second, RED);
         }
         render.render(ressourcePool.getModel(path), pos, rotation, scale);
+    }
+    if (!shader.empty()) {
+        EndShaderMode();
     }
     camera.EndMode();
 }

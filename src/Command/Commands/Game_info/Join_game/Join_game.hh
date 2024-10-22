@@ -21,8 +21,8 @@ namespace Rtype
                     Join_game() = default;
                     ~Join_game();
 
-                    void set_client(udp::endpoint endpoint, int gameRoom);
-                    void set_server(udp::endpoint endpoint, std::shared_ptr<Rtype::Game_info> game, std::shared_ptr<Rtype::client_info> client_info);
+                    void set_client(int gameRoom);
+                    void set_server(std::shared_ptr<Rtype::Game_info> game, std::shared_ptr<Rtype::client_info> client_info);
 
                     void execute_client_side();
                     void execute_server_side();

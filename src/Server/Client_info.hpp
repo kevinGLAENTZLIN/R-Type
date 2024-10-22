@@ -161,6 +161,10 @@ namespace Rtype {
              */
             void setAddr(std::string address);
 
+            bool isAlive() const;
+
+            void setAliveStatus(bool is_alive);
+
             /**
              * @brief Adds a command to the client's command history.
              * 
@@ -174,6 +178,7 @@ namespace Rtype {
             template <Utils::FunctionIndex T>
             void pushCmdToHistory(Utils::InfoTypeEnum function_type, T function_index, std::va_list params)
             {
+                Utils::ParametersMap::init_map();
                 int nb_params = Utils::ParametersMap::getNbParameterPerFunctionClient(function_type, function_index);
                 std::string params_type = Utils::ParametersMap::getParameterTypePerFunctionClient(function_type, function_index);
                 std::vector<std::string> vector_params;

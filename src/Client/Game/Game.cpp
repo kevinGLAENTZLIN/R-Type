@@ -470,7 +470,6 @@ void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int
 void Rtype::Game::updateMenu() {
 
     auto clicSystem = _core->getSystem<ECS::Systems::ButtonClickSystem>();
-
     auto buttonEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ButtonClickSystem>());
 
     clicSystem->update(_core->getComponents<ECS::Components::Button>(),
@@ -487,8 +486,8 @@ void Rtype::Game::update() {
 
     auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
     auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
-    auto damageableEntities = _core->getEntitiesWithComponents<ECS::Components::Position, ECS::Components::Hitbox,
-                                                               ECS::Components::Health>();
+//    auto damageableEntities = _core->getEntitiesWithComponents<ECS::Components::Position, ECS::Components::Hitbox,
+//                                                               ECS::Components::Health>();
     auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     auto backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());

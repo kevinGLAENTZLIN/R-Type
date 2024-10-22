@@ -49,7 +49,7 @@ set(LIB_SOURCES
     ./Component/Music/Music.cpp
     ./Component/Rotate/Rotate.cpp
     ./Component/Scale/Scale.cpp
-    ./Component/Volume/Volume.cpp
+    ./Component/Sound/Sound.cpp
     ./Component/Input/Input.cpp
     ./Component/Render2D/Render2D.cpp
     ./Component/Render3D/Render3D.cpp

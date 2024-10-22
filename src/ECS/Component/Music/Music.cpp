@@ -1,9 +1,15 @@
+/*
+** EPITECH PROJECT, 2024
+** R-Type - Components : Music
+** File description:
+** Music Component
+*/
+
 #include "Music.hh"
 
 ECS::Components::Musica::Musica(const std::string &filePath):
     _isPaused(false)
 {
-    InitAudioDevice();
     _musicStream = LoadMusicStream(filePath.c_str());
 }
 
@@ -21,6 +27,7 @@ void ECS::Components::Musica::playFrom(float startTime)
 void ECS::Components::Musica::stop()
 {
     StopMusicStream(_musicStream);
+    UnloadMusicStream(_musicStream);
 }
 
 void ECS::Components::Musica::pause()

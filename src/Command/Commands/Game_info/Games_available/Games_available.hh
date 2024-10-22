@@ -20,8 +20,8 @@ namespace Rtype
                     Games_available() = default;
                     ~Games_available();
 
-                    void set_client(udp::endpoint endpoint);
-                    void set_server(udp::endpoint endpoint, std::vector<std::shared_ptr<Rtype::Game_info>> games);
+                    void set_client();
+                    void set_server(std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> games);
 
                     void execute_client_side();
                     void execute_server_side();
@@ -29,7 +29,7 @@ namespace Rtype
                 protected:
                 private:
                     udp::endpoint _endpoint;
-                    std::vector<std::shared_ptr<Rtype::Game_info>> _games;
+                    std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
             };
         }
     }

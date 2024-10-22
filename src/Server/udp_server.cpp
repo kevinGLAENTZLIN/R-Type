@@ -98,15 +98,15 @@ void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
 {
     if (client_id == -1 || game_room <= 0 || _clients[client_id]->getRoom() != -1)
         return;
-    for (auto game = _games.begin(); game != _games.end(); ++game) {
+    for (auto game = _games->begin(); game != _games->end(); ++game) {
         if (game->get()->getRoomId() == game_room) {
             game->get()->connectPlayer(_clients[client_id]);
             return;
         }
     }
     Game_info tmp(game_room);
-    _games.push_back(std::make_shared<Game_info>(std::move(tmp)));
-    _games.back()->connectPlayer(_clients[client_id]);
+    _games->push_back(std::make_shared<Game_info>(std::move(tmp)));
+    _games->back()->connectPlayer(_clients[client_id]);
 }
 
 void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)

@@ -126,7 +126,7 @@ namespace Rtype {
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
             std::map<int, std::shared_ptr<Rtype::client_info>> _clients;
-            std::vector<std::shared_ptr<Rtype::Game_info>> _games;
+            std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
             Rtype::Command::Command_invoker _commandInvoker;
             Rtype::Command::Factory _commandFactory;
     };

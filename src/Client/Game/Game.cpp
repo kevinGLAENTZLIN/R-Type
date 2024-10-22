@@ -231,6 +231,14 @@ void Rtype::Game::destroyMusic()
         _core->destroyEntity(entity);
 }
 
+void Rtype::Game::destroyEntityText(void)
+{
+    std::vector<std::size_t> entitiesText = _core->getEntitiesWithComponent<ECS::Components::Text>();
+
+    for (auto &entity : entitiesText)
+        _core->destroyEntity(entity);
+}
+
 void Rtype::Game::initOptions(void)
 {
     destroyEntityMenu();
@@ -273,36 +281,132 @@ void Rtype::Game::joinGameID(void)
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
+void Rtype::Game::joinRandomGame(void)
+{
+    destroyEntityMenu();
+    destroyEntityLayer();
+
+    std::size_t back = _core->createEntity();
+    _core->addComponent(back, ECS::Components::Position{400, 200});
+    _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
+    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+        initPlayOption();
+    }});
+    createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
+void Rtype::Game::updatePlayerCountText(void)
+{
+    auto &textComponent = _core->getComponent<ECS::Components::Text>(_playerCountTextEntity);
+    textComponent.setText(std::to_string(_playerCount));
+}
+
+void Rtype::Game::initCreationGame(void)
+{
+    destroyEntityMenu();
+    destroyEntityLayer();
+
+    _playerCount = 2;
+    std::size_t easyButtonEntity = _core->createEntity();
+    _core->addComponent(easyButtonEntity, ECS::Components::Position{100, 200});
+    _core->addComponent(easyButtonEntity, ECS::Components::Text{"Facile", 20, RAYWHITE});
+    _core->addComponent(easyButtonEntity, ECS::Components::Button{Rectangle{100, 190, 300, 60}, true, [this]() {
+        _selectedDifficulty = 0;
+    }});
+
+    std::size_t normalButtonEntity = _core->createEntity();
+    _core->addComponent(normalButtonEntity, ECS::Components::Position{100, 250});
+    _core->addComponent(normalButtonEntity, ECS::Components::Text{"Normal", 20, RAYWHITE});
+    _core->addComponent(normalButtonEntity, ECS::Components::Button{Rectangle{100, 240, 300, 60}, true, [this]() {
+        _selectedDifficulty = 1;
+    }});
+
+    std::size_t hardButtonEntity = _core->createEntity();
+    _core->addComponent(hardButtonEntity, ECS::Components::Position{100, 300});
+    _core->addComponent(hardButtonEntity, ECS::Components::Text{"Difficile", 20, RAYWHITE});
+    _core->addComponent(hardButtonEntity, ECS::Components::Button{Rectangle{100, 290, 300, 60}, true, [this]() {
+        _selectedDifficulty = 2;
+    }});
+
+    std::size_t decreaseButtonEntity = _core->createEntity();
+    _core->addComponent(decreaseButtonEntity, ECS::Components::Position{400, 400});
+    _core->addComponent(decreaseButtonEntity, ECS::Components::Text{"-", 30, RAYWHITE});
+    _core->addComponent(decreaseButtonEntity, ECS::Components::Button{Rectangle{370, 390, 60, 60}, true, [this]() {
+        if (_playerCount > 1) {
+            _playerCount--;
+            updatePlayerCountText();
+        }
+    }});
+
+    std::size_t playerCountTextEntity = _core->createEntity();
+    _playerCountTextEntity = playerCountTextEntity;
+    _core->addComponent(playerCountTextEntity, ECS::Components::Position{460, 400});
+    _core->addComponent(playerCountTextEntity, ECS::Components::Text{std::to_string(_playerCount), 30, RAYWHITE});
+
+    std::size_t increaseButtonEntity = _core->createEntity();
+    _core->addComponent(increaseButtonEntity, ECS::Components::Position{520, 400});
+    _core->addComponent(increaseButtonEntity, ECS::Components::Text{"+", 30, RAYWHITE});
+    _core->addComponent(increaseButtonEntity, ECS::Components::Button{Rectangle{510, 390, 60, 60}, true, [this]() {
+        if (_playerCount < 4) {
+            _playerCount++;
+            updatePlayerCountText();
+        }
+    }});
+
+    std::size_t createButtonEntity = _core->createEntity();
+    _core->addComponent(createButtonEntity, ECS::Components::Position{400, 500});
+    _core->addComponent(createButtonEntity, ECS::Components::Text{"Create Game", 30, RAYWHITE});
+    _core->addComponent(createButtonEntity, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        initGame();
+    }});
+
+    std::size_t back = _core->createEntity();
+    _core->addComponent(back, ECS::Components::Position{400, 600});
+    _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
+    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 590, 300, 60}, true, [this]() {
+        initPlayOption();
+    }});
+    createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
 void Rtype::Game::initPlayOption(void)
 {
     destroyEntityMenu();
     destroyEntityLayer();
+    destroyEntityText();
 
     std::size_t createGame = _core->createEntity();
     _core->addComponent(createGame, ECS::Components::Position{400, 200});
     _core->addComponent(createGame, ECS::Components::Text{"Create Game", 30, RAYWHITE});
     _core->addComponent(createGame, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
-        initGame();
+        initCreationGame();
+    }});
+
+    std::size_t joinRandomGameEntity = _core->createEntity();
+    _core->addComponent(joinRandomGameEntity, ECS::Components::Position{400, 300});
+    _core->addComponent(joinRandomGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
+    _core->addComponent(joinRandomGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+        joinRandomGame();
     }});
 
     std::size_t joinGameEntity = _core->createEntity();
-    _core->addComponent(joinGameEntity, ECS::Components::Position{400, 300});
-    _core->addComponent(joinGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
-    _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+    _core->addComponent(joinGameEntity, ECS::Components::Position{400, 400});
+    _core->addComponent(joinGameEntity, ECS::Components::Text{"Search available game", 30, RAYWHITE});
+    _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
         joinGame();
     }});
 
     std::size_t joinGameId = _core->createEntity();
-    _core->addComponent(joinGameId, ECS::Components::Position{400, 400});
-    _core->addComponent(joinGameId, ECS::Components::Text{"Join Game by ID", 30, RAYWHITE});
-    _core->addComponent(joinGameId, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
+    _core->addComponent(joinGameId, ECS::Components::Position{400, 500});
+    _core->addComponent(joinGameId, ECS::Components::Text{"Join friends game", 30, RAYWHITE});
+    _core->addComponent(joinGameId, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
         joinGameID();
     }});
 
     std::size_t back = _core->createEntity();
-        _core->addComponent(back, ECS::Components::Position{400, 500});
+        _core->addComponent(back, ECS::Components::Position{400, 600});
         _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
-        _core->addComponent(back, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        _core->addComponent(back, ECS::Components::Button{Rectangle{350, 590, 300, 60}, true, [this]() {
         initMenu();
     }});
     createBackgroundLayers(0.f, "bg_menu", 1);
@@ -361,6 +465,7 @@ void Rtype::Game::run() {
                 updateMusic("menu");
                 updateMenu();
                 renderMenu();
+                std::cout << "Level choose -> " << _selectedDifficulty << std::endl;
                 break;
             case PLAY:
                 updateMusic("stage1");

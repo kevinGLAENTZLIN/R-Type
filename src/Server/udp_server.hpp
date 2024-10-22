@@ -17,6 +17,7 @@
 #include <map>
 #include <string>
 #include <boost/asio.hpp>
+#include <unordered_map>
 #include "Client_info.hpp"
 #include "Game_info.hh"
 #include "../Utils/ParametersMap/ParametersMap.hpp"
@@ -119,13 +120,18 @@ namespace Rtype {
                     return nullptr;
             }
 
-            void handleResponse(Utils::Network::Response clientResponse); //! Temporary: will be probably refactor by a kind of factory of functions 
-            void handleGameInfo(Utils::Network::Response clientResponse);
-            void handlePlayer(Utils::Network::Response clientResponse) {}; // temp empty
-            void handleEnemy(Utils::Network::Response clientResponse) {}; // temp empty
-            void handleBoss(Utils::Network::Response clientResponse) {}; // temp empty
-            void handlePowerUp(Utils::Network::Response clientResponse) {}; // temp empty
-            void handleProjectile(Utils::Network::Response clientResponse) {}; // temp empty
+            void handleResponse(Utils::Network::Response clientResponse);
+
+            void setHandleMaps();
+            void setHandleGameInfoMap();
+            void setHandlePlayerMap();
+            void setHandlePowerUpMap();
+            void setHandleProjectileMap();
+
+            std::unordered_map<Utils::GameInfoEnum, std::function<void(Utils::Network::Response)>> _handleGameInfoMap;
+            std::unordered_map<Utils::PlayerEnum, std::function<void(Utils::Network::Response)>> _handlePlayerMap;
+            std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
+            std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
 
             // ! To Refactor
             /**
@@ -305,5 +311,6 @@ namespace Rtype {
             std::vector<std::shared_ptr<Rtype::Game_info>> _games;
             Rtype::Command::Command_invoker _commandInvoker;
             Rtype::Command::Factory _commandFactory;
+            
     };
 }

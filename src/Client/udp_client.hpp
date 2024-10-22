@@ -82,13 +82,17 @@ namespace Rtype {
         void setHandleMaps();
         void setHandleGameInfoMap();
         void setHandlePlayerMap();
+        void setHandleEnemyMap();
         void setHandlePowerUpMap();
         void setHandleProjectileMap();
+        void setHandleBossMap();
 
         std::unordered_map<Utils::GameInfoEnum, std::function<void(Utils::Network::Response)>> _handleGameInfoMap;
         std::unordered_map<Utils::PlayerEnum, std::function<void(Utils::Network::Response)>> _handlePlayerMap;
         std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
         std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
+        std::unordered_map<Utils::EnemyEnum, std::function<void(Utils::Network::Response)>> _handleEnemyMap;
+        std::unordered_map<Utils::BossEnum, std::function<void(Utils::Network::Response)>> _handleBossMap;
 
         /**
          * @brief Run the IO context.

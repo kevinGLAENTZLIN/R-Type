@@ -101,20 +101,24 @@ void Rtype::Game_info::connectPlayer(std::shared_ptr<Rtype::client_info> player)
 {
 	if (!isGameAvailable())
 		return;
-	_players.push_back(player);
+	_players[player->getId()] = player;
 	player->setRoom(_id);
 	player->setX(42);
 	player->setY(42);
 }
 
+const std::map<int, std::shared_ptr<Rtype::client_info>>& Rtype::Game_info::getPlayers(void) const {
+    return _players;
+}
+
 void Rtype::Game_info::disconnectPlayer(int id)
 {
 	for (auto i_player = _players.begin(); i_player != _players.end(); i_player++) {
-		Rtype::client_info player = *i_player.base()->get();
-		if (id == player.getId()) {
-			player.setRoom(-1);
-			player.setX(0);
-			player.setY(0);
+		std::shared_ptr<Rtype::client_info> player = i_player->second;
+		if (id == player->getId()) {
+			player->setRoom(-1);
+			player->setX(0);
+			player->setY(0);
 			_players.erase(i_player);
 			return;
 		}

@@ -71,14 +71,36 @@ namespace Rtype {
          * @param clientResponse The response from the server.
          */
         void handleResponse(Utils::Network::Response clientResponse);
-        void handleGameInfo(Utils::Network::Response clientResponse);
-        void handlePlayer(Utils::Network::Response clientResponse) {}; //temp empty
-        void handleEnemy(Utils::Network::Response clientResponse) {}; //temp empty
-        void handleBoss(Utils::Network::Response clientResponse) {}; //temp empty
-        void handlePowerUp(Utils::Network::Response clientResponse) {}; //temp empty
-        void handleProjectile(Utils::Network::Response clientResponse) {}; //temp empty
 
         void connectClient();
+
+        template <typename T>
+        std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
+            static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
+
+            T* derived = dynamic_cast<T*>(base.get());
+            if (derived) {
+                base.release();
+                return std::unique_ptr<T>(derived);
+            } else
+                return nullptr;
+        }
+
+    
+        void setHandleMaps();
+        void setHandleGameInfoMap();
+        void setHandlePlayerMap();
+        void setHandleEnemyMap();
+        void setHandlePowerUpMap();
+        void setHandleProjectileMap();
+        void setHandleBossMap();
+
+        std::unordered_map<Utils::GameInfoEnum, std::function<void(Utils::Network::Response)>> _handleGameInfoMap;
+        std::unordered_map<Utils::PlayerEnum, std::function<void(Utils::Network::Response)>> _handlePlayerMap;
+        std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
+        std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
+        std::unordered_map<Utils::EnemyEnum, std::function<void(Utils::Network::Response)>> _handleEnemyMap;
+        std::unordered_map<Utils::BossEnum, std::function<void(Utils::Network::Response)>> _handleBossMap;
 
         /**
          * @brief Run the IO context.

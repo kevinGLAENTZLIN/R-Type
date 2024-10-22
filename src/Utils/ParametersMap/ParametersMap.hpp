@@ -140,7 +140,7 @@ namespace Utils
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpDisappear)}, {"", ""}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpAttack)}, {"", ""}},
 
-                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"iiii", "iiiiii"}},
+                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"iiiiii", "iiiiii"}},
                     {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileHit)}, {"", "i"}},
                 };
             }

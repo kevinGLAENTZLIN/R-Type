@@ -109,6 +109,140 @@ void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
     _games->back()->connectPlayer(_clients[client_id]);
 }
 
+void Rtype::udpServer::setHandleMaps() {
+    setHandleGameInfoMap();
+    setHandlePlayerMap();
+    setHandlePowerUpMap();
+    setHandleProjectileMap();
+}
+
+void Rtype::udpServer::setHandleGameInfoMap() {
+    _handleGameInfoMap[Utils::GameInfoEnum::NewClientConnected] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)));
+        cmd->set_server(_senderEndpoint, _clients);
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));  
+    };
+
+    _handleGameInfoMap[Utils::GameInfoEnum::CreateGame] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Create_game>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::CreateGame)));
+        cmd->set_server(_senderEndpoint, _games);
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handleGameInfoMap[Utils::GameInfoEnum::GamesAvailable] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Games_available>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::GamesAvailable)));
+        cmd->set_server(_senderEndpoint, _games);
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handleGameInfoMap[Utils::GameInfoEnum::SafetyCheck] = [this](Utils::Network::Response clientResponse) {
+        std::cerr << "SafetyCheck" << std::endl;
+    };
+
+    _handleGameInfoMap[Utils::GameInfoEnum::JoinGame] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Join_game>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)));
+        cmd->set_server(_senderEndpoint, _games[clientResponse.PopParam<int>()], _clients[get_sender_client_id()]);
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handleGameInfoMap[Utils::GameInfoEnum::LevelComplete] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::GameInfo::Level_complete> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Level_complete>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::LevelComplete)));
+        cmd->set_server(_senderEndpoint, _games[clientResponse.PopParam<int>()]);
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+}
+
+void Rtype::udpServer::setHandlePlayerMap() {
+    _handlePlayerMap[Utils::PlayerEnum::PlayerSpawnOnGame] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Player::Spawn> cmd = convertACommandToCommand<Rtype::Command::Player::Spawn>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerSpawnOnGame)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+
+        cmd->set_server(_games[gameID]->getPlayers(),get_sender_client_id(), _clients[get_sender_client_id()]->getX(), _clients[get_sender_client_id()]->getY());
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handlePlayerMap[Utils::PlayerEnum::PlayerDie] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Player::Die> cmd = convertACommandToCommand<Rtype::Command::Player::Die>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerDie)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+
+        cmd->set_server(_games[gameID]->getPlayers(),get_sender_client_id());
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handlePlayerMap[Utils::PlayerEnum::PlayerMove] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Player::Move> cmd = convertACommandToCommand<Rtype::Command::Player::Move>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+
+        cmd->set_server(_games[gameID]->getPlayers(),get_sender_client_id(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>());
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handlePlayerMap[Utils::PlayerEnum::PlayerAttack] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Player::Attack> cmd = convertACommandToCommand<Rtype::Command::Player::Attack>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerAttack)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+
+        cmd->set_server(_games[gameID]->getPlayers(), clientResponse.PopParam<int>());
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handlePlayerMap[Utils::PlayerEnum::PlayerGotPowerUp] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Player::Power_up> cmd = convertACommandToCommand<Rtype::Command::Player::Power_up>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerGotPowerUp)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+
+
+        cmd->set_server(_games[gameID]->getPlayers(), get_sender_client_id(), clientResponse.PopParam<int>());
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handlePlayerMap[Utils::PlayerEnum::PlayerHitAWall] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Player::Hit_wall> cmd = convertACommandToCommand<Rtype::Command::Player::Hit_wall>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerHitAWall)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+
+        cmd->set_server(_games[gameID]->getPlayers(), get_sender_client_id());
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handlePlayerMap[Utils::PlayerEnum::PlayerScore] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Player::Score> cmd = convertACommandToCommand<Rtype::Command::Player::Score>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerScore)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+        
+        std::cerr <<  "Hardcoded score" << std::endl;
+        cmd->set_server(_games[gameID]->getPlayers(), 4242);
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+}
+
+void Rtype::udpServer::setHandlePowerUpMap() {
+    std::cerr << "PowerUpNotImplemented" << std::endl;
+}
+
+void Rtype::udpServer::setHandleProjectileMap() {
+    _handleProjectileMap[Utils::ProjectileEnum::ProjectileFired] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = convertACommandToCommand<Rtype::Command::Projectile::Fired>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Projectile), static_cast<uint8_t>(Utils::ProjectileEnum::ProjectileFired)));
+        int gameID = _clients[get_sender_client_id()]->getRoom();
+
+        cmd->set_server(_games[gameID]->getPlayers(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>());
+        cmd->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
+        _commandInvoker.addCommand(std::move(cmd));
+    };
+
+    _handleProjectileMap[Utils::ProjectileEnum::ProjectileHit] = [this](Utils::Network::Response clientResponse) {
+        (void)clientResponse;
+        std::cerr << "ProjectileHitNotImplemented" << std::endl;
+    };
+}
+
 void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
@@ -116,30 +250,24 @@ void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
     switch (cmd_category)
     {
     case Utils::InfoTypeEnum::GameInfo:
-        handleGameInfo(clientResponse);
+        _handleGameInfoMap[static_cast<Utils::GameInfoEnum>(clientResponse.GetInfoFunction())](clientResponse);
         break;
+    case Utils::InfoTypeEnum::Player:
+        _handlePlayerMap[static_cast<Utils::PlayerEnum>(clientResponse.GetInfoFunction())](clientResponse);
+        break;
+    case Utils::InfoTypeEnum::PowerUp:
+        _handlePowerUpMap[static_cast<Utils::PowerUpEnum>(clientResponse.GetInfoFunction())](clientResponse);
+        break;
+    case Utils::InfoTypeEnum::Projectile:
+        _handleProjectileMap[static_cast<Utils::ProjectileEnum>(clientResponse.GetInfoFunction())](clientResponse);
+        break;
+    case Utils::InfoTypeEnum::Enemy:
+        std::cerr << "EnemyNotImplemented" << std::endl;
+        break;
+    case Utils::InfoTypeEnum::Boss:
+        std::cerr << "BossNotImplemented" << std::endl;
     default:
-        break;
-    }
-}
-
-void Rtype::udpServer::handleGameInfo(Utils::Network::Response clientResponse)
-{
-    Utils::GameInfoEnum cmd_index = static_cast<Utils::GameInfoEnum>(clientResponse.GetInfoFunction());
-
-    switch (cmd_index)
-    {
-    case Utils::GameInfoEnum::NewClientConnected :
-        CONSOLE_INFO("New client is connecting: ", "");
-        std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd_connection = convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(cmd_index)));
-        cmd_connection->set_server(_senderEndpoint, _clients);
-        cmd_connection->setCommonPart(_socket, _senderEndpoint, 0);
-        _commandInvoker.addCommand(std::move(cmd_connection));
-
-        // std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd_join_game = convertACommandToCommand<Rtype::Command::GameInfo::Join_game>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)));
-        // cmd_join_game->set_server(_senderEndpoint, );
-        // cmd_join_game->setCommonPart(_socket, _senderEndpoint, _clients[get_sender_client_id()]->getAckToSend());
-        // _commandInvoker.addCommand(std::move(cmd_join_game));
+        std::cerr << "Unknown command" << std::endl;
         break;
     }
 }

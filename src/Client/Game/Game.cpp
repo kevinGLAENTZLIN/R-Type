@@ -48,6 +48,8 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::AI>();
     _core->registerComponent<ECS::Components::Text>();
     _core->registerComponent<ECS::Components::Button>();
+    _core->registerComponent<ECS::Components::Musica>();
+    _core->registerComponent<ECS::Components::SoundEffect>();
 
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
@@ -141,6 +143,12 @@ Rtype::Game::Game()
     buttonClickSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
+
+    InitAudioDevice();
+    createMusic("./resources/stage1/stage1.mp3", "stage1");
+    createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
+    createSound("./resources/blasterLego/blasterLego.mp3", "blasterLego");
+    createSound("./resources/breakLego/breakLego.mp3", "breakLego");
 }
 
 Rtype::Game::~Game()
@@ -165,6 +173,7 @@ void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float po
 void Rtype::Game::movePlayer(int id, float x, float y)
 {
     auto &velocity = _core->getComponent<ECS::Components::Velocity>(_mapID[id]);
+
     velocity.setX(x);
     velocity.setY(y);
 }
@@ -173,6 +182,7 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t player = _core->createEntity();
+
     _core->addComponent(player, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(player, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Scale{1.0f});
@@ -186,6 +196,7 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
     std::size_t otherPlayer = _core->createEntity();
+
     _core->addComponent(otherPlayer, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(otherPlayer, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
     _core->addComponent(otherPlayer, ECS::Components::Scale{1.0f});
@@ -209,6 +220,14 @@ void Rtype::Game::destroyEntityLayer(void)
     std::vector<std::size_t> entitiesLayer = _core->getEntitiesWithComponent<ECS::Components::Background>();
 
     for (auto &entity : entitiesLayer)
+        _core->destroyEntity(entity);
+}
+
+void Rtype::Game::destroyMusic()
+{
+    std::vector<std::size_t> entitiesMusic = _core->getEntitiesWithComponent<ECS::Components::Musica>();
+
+    for (auto &entity : entitiesMusic)
         _core->destroyEntity(entity);
 }
 
@@ -293,6 +312,7 @@ void Rtype::Game::initMenu(void)
 {
     destroyEntityMenu();
     destroyEntityLayer();
+    playMusic("menu");
 
     std::size_t startGameButton = _core->createEntity();
     _core->addComponent(startGameButton, ECS::Components::Position{400, 200});
@@ -319,8 +339,11 @@ void Rtype::Game::initMenu(void)
 
 void Rtype::Game::initGame(void)
 {
+    stopMusic("menu");
     destroyEntityMenu();
     destroyEntityLayer();
+    destroyMusic();
+    playMusic("stage1");
     createBackgroundLayers(2.f , "background_layer0", 3);
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
@@ -335,15 +358,18 @@ void Rtype::Game::run() {
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
             case MENU:
+                updateMusic("menu");
                 updateMenu();
                 renderMenu();
                 break;
             case PLAY:
+                updateMusic("stage1");
                 update();
                 render();
                 break;
         }
     }
+    CloseAudioDevice();
 }
 
 std::vector<std::size_t> getAllInputs() {
@@ -419,6 +445,7 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+    playSound("blasterLego");
 }
 
 void Rtype::Game::destroyProjectile(std::size_t entityID)
@@ -439,6 +466,8 @@ void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int
         _core->addComponent(background, ECS::Components::Background{width, speed});
     }
 }
+
+//FUNCTIONS TO UPDATE GAME AND MENU -------------------------------------------
 
 void Rtype::Game::updateMenu() {
 
@@ -503,6 +532,8 @@ void Rtype::Game::update() {
     if (false)
         _camera.Update(CAMERA_FREE);
 }
+
+//FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
 
 void Rtype::Game::renderMenu() {
     BeginDrawing();
@@ -582,4 +613,65 @@ void Rtype::Game::render() {
                            _camera);
 
     EndDrawing();
+}
+
+//FUNCTIONS TO HANDLE MUSIC AND SOUND -----------------------------------------
+
+
+void Rtype::Game::createMusic(std::string path, std::string name) {
+    std::size_t musicEntity = _core->createEntity();
+    ECS::Components::Musica musicaComponent{path};
+
+    _core->addComponent(musicEntity, musicaComponent);
+    _musicMap.emplace(name, std::move(musicaComponent));
+}
+
+void Rtype::Game::createSound(std::string path, std::string name) {
+    std::size_t soundEntity = _core->createEntity();
+    ECS::Components::SoundEffect soundComponent{path};
+
+    _core->addComponent(soundEntity, soundComponent);
+    _soundMap.emplace(name, std::move(soundComponent));
+}
+
+void Rtype::Game::updateMusic(std::string name) {
+    auto it = _musicMap.find(name);
+
+    if (it != _musicMap.end()) {
+        it->second.update();
+    }
+}
+
+void Rtype::Game::playFromMusic(std::string name, float sec) {
+    auto it = _musicMap.find(name);
+
+    if (it != _musicMap.end()) {
+        it->second.playFrom(sec);
+    }
+}
+
+void Rtype::Game::stopMusic(std::string name) {
+    auto it = _musicMap.find(name);
+
+    if (it != _musicMap.end()) {
+        it->second.stop();
+    }
+}
+
+void Rtype::Game::playMusic(std::string name) {
+    auto it = _musicMap.find(name);
+
+    if (it != _musicMap.end()) {
+        it->second.play();
+    }
+}
+
+void Rtype::Game::playSound(std::string name) {
+    auto it = _soundMap.find(name);
+
+    if (it != _soundMap.end()) {
+        it->second.play();
+    } else {
+        std::cerr << "Sound not found" << std::endl;
+    }
 }

@@ -28,7 +28,6 @@ namespace Rtype
 
                 protected:
                 private:
-                    udp::endpoint _endpoint;
                     std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
             };
         }

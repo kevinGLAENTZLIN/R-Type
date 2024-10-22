@@ -30,7 +30,6 @@ namespace Rtype
                 private:
                     int getRoomIdAvailable(bool set_seed) const;
 
-                    udp::endpoint _endpoint;
                     std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
             };
         }

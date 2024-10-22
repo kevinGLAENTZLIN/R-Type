@@ -31,7 +31,8 @@ namespace Rtype
             void computeGame(void);
             void computeTick(void);
 
-            int gameStatus(void);
+            bool gameStatus(void);
+            void goNextLevel(void);
             int getLevel(void);
             int getRoomId(void);
             bool isGameAvailable(void);

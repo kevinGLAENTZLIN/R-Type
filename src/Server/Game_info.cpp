@@ -77,9 +77,14 @@ bool Rtype::Game_info::isGameAvailable(void)
 	return !(_players.max_size() == _nbMaxPlayer);
 }
 
-int Rtype::Game_info::gameStatus(void)
+bool Rtype::Game_info::gameStatus(void)
 {
-	return 0;
+	return true;
+}
+
+void Rtype::Game_info::goNextLevel(void)
+{
+	_level += 1;
 }
 
 int Rtype::Game_info::getLevel(void)

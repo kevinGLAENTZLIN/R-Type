@@ -1,44 +1,48 @@
 #!/bin/bash
 
-# Couleurs pour les messages
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Fichier pour stocker le chemin vcpkg
 VCPKG_PATH_FILE=".vcpkg_path"
 
-# Fonction pour afficher l'aide
 show_help() {
-    echo -e "${BLUE}Usage: ./build.sh [Rule]${NC}"
+    echo -e "${BLUE}Usage: ./build.sh [rule]${NC}"
     echo "Rules:"
-    echo -e "  ${YELLOW}SETUP_VCPKG${NC} - Setup vcpkg path"
-    echo -e "  ${YELLOW}Init${NC}        - Initialize build directory and setup CMake"
-    echo -e "  ${YELLOW}Reset${NC}       - Delete build directory and reinitialize"
-    echo -e "  ${YELLOW}Release${NC}     - Configure CMake in Release mode"
-    echo -e "  ${YELLOW}Debug${NC}       - Configure CMake in Debug mode"
-    echo -e "  ${YELLOW}Build${NC}       - Build the project"
-    echo -e "  ${YELLOW}Test${NC}        - Test the project"
-    echo -e "  ${YELLOW}Help${NC}        - Show this help message"
-    echo -e "  ${YELLOW}Clean${NC}       - Clean binaries, testing folder, and Debug folders"
+    echo -e "  ${YELLOW}setup_vcpkg${NC} - Setup vcpkg"
+    echo -e "  ${YELLOW}init${NC}        - Initialize build directory and setup CMake"
+    echo -e "  ${YELLOW}reset${NC}       - Delete build directory and reinitialize"
+    echo -e "  ${YELLOW}release${NC}     - Configure CMake in Release mode"
+    echo -e "  ${YELLOW}debug${NC}       - Configure CMake in Debug mode"
+    echo -e "  ${YELLOW}build${NC}       - Build the project"
+    echo -e "  ${YELLOW}test${NC}        - Test the project"
+    echo -e "  ${YELLOW}lint${NC}        - Run Clang-Tidy on the project"
+    echo -e "  ${YELLOW}help${NC}        - Show this help message"
+    echo -e "  ${YELLOW}clean${NC}       - Clean binaries, testing folder, and Debug folders"
+    echo -e "  ${YELLOW}full_build${NC}  - Run setup_vcpkg, init, release, and build in sequence"
 }
 
-# Fonction pour vérifier si vcpkg est configuré
 check_vcpkg_setup() {
     if [ ! -f "$VCPKG_PATH_FILE" ]; then
-        echo -e "${RED}Error: vcpkg path not set. Please run './build.sh SETUP_VCPKG' first.${NC}"
+        echo -e "${RED}Error: vcpkg path not set. Please run './build.sh setup_vcpkg' first.${NC}"
         exit 1
     fi
 }
 
-# Fonction pour configurer vcpkg
 setup_vcpkg() {
     echo -e "${BLUE}Starting vcpkg setup...${NC}"
-    echo -e "${YELLOW}Please enter the path to your vcpkg directory:${NC}"
-    read vcpkg_dir
-    vcpkg_cmake_path="${vcpkg_dir}/scripts/buildsystems/vcpkg.cmake"
+    if [ ! -d "vcpkg" ]; then
+        echo -e "${YELLOW}vcpkg directory not found. Cloning vcpkg...${NC}"
+        git clone https://github.com/microsoft/vcpkg.git
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Error: Failed to clone vcpkg repository.${NC}"
+            exit 1
+        fi
+    fi
+
+    vcpkg_cmake_path="vcpkg/scripts/buildsystems/vcpkg.cmake"
 
     if [ -f "$vcpkg_cmake_path" ]; then
         echo "$vcpkg_cmake_path" > "$VCPKG_PATH_FILE"
@@ -50,7 +54,6 @@ setup_vcpkg() {
     echo -e "${BLUE}vcpkg setup completed.${NC}"
 }
 
-# Fonction pour initialiser le projet
 init_project() {
     echo -e "${BLUE}Initializing project...${NC}"
     check_vcpkg_setup
@@ -60,11 +63,14 @@ init_project() {
     cd build
     echo -e "${YELLOW}Running CMake...${NC}"
     cmake .. -DCMAKE_TOOLCHAIN_FILE="$vcpkg_path" -DVCPKG_MANIFEST_MODE=ON
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: CMake configuration failed.${NC}"
+        exit 1
+    fi
     cd ..
     echo -e "${GREEN}Project initialized successfully.${NC}"
 }
 
-# Fonction pour réinitialiser le projet
 reset_project() {
     echo -e "${BLUE}Resetting project...${NC}"
     echo -e "${YELLOW}Removing build directory...${NC}"
@@ -74,7 +80,6 @@ reset_project() {
     echo -e "${GREEN}Project reset completed.${NC}"
 }
 
-# Fonction pour configurer en mode Release
 configure_release() {
     echo -e "${BLUE}Configuring project in Release mode...${NC}"
     check_vcpkg_setup
@@ -82,11 +87,14 @@ configure_release() {
     cd build
     echo -e "${YELLOW}Running CMake in Release mode...${NC}"
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$vcpkg_path" -DVCPKG_MANIFEST_MODE=ON ..
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: CMake configuration in Release mode failed.${NC}"
+        exit 1
+    fi
     cd ..
     echo -e "${GREEN}Project configured in Release mode.${NC}"
 }
 
-# Fonction pour configurer en mode Debug
 configure_debug() {
     echo -e "${BLUE}Configuring project in Debug mode...${NC}"
     check_vcpkg_setup
@@ -94,17 +102,24 @@ configure_debug() {
     cd build
     echo -e "${YELLOW}Running CMake in Debug mode...${NC}"
     cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE="$vcpkg_path" -DVCPKG_MANIFEST_MODE=ON ..
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: CMake configuration in Debug mode failed.${NC}"
+        exit 1
+    fi
     cd ..
     echo -e "${GREEN}Project configured in Debug mode.${NC}"
 }
 
-# Fonction pour builder le projet
 build_project() {
     echo -e "${BLUE}Building project...${NC}"
     check_vcpkg_setup
     cd build
     echo -e "${YELLOW}Running CMake build...${NC}"
     cmake --build .
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: Build failed.${NC}"
+        exit 1
+    fi
     cd ..
     echo -e "${GREEN}Project build completed.${NC}"
 }
@@ -115,12 +130,16 @@ test_project() {
     cd build || exit 1
     echo -e "${YELLOW}Running CMake build...${NC}"
     cmake --build .
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: Build failed.${NC}"
+        exit 1
+    fi
     cd .. || exit 1
     echo -e "${YELLOW}Testing project...${NC}"
     cd build || exit 1
     ctest --rerun-failed --output-on-failure
     if [ $? -ne 0 ]; then
-        echo -e "${RED}Error with testing !${NC}"
+        echo -e "${RED}Error: Testing failed.${NC}"
         exit 1
     fi
     echo -e "${GREEN}Testing project completed.${NC}"
@@ -128,58 +147,78 @@ test_project() {
 
 clean_project() {
     echo -e "${BLUE}Cleaning project...${NC}"
-
-    # Supprimer le dossier testing à la racine
     echo -e "${YELLOW}Removing testing directory...${NC}"
     rm -rf Testing
-
-    # Supprimer les dossiers Debug dans src
     echo -e "${YELLOW}Removing Debug folders in src...${NC}"
     find src -type d -name "Debug" -exec rm -rf {} +
-
-    # Supprimer les binaires spécifiques
     echo -e "${YELLOW}Removing specific binaries...${NC}"
     rm -rf r-type_client
     rm -rf r-type_server
     rm -rf ./lib/*
-
     echo -e "${GREEN}Project cleaned successfully.${NC}"
 }
 
-# Vérification des arguments
+run_clang_tidy() {
+    echo -e "${BLUE}Running Clang-Tidy...${NC}"
+    check_vcpkg_setup
+    cd build || exit 1
+    echo -e "${YELLOW}Running Clang-Tidy on source files...${NC}"
+    cmake --build . --target clang-tidy
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error: Clang-Tidy failed.${NC}"
+        exit 1
+    fi
+    cd ..
+    echo -e "${GREEN}Clang-Tidy completed successfully.${NC}"
+}
+
+full_build() {
+    echo -e "${BLUE}Starting full build process...${NC}"
+    setup_vcpkg
+    init_project
+    configure_release
+    build_project
+    echo -e "${GREEN}Full build process completed successfully.${NC}"
+}
+
 if [ $# -eq 0 ]; then
     echo -e "${RED}Error: No rule specified.${NC}"
     show_help
     exit 1
 fi
 
-# Traitement de la règle spécifiée
 case $1 in
-    SETUP_VCPKG)
+    setup_vcpkg)
         setup_vcpkg
         ;;
-    Init)
+    init)
         init_project
         ;;
-    Reset)
+    reset)
         reset_project
         ;;
-    Release)
+    release)
         configure_release
         ;;
-    Debug)
+    debug)
         configure_debug
         ;;
-    Build)
+    build)
         build_project
         ;;
-    Test)
+    test)
         test_project
         ;;
-    Clean)
+    lint)
+        run_clang_tidy
+        ;;
+    clean)
         clean_project
         ;;
-    Help)
+    full_build)
+        full_build
+        ;;
+    help)
         show_help
         ;;
     *)

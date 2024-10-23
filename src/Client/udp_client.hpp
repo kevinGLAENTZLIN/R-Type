@@ -18,7 +18,7 @@
 #include <vector>
 #include <array>
 
-#include "./Network/Network.hpp"
+#include "../Utils/Network/Network.hpp"
 // #include "../Utils/ParametersMap/ParametersMap.hpp"
 // #include "../Command/Factory/Factory.hh"
 // #include "../Command/Invoker/Command_invoker.hh"

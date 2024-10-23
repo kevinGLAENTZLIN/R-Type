@@ -18,6 +18,7 @@ namespace Rtype
 {
     class Network {
         public:
+            Network(boost::asio::io_service& io_service, short port, std::string type);
             Network(boost::asio::io_context io_context, const std::string &serverAddr, const int serverPort, std::string type);
             ~Network();
 
@@ -34,6 +35,7 @@ namespace Rtype
 
             std::shared_ptr<udp::socket> getSocket();
 
+            void setSenderEndpoint(udp::endpoint endpoint);
             udp::endpoint getSenderEndpoint();
 
             template <typename T>
@@ -52,7 +54,7 @@ namespace Rtype
             int _ackToSend;
             int _ackToReceive;
             std::shared_ptr<udp::socket> _socket;
-            udp::endpoint _serverEndpoint;
+            udp::endpoint _endpoint;
             Rtype::Command::Command_invoker _commandInvoker;
             Rtype::Command::Factory _commandFactory;
     };

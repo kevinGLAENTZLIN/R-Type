@@ -22,6 +22,7 @@
 #include "Game_info.hh"
 #include "../Utils/ParametersMap/ParametersMap.hpp"
 #include "../Utils/Response/Response.hpp"
+#include "../Utils/Network/Network.hpp"
 #include "../Command/Factory/Factory.hh"
 #include "../Command/Invoker/Command_invoker.hh"
 
@@ -127,14 +128,15 @@ namespace Rtype {
             std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
             std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
 
-            std::shared_ptr<udp::socket> _socket;
-            udp::endpoint _senderEndpoint;
+            Rtype::Network _network;
+            // std::shared_ptr<udp::socket> _socket;
+            // udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
             std::map<int, std::shared_ptr<Rtype::client_info>> _clients;
             std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
-            Rtype::Command::Command_invoker _commandInvoker;
-            Rtype::Command::Factory _commandFactory;
+            // Rtype::Command::Command_invoker _commandInvoker;
+            // Rtype::Command::Factory _commandFactory;
             
     };
 }

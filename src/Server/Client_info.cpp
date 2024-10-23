@@ -111,3 +111,14 @@ void Rtype::client_info::setAddr(std::string address)
 {
 	_addr = address;
 }
+
+bool Rtype::client_info::isAlive() const
+{
+	return _isAlive;
+}
+
+void Rtype::client_info::setAliveStatus(bool is_alive)
+{
+	_isAlive = is_alive;
+}
+

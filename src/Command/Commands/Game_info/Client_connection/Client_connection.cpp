@@ -7,14 +7,12 @@
 
 #include "Client_connection.hh"
 
-void Rtype::Command::GameInfo::Client_connection::set_client(udp::endpoint endpoint)
+void Rtype::Command::GameInfo::Client_connection::set_client()
 {
-	_endpoint = endpoint;
 }
 
-void Rtype::Command::GameInfo::Client_connection::set_server(udp::endpoint endpoint, std::map<int, std::shared_ptr<Rtype::client_info>> &clients)
+void Rtype::Command::GameInfo::Client_connection::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> &clients)
 {
-	_endpoint = endpoint;
     _clients = clients;
 }
 

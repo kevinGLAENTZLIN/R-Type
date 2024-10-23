@@ -1,4 +1,4 @@
-/*
+    /*
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
@@ -31,10 +31,12 @@ namespace Rtype
             void computeGame(void);
             void computeTick(void);
 
-            int gameStatus(void);
+            bool gameStatus(void);
+            void goNextLevel(void);
             int getLevel(void);
             int getRoomId(void);
             bool isGameAvailable(void);
+            const std::map<int, std::shared_ptr<Rtype::client_info>> &getPlayers(void) const;
 
             void connectPlayer(std::shared_ptr<Rtype::client_info> player);
             void disconnectPlayer(int id);
@@ -46,7 +48,7 @@ namespace Rtype
             int _nbMaxPlayer;
             unsigned int _tick;
             std::thread _tickThread;
-            std::vector<std::shared_ptr<Rtype::client_info>> _players;
+            std::map<int, std::shared_ptr<Rtype::client_info>> _players;
 
     };
 }

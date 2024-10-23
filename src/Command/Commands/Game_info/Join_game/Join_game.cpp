@@ -7,15 +7,13 @@
 
 #include "Join_game.hh"
 
-void Rtype::Command::GameInfo::Join_game::set_client(udp::endpoint endpoint, int gameRoom)
+void Rtype::Command::GameInfo::Join_game::set_client(int gameRoom)
 {
-    _endpoint = endpoint;
     _gameRoom = gameRoom;
 }
 
-void Rtype::Command::GameInfo::Join_game::set_server(udp::endpoint endpoint, std::shared_ptr<Rtype::Game_info> game, std::shared_ptr<Rtype::client_info> client_info)
+void Rtype::Command::GameInfo::Join_game::set_server(std::shared_ptr<Rtype::Game_info> game, std::shared_ptr<Rtype::client_info> client_info)
 {
-    _endpoint = endpoint;
     _gameInfo = game;
     _clientInfo = client_info;
 }
@@ -26,9 +24,17 @@ Rtype::Command::GameInfo::Join_game::~Join_game()
 
 void Rtype::Command::GameInfo::Join_game::execute_client_side()
 {
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame, _gameRoom);
 }
 
 void Rtype::Command::GameInfo::Join_game::execute_server_side()
 {
+    if (!_gameInfo->isGameAvailable()) {
+        CONSOLE_INFO(_gameInfo->getRoomId(), " is not available : max player number reach")
+	    sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame, false, 0);
+        return;
+    }
     _gameInfo->connectPlayer(_clientInfo);
+    CONSOLE_INFO(_gameInfo->getRoomId(), " successfully connect to the room")
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame, true, _gameInfo->getLevel());
 }

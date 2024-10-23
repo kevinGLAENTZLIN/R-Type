@@ -21,7 +21,7 @@ void ECS::Systems::UpdateVelocityAI::update (
         if (aiType == PATAPATA) {
             float amplitude = 0.05f;
             float frequency = 2.0f;
-            velocities[aiId]->setX(-0.1f);
+            velocities[aiId]->setX(-0.05f);
             velocities[aiId]->setY(
                 amplitude * std::sin(frequency * positions[aiId]->getX()));
         }
@@ -31,7 +31,7 @@ void ECS::Systems::UpdateVelocityAI::update (
             float offset = 0.01f;
             if (positions[aiId]->getOriginalY() > 0)
                 offset *= -1; 
-            velocities[aiId]->setX(-0.1f);
+            velocities[aiId]->setX(-0.05f);
             velocities[aiId]->setY(
                 amplitude * std::sin(frequency * positions[aiId]->getX()) + offset);
         }
@@ -39,8 +39,6 @@ void ECS::Systems::UpdateVelocityAI::update (
             velocities[aiId]->setY(0.5);
             if (positions[aiId]->getY() > 4.0)
                 velocities[aiId]->setY(0);
-            if (AIs[aiId]->isFiring())
-                break;
             
             std::vector<std::pair<float, float>> playersPos;
             for (const auto& player : serverToLocalPlayersId)

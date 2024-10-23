@@ -7,14 +7,12 @@
 
 #include "Games_available.hh"
 
-void Rtype::Command::GameInfo::Games_available::set_client(udp::endpoint endpoint)
+void Rtype::Command::GameInfo::Games_available::set_client()
 {
-    _endpoint = endpoint;
 }
 
-void Rtype::Command::GameInfo::Games_available::set_server(udp::endpoint endpoint, std::vector<std::shared_ptr<Rtype::Game_info>> games)
+void Rtype::Command::GameInfo::Games_available::set_server(std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> games)
 {
-    _endpoint = endpoint;
     _games = games;
 }
 
@@ -24,8 +22,13 @@ Rtype::Command::GameInfo::Games_available::~Games_available()
 
 void Rtype::Command::GameInfo::Games_available::execute_client_side()
 {
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
 }
 
 void Rtype::Command::GameInfo::Games_available::execute_server_side()
 {
+    for (auto game: *_games) {
+        if (game->isGameAvailable())
+    	    sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable, game->getRoomId());
+    }
 }

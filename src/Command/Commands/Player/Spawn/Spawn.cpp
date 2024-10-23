@@ -25,6 +25,11 @@ Rtype::Command::Player::Spawn::~Spawn()
 
 void Rtype::Command::Player::Spawn::execute_client_side()
 {
+    std::cerr << "This command have no client side" << std::endl;
+}
+
+void Rtype::Command::Player::Spawn::execute_server_side()
+{
     _players[_playerID]->setX(_x);
     _players[_playerID]->setX(_y);
     for (auto player: _players) {
@@ -32,8 +37,4 @@ void Rtype::Command::Player::Spawn::execute_client_side()
         sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerSpawnOnGame, _playerID, _x, _y);
     }
     _game->createPlayer(_playerID, _x * 1.f, _y * 1.f);
-}
-
-void Rtype::Command::Player::Spawn::execute_server_side()
-{
 }

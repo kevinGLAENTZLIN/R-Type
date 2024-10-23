@@ -15,9 +15,15 @@ std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringProjectile(
             AIs[entities[i]]->setCooldown(AIs[entities[i]]->getCooldown() - 1);
             continue;
         }
-        if (AIs[entities[i]]->getEnemyType() == PATAPATA && positions[entities[i]]->getX() < 2.0) {
+        if ((AIs[entities[i]]->getEnemyType() == PATAPATA || AIs[entities[i]]->getEnemyType() == BUG) &&
+            positions[entities[i]]->getX() < 2.0) {
             AIs[entities[i]]->setFiring(true);
-            AIs[entities[i]]->setCooldown(50);
+            AIs[entities[i]]->setCooldown(100);
+            firingEntities.push_back(entities[i]);
+        }
+        if (AIs[entities[i]]->getEnemyType() == BINK) {
+            AIs[entities[i]]->setFiring(true);
+            AIs[entities[i]]->setCooldown(100);
             firingEntities.push_back(entities[i]);
         }
     }

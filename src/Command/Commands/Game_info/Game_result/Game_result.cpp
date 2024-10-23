@@ -11,10 +11,9 @@ void Rtype::Command::GameInfo::Game_result::set_client()
 {
 }
 
-void Rtype::Command::GameInfo::Game_result::set_server(udp::endpoint endpoint, std::shared_ptr<Rtype::Game_info> game)
+void Rtype::Command::GameInfo::Game_result::set_server(std::shared_ptr<Rtype::Game_info> game_info)
 {
-    _endpoint = endpoint;
-    _game = game;
+    _gameInfo = game_info;
 }
 
 Rtype::Command::GameInfo::Game_result::~Game_result()
@@ -28,4 +27,6 @@ void Rtype::Command::GameInfo::Game_result::execute_client_side()
 
 void Rtype::Command::GameInfo::Game_result::execute_server_side()
 {
+    CONSOLE_INFO("Game status: ", (_gameInfo->gameStatus() ? "Won" : "Lost"))
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GameWonLost, _gameInfo->gameStatus());
 }

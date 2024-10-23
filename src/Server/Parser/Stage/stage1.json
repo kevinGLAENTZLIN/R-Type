@@ -8,7 +8,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 12,
+        "time second": 12
     }
     "PataPata0_1": {
         "type": "PATAPATA",
@@ -19,7 +19,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 12,
+        "time second": 12
     }
     "PataPata0_2": {
         "type": "PATAPATA",
@@ -30,7 +30,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 12,
+        "time second": 12
     }
     "PataPata0_3": {
         "type": "PATAPATA",
@@ -41,7 +41,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 12,
+        "time second": 12
     }
     "PataPata0_4": {
         "type": "PATAPATA",
@@ -52,7 +52,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 12,
+        "time second": 12
     }
 
     "PataPata1_0": {
@@ -64,7 +64,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 14,
+        "time second": 14
     }
     "PataPata1_1": {
         "type": "PATAPATA",
@@ -75,7 +75,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 14,
+        "time second": 14
     }
     "PataPata1_2": {
         "type": "PATAPATA",
@@ -86,7 +86,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 14,
+        "time second": 14
     }
     "PataPata1_3": {
         "type": "PATAPATA",
@@ -97,7 +97,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 14,
+        "time second": 14
     }
     "PataPata1_4": {
         "type": "PATAPATA",
@@ -108,7 +108,7 @@
         }
         "model": "enemy_one",
         "time minute": 0,
-        "time second": 14,
+        "time second": 14
     }
 
     "Bug0_0": {
@@ -120,7 +120,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 16
     }
     "Bug0_1": {
         "type": "BUG",
@@ -131,7 +131,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 16
     }
     "Bug0_2": {
         "type": "BUG",
@@ -142,7 +142,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 16
     }
     "Bug0_3": {
         "type": "BUG",
@@ -153,7 +153,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 16
     }
     "Bug0_4": {
         "type": "BUG",
@@ -164,7 +164,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 16
     }
     "Bug0_5": {
         "type": "BUG",
@@ -175,7 +175,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 16
     }
 
     "Bink0": {
@@ -191,7 +191,7 @@
     }
 
     "Bug1_0": {
-        "type": "BUG",
+        "type": "BUG"
         "difficulty": 1,
         "position": {
             "x": 10.5,
@@ -199,7 +199,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 19,
     }
     "Bug1_1": {
         "type": "BUG",
@@ -210,7 +210,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 19
     }
     "Bug1_2": {
         "type": "BUG",
@@ -221,7 +221,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 19
     }
     "Bug1_3": {
         "type": "BUG",
@@ -232,7 +232,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 19
     }
     "Bug1_4": {
         "type": "BUG",
@@ -243,7 +243,7 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 19
     }
     "Bug1_5": {
         "type": "BUG",
@@ -254,7 +254,276 @@
         }
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16,
+        "timesecond": 19
+    }
+
+    "Patapata2_0": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": -1.0
+        }
+        "model": "enemy_one",
+        "time minute": 0,
+        "time second": 21
+    }
+    "Patapata2_1": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.5,
+            "y": 0.25
+        }
+        "model": "enemy_one",
+        "time minute": 0,
+        "time second": 21
+    }
+    "Patapata2_2": {
+        "type": "PATAPATA",
+        "difficulty": 2,
+        "position": {
+            "x": 12.5,
+            "y": -0.5
+        }
+        "model": "enemy_one",
+        "time minute": 0,
+        "time second": 21
+    }
+    "Patapata2_3": {
+        "type": "PATAPATA",
+        "difficulty": 3,
+        "position": {
+            "x": 13.5,
+            "y": 0.75
+        }
+        "model": "enemy_one",
+        "time minute": 0,
+        "time second": 21
+    }
+
+    "BOSS1_tail0": {
+        "type": "BOSS1_tail0",
+        "difficulty": 1,
+        "position": {
+            "x": 3,
+            "y": 6
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail1": {
+        "type": "BOSS1_tail1",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail2": {
+        "type": "BOSS1_tail2",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail3": {
+        "type": "BOSS1_tail3",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail4": {
+        "type": "BOSS1_tail4",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail5": {
+        "type": "BOSS1_tail5",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail6": {
+        "type": "BOSS1_tail6",
+        "difficulty": 1
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail7": {
+        "type": "BOSS1_tail7",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail8": {
+        "type": "BOSS1_tail8",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail9": {
+        "type": "BOSS1_tail9",
+        "difficulty": 1
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail10": {
+        "type": "BOSS1_tail10",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail11": {
+        "type": "BOSS1_tail11",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail12": {
+        "type": "BOSS1_tail12",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail13": {
+        "type": "BOSS1_tail13",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail14": {
+        "type": "BOSS1_tail14",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail15": {
+        "type": "BOSS1_tail15",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail16": {
+        "type": "BOSS1_tail16",
+        "difficulty": 1
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail17": {
+        "type": "BOSS1_tail17",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail18": {
+        "type": "BOSS1_tail18",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail19": {
+        "type": "BOSS1_tail19",
+        "difficulty": 1
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+    "BOSS1_tail20": {
+        "type": "BOSS1_tail20",
+        "difficulty": 1,
+        "position": {
+            "x": ,
+        },
+        "model": "enemy_one",
+        "time minute": 2,
+        "time second": 10
+    }
+
+    "BOSS1_core": {
+        "type": "BOSS1_core",
+        "difficulty": 1,
+        "position": {
+            "x": 8,
+            "y": -0.5,
+        },
+        "model": "boss1_core",
+        "time minute": 2,
+        "time second": 20
     }
     
 }

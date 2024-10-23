@@ -20,7 +20,28 @@ typedef enum enemiesTypeEnum_e {
     PATAPATA,
     BUG,
     BINK,
-    SCANT
+    SCANT,
+    BYDOSHOT,
+    BOSS1_Tail0,
+    BOSS1_Tail1,
+    BOSS1_Tail2,
+    BOSS1_Tail3,
+    BOSS1_Tail4,
+    BOSS1_Tail5,
+    BOSS1_Tail6,
+    BOSS1_Tail7,
+    BOSS1_Tail8,
+    BOSS1_Tail9,
+    BOSS1_Tail10,
+    BOSS1_Tail11,
+    BOSS1_Tail12,
+    BOSS1_Tail13,
+    BOSS1_Tail14,
+    BOSS1_Tail15,
+    BOSS1_Tail16,
+    BOSS1_Tail17,
+    BOSS1_Tail18,
+    BOSS1_Tail19,
 } enemiesTypeEnum_t;
 
 class ecsUtils {
@@ -35,7 +56,10 @@ public:
         if (type == "BINK")
             return BINK;
         if (type == "SCANT")
-            return SCANT;        
+            return SCANT;
+        if (type == "BYDOSHOT")
+            return BYDOSHOT;
+        
         return UNKNOWN;
     };
 

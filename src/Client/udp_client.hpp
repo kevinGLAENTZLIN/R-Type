@@ -17,12 +17,15 @@
 #include <thread>
 #include <vector>
 #include <array>
-#include "../Utils/ParametersMap/ParametersMap.hpp"
-#include "../Command/Factory/Factory.hh"
-#include "../Command/Invoker/Command_invoker.hh"
+
+#include "./Network/Network.hpp"
+// #include "../Utils/ParametersMap/ParametersMap.hpp"
+// #include "../Command/Factory/Factory.hh"
+// #include "../Command/Invoker/Command_invoker.hh"
+
 #include "./Game/Game.hh"
 
-#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  convertACommandToCommand<TYPE>(_commandFactory.createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
+#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
 using boost::asio::ip::udp;
 
@@ -95,15 +98,16 @@ namespace Rtype {
         void runNetwork();  // New method to handle the networking thread.
 
         int _id;
-        int _ackToSend;
-        int _ackToReceive;
         boost::asio::io_context _ioContext;
-        std::shared_ptr<udp::socket> _socket;
-        udp::endpoint _serverEndpoint;
+        std::shared_ptr<Rtype::Network> _network;
+        // int _ackToSend;
+        // int _ackToReceive;
+        // std::shared_ptr<udp::socket> _socket;
+        // udp::endpoint _serverEndpoint;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
-        Rtype::Command::Command_invoker _commandInvoker;
-        Rtype::Command::Factory _commandFactory;
+        // std::shared_ptr<Rtype::Command::Command_invoker> _commandInvoker;
+        // std::shared_ptr<Rtype::Command::Factory> _commandFactory;
         Rtype::Game _game;
     };
 }

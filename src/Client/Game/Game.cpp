@@ -16,8 +16,8 @@ std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegi
 int menuOption = 0;
 std::vector<std::string> options = { "Start Game", "Options", "Quit" };
 
-Rtype::Game::Game()
-    : _isRunning(true), _currentState(MENU)
+Rtype::Game::Game(std::shared_ptr<Rtype::Network> network)
+    : _network(network), _isRunning(true), _currentState(MENU)
 {
     _core = std::make_unique<ECS::Core::Core>();
 

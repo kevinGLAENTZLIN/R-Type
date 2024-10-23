@@ -5,14 +5,12 @@
 ** udp_client
 */
 
-#include "udp_client.hpp"
+#include "./udp_client.hpp"
 #include "../Utils/Protocol/Protocol.hpp"
 
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort):
-    _id(-1), _ackToSend(0), _ackToReceive(0), 
-    _ioContext(), _socket(std::make_shared<udp::socket>(_ioContext, udp::endpoint(udp::v4(), 0))),
-    _serverEndpoint(boost::asio::ip::make_address(serverAddr), serverPort),
-    _commandInvoker("Client"), _commandFactory(), _game()
+    _id(-1), _ioContext(),
+    _network(std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client")), _game(_network)
 {
     setHandleMaps();
     connectClient();
@@ -21,9 +19,9 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
 
 Rtype::udpClient::~udpClient()
 {
-    if (_socket->is_open()) {
-        _socket->cancel();
-        _socket->close();
+    if (_network->getSocket()->is_open()) {
+        _network->getSocket()->cancel();
+        _network->getSocket()->close();
     }
     _ioContext.stop();
     if (_networkThread.joinable()) {
@@ -51,8 +49,8 @@ void Rtype::udpClient::read_server()
 {
     udp::endpoint sender_endpoint;
 
-    _commandInvoker.executeCommand();
-    _socket->async_receive_from(boost::asio::buffer(_receiverBuffer), sender_endpoint,
+    _network->executeInvoker();
+    _network->getSocket()->async_receive_from(boost::asio::buffer(_receiverBuffer), sender_endpoint,
     [this](const boost::system::error_code& error, std::size_t bytes_recv) {
         Utils::Network::Response clientResponse;
         Utils::Network::bytes data;
@@ -76,23 +74,23 @@ void Rtype::udpClient::setHandleMaps()
 void Rtype::udpClient::setHandleGameInfoMap()
 {
     _handleGameInfoMap[Utils::GameInfoEnum::NewClientConnected] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)));
+        std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)));
         _id = response.PopParam<int>();
         CONSOLE_INFO("Id set on client: ", _id);
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::GamesAvailable] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Games_available>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::GamesAvailable)));
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Games_available>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::GamesAvailable)));
         int codeRoom = response.PopParam<int>();
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::CreateGame] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Create_game>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::CreateGame)));
+        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Create_game>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::CreateGame)));
         int codeRoom = response.PopParam<int>();
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::JoinGame] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Join_game>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)));
+        std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Join_game>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)));
         bool accepted = response.PopParam<bool>();
         int codeRoom = response.PopParam<int>();
 
@@ -103,7 +101,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::GameWonLost] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Game_result> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Game_result>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::GameWonLost)));
+        std::unique_ptr<Rtype::Command::GameInfo::Game_result> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Game_result>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::GameWonLost)));
         bool won = response.PopParam<bool>();
 
         if (won) {
@@ -118,7 +116,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::LevelComplete] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Level_complete> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Level_complete>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::LevelComplete)));
+        std::unique_ptr<Rtype::Command::GameInfo::Level_complete> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Level_complete>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::LevelComplete)));
         int level = response.PopParam<int>();
 
         std::cerr << "Level " << level << " completed." << std::endl;
@@ -128,7 +126,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
 
 void Rtype::udpClient::setHandlePlayerMap() {
     _handlePlayerMap[Utils::PlayerEnum::PlayerSpawnOnGame] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Spawn> cmd = convertACommandToCommand<Rtype::Command::Player::Spawn>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerSpawnOnGame)));
+        std::unique_ptr<Rtype::Command::Player::Spawn> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Spawn>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerSpawnOnGame)));
         int new_player_id = response.PopParam<int>();
         int x = response.PopParam<int>();
         int y = response.PopParam<int>();
@@ -136,13 +134,13 @@ void Rtype::udpClient::setHandlePlayerMap() {
 
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerDie] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Die> cmd = convertACommandToCommand<Rtype::Command::Player::Die>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerDie)));
+        std::unique_ptr<Rtype::Command::Player::Die> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Die>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerDie)));
         int playerId = response.PopParam<int>();
     };
 
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerMove] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Move> cmd = convertACommandToCommand<Rtype::Command::Player::Move>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
+        std::unique_ptr<Rtype::Command::Player::Move> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Move>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
     
         int playerId = response.PopParam<int>();
         int x = response.PopParam<int>();
@@ -151,7 +149,7 @@ void Rtype::udpClient::setHandlePlayerMap() {
     };
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerAttack] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Attack> cmd = convertACommandToCommand<Rtype::Command::Player::Attack>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerAttack)));
+        std::unique_ptr<Rtype::Command::Player::Attack> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Attack>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerAttack)));
 
         int missileId = response.PopParam<int>();
 
@@ -168,13 +166,13 @@ void Rtype::udpClient::setHandlePlayerMap() {
 
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerHitAWall] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Hit_wall> cmd = convertACommandToCommand<Rtype::Command::Player::Hit_wall>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerHitAWall)));
+        std::unique_ptr<Rtype::Command::Player::Hit_wall> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Hit_wall>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerHitAWall)));
         int playerId = response.PopParam<int>();
     };
 
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerScore] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Score> cmd = convertACommandToCommand<Rtype::Command::Player::Score>(_commandFactory.createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerScore)));        int score = response.PopParam<int>();
+        std::unique_ptr<Rtype::Command::Player::Score> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Score>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerScore)));        int score = response.PopParam<int>();
 
         std::cerr << "The unused Score is: " << score << std::endl;
 
@@ -284,6 +282,6 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 void Rtype::udpClient::connectClient()
 {
     std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd_connection = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Client_connection, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected);
-    cmd_connection->setCommonPart(_socket, _serverEndpoint, _ackToSend);
-    _commandInvoker.addCommand(std::move(cmd_connection));
+    cmd_connection->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    _network->addCommandToInvoker(std::move(cmd_connection));
 }

@@ -43,6 +43,8 @@
 
 #include "../../Utils/enemiesTypeEnum.hpp"
 
+#include "../Network/Network.hpp"
+
 namespace Rtype {
     enum GameState {
         MENU,
@@ -51,7 +53,7 @@ namespace Rtype {
 
     class Game {
     public:
-        Game();
+        Game(std::shared_ptr<Rtype::Network> network);
         ~Game();
 
         void run();
@@ -91,6 +93,7 @@ namespace Rtype {
         void createSound(std::string path, std::string name);
         void updatePlayerCountText();
 
+        std::shared_ptr<Rtype::Network> _network;
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;
         GameState _currentState;

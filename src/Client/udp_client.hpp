@@ -14,6 +14,7 @@
 
 #include <boost/asio.hpp>
 #include <iostream>
+#include <memory>
 #include <thread>
 #include <vector>
 #include <array>
@@ -23,13 +24,15 @@
 // #include "../Command/Factory/Factory.hh"
 // #include "../Command/Invoker/Command_invoker.hh"
 
-#include "./Game/Game.hh"
+//#include "./Game/Game.hh"
 
 #define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
 using boost::asio::ip::udp;
 
 namespace Rtype {
+
+    class Network;
     /**
      * @class udpClient
      * @brief Class to manage a UDP client.
@@ -76,7 +79,7 @@ namespace Rtype {
         void handleResponse(Utils::Network::Response clientResponse);
 
         void connectClient();
-    
+
         void setHandleMaps();
         void setHandleGameInfoMap();
         void setHandlePlayerMap();
@@ -108,6 +111,6 @@ namespace Rtype {
         std::thread _networkThread;  // New thread for the network loop.
         // std::shared_ptr<Rtype::Command::Command_invoker> _commandInvoker;
         // std::shared_ptr<Rtype::Command::Factory> _commandFactory;
-        Rtype::Game _game;
+        std::unique_ptr<Rtype::Game> _game;
     };
 }

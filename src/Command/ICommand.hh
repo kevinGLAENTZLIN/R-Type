@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "../Client/Game/Game.hh"
 #include <boost/asio.hpp>
 
 using boost::asio::ip::udp;

@@ -20,11 +20,9 @@
 #include <unordered_map>
 #include "Client_info.hpp"
 #include "Game_info.hh"
-#include "../Utils/ParametersMap/ParametersMap.hpp"
+
 #include "../Utils/Response/Response.hpp"
 #include "../Utils/Network/Network.hpp"
-#include "../Command/Factory/Factory.hh"
-#include "../Command/Invoker/Command_invoker.hh"
 
 using boost::asio::ip::udp;
 using boost::asio::ip::address;
@@ -43,7 +41,7 @@ namespace Rtype {
              * @param port The port on which the server will listen.
              */
             udpServer(boost::asio::io_service& io_service, short port);
-            
+
             /**
              * @brief Destructor for the udpServer class.
              */
@@ -137,6 +135,6 @@ namespace Rtype {
             std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
             // Rtype::Command::Command_invoker _commandInvoker;
             // Rtype::Command::Factory _commandFactory;
-            
+
     };
 }

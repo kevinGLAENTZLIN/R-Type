@@ -7,9 +7,8 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include<unistd.h>
-#include <vector>
+
+#include "../../Utils/Network/Network.hpp"
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;

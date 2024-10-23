@@ -33,7 +33,7 @@ set(CLIENT_SOURCES
     ./main.cpp
     ./Game/Game.cpp
     ./udp_client.cpp
-    # ./Network/udp_client.cpp
+    ../Utils/Network/Network.cpp
     ../Server/Client_info.cpp
     ../Server/Game_info.cpp
     ../Utils/Protocol/Protocol.cpp

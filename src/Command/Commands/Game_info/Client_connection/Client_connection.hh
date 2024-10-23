@@ -16,7 +16,7 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Client_connection: public ACommand{
+            class Client_connection : public ACommand{
                 public:
                     Client_connection() = default;
                     ~Client_connection();

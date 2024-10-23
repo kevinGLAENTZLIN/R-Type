@@ -7,6 +7,7 @@ set(LIB_SOURCES
     ./ParametersMap/ParametersMap.cpp
     ./Response/Response.cpp
     ./Protocol/Protocol.cpp
+    ./Network/Network.cpp
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)

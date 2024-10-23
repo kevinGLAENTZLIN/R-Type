@@ -9,9 +9,10 @@
 #include "../Utils/Protocol/Protocol.hpp"
 
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort):
-    _id(-1), _ioContext(),
-    _network(std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client")), _game(_network)
+    _id(-1), _ioContext()
 {
+    _network = std::make_shared<Rtype::Network>();
+    _game = std::make_unique<Rtype::Game>(_network);
     setHandleMaps();
     connectClient();
     read_server();
@@ -36,7 +37,7 @@ void Rtype::udpClient::run()
     _networkThread = std::thread([this]() {
         this->runNetwork();
     });
-    _game.run();
+    _game->run();
 }
 
 void Rtype::udpClient::runNetwork()
@@ -141,11 +142,11 @@ void Rtype::udpClient::setHandlePlayerMap() {
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerMove] = [this](Utils::Network::Response response) {
         std::unique_ptr<Rtype::Command::Player::Move> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Move>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
-    
+
         int playerId = response.PopParam<int>();
         int x = response.PopParam<int>();
         int y = response.PopParam<int>();
-    
+
     };
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerAttack] = [this](Utils::Network::Response response) {
@@ -187,7 +188,7 @@ void Rtype::udpClient::setHandleEnemyMap() {
         int x = response.PopParam<int>();
         int y = response.PopParam<int>();
     };
-    
+
     _handleEnemyMap[Utils::EnemyEnum::EnemyDie] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();
     };
@@ -215,10 +216,10 @@ void Rtype::udpClient::setHandlePowerUpMap() {
 
 void Rtype::udpClient::setHandleProjectileMap() {
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileFired] = [this](Utils::Network::Response response) {
-        int ProjectileType = response.PopParam<int>(); 
-        int ProjectileID = response.PopParam<int>(); 
-        int XOrigin = response.PopParam<int>(); 
-        int YOrigin = response.PopParam<int>(); 
+        int ProjectileType = response.PopParam<int>();
+        int ProjectileID = response.PopParam<int>();
+        int XOrigin = response.PopParam<int>();
+        int YOrigin = response.PopParam<int>();
         int XVector = response.PopParam<int>();
         int YVector = response.PopParam<int>();
     };

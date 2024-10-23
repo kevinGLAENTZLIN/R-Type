@@ -7,6 +7,9 @@
 
 #include "Network.hpp"
 
+Rtype::Network::Network():
+    _commandInvoker("client")
+{}
 
 Rtype::Network::Network(boost::asio::io_service& io_service, short port, std::string type):
 	_ackToReceive(0), _ackToSend(0), _socket(std::make_shared<udp::socket>(udp::socket(io_service, udp::endpoint(udp::v4(), port)))),

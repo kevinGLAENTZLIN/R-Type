@@ -7,17 +7,19 @@
 
 #pragma once
 
-#include "../Utils/ParametersMap/ParametersMap.hpp"
-#include "../Command/Factory/Factory.hh"
-#include "../Command/Invoker/Command_invoker.hh"
+#include "../ParametersMap/ParametersMap.hpp"
+#include "../../Command/Factory/Factory.hh"
+#include "../../Command/Invoker/Command_invoker.hh"
 
 #include <boost/asio.hpp>
 #include <iostream>
 
 namespace Rtype
 {
+
     class Network {
         public:
+            Network();
             Network(boost::asio::io_service& io_service, short port, std::string type);
             Network(boost::asio::io_context io_context, const std::string &serverAddr, const int serverPort, std::string type);
             ~Network();

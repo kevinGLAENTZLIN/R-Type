@@ -74,10 +74,13 @@ namespace Rtype {
         void initGame();
         void joinGame();
         void initOptions();
+        void joinRandomGame();
         void joinGameID();
         void initPlayOption();
+        void initCreationGame();
         void destroyEntityMenu();
         void destroyEntityLayer();
+        void destroyEntityText();
         void destroyMusic();
         void createMusic(std::string path, std::string name);
         void playMusic(std::string name);
@@ -86,11 +89,15 @@ namespace Rtype {
         void updateMusic(std::string name);
         void playSound(std::string name);
         void createSound(std::string path, std::string name);
+        void updatePlayerCountText();
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;
         GameState _currentState;
         bool _isRunning;
+        short _playerCount;
+        short _selectedDifficulty;
+        std::size_t _playerCountTextEntity;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;

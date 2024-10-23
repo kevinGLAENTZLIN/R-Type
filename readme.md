@@ -15,7 +15,7 @@ If you have SSH set up, you can clone the project using the following command:
 
 ```bash
 git clone git@github.com:kevinGLAENTZLIN/R-Type.git
-cd name of project
+cd R-Type
 ```
 
 ### Option 2: Clone using HTTPS
@@ -24,7 +24,7 @@ If you don't have SSH set up, you can clone the project using HTTPS with the fol
 
 ```bash
 git clone https://github.com/kevinGLAENTZLIN/R-Type.git
-cd name of project
+cd R-Type
 ```
 
 ### Option 3: Download ZIP
@@ -43,24 +43,31 @@ If you don't have an SSH key and want to clone the project using SSH, you can fo
 
 | Command        | Description                                    |
 |----------------|------------------------------------------------|
-| `SETUP_VCPKG`  | Set up the path to vcpkg                       |
-| `Init`         | Initialize the project with CMake              |
-| `Release`      | Configure the project in Release mode          |
-| `Debug`        | Configure the project in Debug mode            |
-| `Build`        | Compile the project                            |
-| `Test`         | Run the project tests                          |
-| `Clean`        | Clean generated files                          |
-| `Reset`        | Reset the project by deleting the `build/` folder |
-| `Help`         | Display help for the script                    |
+| `setup_vcpkg`  | Set up the path to vcpkg                       |
+| `init`         | Initialize the project with CMake              |
+| `release`      | Configure the project in Release mode          |
+| `debug`        | Configure the project in Debug mode            |
+| `build`        | Compile the project                            |
+| `test`         | Run the project tests                          |
+| `clean`        | Clean generated files                          |
+| `reset`        | Reset the project by deleting the `build/` folder |
+| `help`         | Display help for the script                    |
+| 'full_build'   | Run the full build process                     |
 
 
 ## Example of usage in Linux
 
 ```bash
-./build.sh SETUP_VCPKG .
-./build.sh Init
-./build.sh Release
-./build.sh Build
+./build.sh setup_vcpkg .
+./build.sh init
+./build.sh release
+./build.sh build
+```
+
+Or you can use full build rules
+
+```bash
+./build.sh full_build
 ```
 
 Congratulations! You have successfully built the project. 🎉
@@ -69,9 +76,9 @@ If you want to pass in debug mode, you can replace `Release` with `Debug` in the
 Or Reset the project by running the following command:
 
 ```bash
-./build.sh Reset
-./build.sh Debug
-./build.sh Build
+./build.sh reset
+./build.sh debug
+./build.sh build
 ```
 
 And that's it! You can now use the `build.sh` script to build the project with ease. 🚀

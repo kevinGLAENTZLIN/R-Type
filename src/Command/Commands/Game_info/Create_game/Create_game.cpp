@@ -7,14 +7,12 @@
 
 #include "Create_game.hh"
 
-void Rtype::Command::GameInfo::Create_game::set_client(udp::endpoint endpoint)
+void Rtype::Command::GameInfo::Create_game::set_client()
 {
-    _endpoint = endpoint;
 }
 
-void Rtype::Command::GameInfo::Create_game::set_server(udp::endpoint endpoint, std::vector<std::shared_ptr<Rtype::Game_info>> &games)
+void Rtype::Command::GameInfo::Create_game::set_server(std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> games)
 {
-    _endpoint = endpoint;
     _games = games;
 }
 
@@ -22,12 +20,35 @@ Rtype::Command::GameInfo::Create_game::~Create_game()
 {
 }
 
+int Rtype::Command::GameInfo::Create_game::getRoomIdAvailable(bool set_seed) const
+{
+    int room_id = 0;
+
+    if (_games->size() == 9000)
+        return -1;
+    if (set_seed)
+        srand(std::time(nullptr));
+    room_id = (rand() % 9000) + 1000;
+    for (auto game: *_games)
+        if (game->getRoomId() == room_id)
+            return getRoomIdAvailable(false);
+    return room_id;
+}
+
 void Rtype::Command::GameInfo::Create_game::execute_client_side()
 {
-	// Do Something who will be executed by the Client
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame);
 }
 
 void Rtype::Command::GameInfo::Create_game::execute_server_side()
 {
-	// Do Something who will be executed by the Server
+    int room_id = getRoomIdAvailable(true);
+
+    if (room_id == -1) {
+        CONSOLE_INFO("Impossible to create a game, no more room available.", "")
+        return;
+    }
+    _games->push_back(std::make_shared<Game_info>(room_id));
+    CONSOLE_INFO("Create a new game: ", room_id)
+	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame, room_id);
 }

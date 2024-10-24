@@ -116,7 +116,7 @@ namespace Utils
                 appendFixedSizeTypeIntoBytes(msg, info);
                 appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner));
                 for (const auto &arg: args) {
-                    std::visit([&msg](auto &&value){
+                    std::visit([&msg](auto &&value) {
                         using P = std::decay_t<decltype(value)>;
                         appendFixedSizeTypeIntoBytes<P>(msg, value);
                     }, arg);

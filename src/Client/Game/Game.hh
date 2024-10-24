@@ -23,6 +23,8 @@
 #include "../../ECS/Component/AI/AI.hh"
 #include "../../ECS/Component/Button/Button.hh"
 #include "../../ECS/Component/Light/Light.hh"
+#include "../../ECS/Component/Music/Music.hh"
+#include "../../ECS/Component/Sound/Sound.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -72,21 +74,39 @@ namespace Rtype {
         void render();
         void renderMenu();
         void switchState(GameState newState);
-        void initMenu(void);
-        void initGame(void);
-        void joinGame(void);
-        void initOptions(void);
-        void joinGameID(void);
-        void initPlayOption(void);
-        void destroyEntityMenu(void);
-        void destroyEntityLayer(void);
+        void initMenu();
+        void initGame();
+        void joinGame();
+        void initOptions();
+        void joinRandomGame();
+        void joinGameID();
+        void initPlayOption();
+        void initCreationGame();
+        void destroyEntityMenu();
+        void destroyEntityLayer();
+        void destroyEntityText();
+        void destroyMusic();
+        void createMusic(std::string path, std::string name);
+        void playMusic(std::string name);
+        void stopMusic(std::string name);
+        void playFromMusic(std::string name, float sec);
+        void updateMusic(std::string name);
+        void playSound(std::string name);
+        void createSound(std::string path, std::string name);
+        void updatePlayerCountText();
 
+        std::map<std::string, ECS::Components::Musica> _musicMap;
+        std::map<std::string, ECS::Components::SoundEffect> _soundMap;
         GameState _currentState;
         bool _isRunning;
+        short _playerCount;
+        short _selectedDifficulty;
+        std::size_t _playerCountTextEntity;
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;
         std::map<int, std::size_t> _mapID;
+        std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
         std::size_t _nbrLight;
         std::string _currentShaders;

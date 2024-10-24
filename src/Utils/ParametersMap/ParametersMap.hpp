@@ -108,6 +108,8 @@ namespace Utils
              */
             static void init_map() 
             {
+                if (!_parametersMap.empty())
+                    return;
                 _parametersMap = {
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::NewClientConnected)}, {"", "i"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", "i"}},
@@ -138,13 +140,13 @@ namespace Utils
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpDisappear)}, {"", ""}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpAttack)}, {"", ""}},
 
-                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"iiii", "iiiiii"}},
+                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"iiiiii", "iiiiii"}},
                     {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileHit)}, {"", "i"}},
                 };
             }
 
             /**
-             * @brief Get the number of parameters on the server side.
+             * @brief Get the number of parameters expected on the server side.
              * @param function_type The category of the function.
              * @param function_index The index of the function.
              * @return The number of parameters expected by the server.
@@ -155,7 +157,7 @@ namespace Utils
             }
 
             /**
-             * @brief Get the number of parameters on the client side.
+             * @brief Get the number of parameters expected on the client side.
              * @param function_type The category of the function.
              * @param function_index The index of the function.
              * @return The number of parameters expected by the client.

@@ -36,14 +36,17 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
         int difficulty = enemyData["difficulty"].asInt();
         float positionX = enemyData["position"]["x"].asFloat();
         float positionY = enemyData["position"]["y"].asFloat();
+        int health = enemyData["health"].asInt();
         std::string model = enemyData["model"].asString();
         int timeMinute = enemyData["time minute"].asInt();
         int timeSecond = enemyData["time second"].asInt();
 
         Rtype::EnemySpawnData enemy;
         enemy.setType(type);
+        enemy.setDifficulty(difficulty);
         enemy.setPositionX(positionX);
         enemy.setPositionY(positionY);
+        enemy.setHealth(health);
         enemy.setModel(model);
         enemy.setSpawnTime({timeMinute, timeSecond});
 

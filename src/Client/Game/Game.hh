@@ -59,13 +59,14 @@ namespace Rtype {
         void run();
         void createPlayer(int id, float pos_x, float pos_y);
         void createOtherPlayer(int id, float pos_x, float pos_y);
-        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
-        void createBoss1Tail(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
+        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
+        void createBoss1();
         void movePlayer(int id, float x, float y);
         void createEnemyProjectile(int id);
         std::vector<std::size_t> getAllInputs();
 
     private:
+        std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
         void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);

@@ -54,6 +54,22 @@ void ECS::Systems::UpdateVelocityAI::update (
             else
                 velocities[aiId]->setX(0.033);
         }
+        if (aiType >= BOSS1_Tail0 && aiType <= BOSS1_Tail19) {
+            float p1x = AIs[aiId]->getP1().first;
+            float p1y = AIs[aiId]->getP1().second;
+            float p2x = AIs[aiId]->getP2().first;
+            float p2y = AIs[aiId]->getP2().second;
+            float distanceBetweenXPoints = p2x - p1x;
+            float deltaBetweenThePoints = distanceBetweenXPoints / 200;
+            float curX = positions[aiId]->getX();
+            float nextY = 0;
+            
+            if (curX >= p2x || (velocities[aiId]->getX() < 0 && curX > p1x))
+                deltaBetweenThePoints *= -1;
+            velocities[aiId]->setX(deltaBetweenThePoints);
+            nextY = ((p1y - p2y) / 2) * std::sin(M_PI / (p1x - p2x)) * (curX - ((p1x + p2x) / 2)) + ((p1y + p2y) / 2);
+            velocities[aiId]->setY(nextY - positions[aiId]->getY());
+        }
     }
 }
 

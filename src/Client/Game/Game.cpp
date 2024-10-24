@@ -173,7 +173,7 @@ Rtype::Game::~Game()
     _ressourcePool.UnloadAll();
 }
 
-void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y)
+void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t enemy = _core->createEntity();
@@ -184,11 +184,11 @@ void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float po
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType});
-    _core->addComponent(enemy, ECS::Components::Health{1});
+    _core->addComponent(enemy, ECS::Components::Health{life});
     _serverToLocalEnemiesId[enemy] = enemy;
 }
 
-void Rtype::Game::createBoss1Tail(enemiesTypeEnum_t enemyType, float pos_x, float pos_y)
+std::size_t Rtype::Game::createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t enemy = _core->createEntity();
@@ -198,8 +198,9 @@ void Rtype::Game::createBoss1Tail(enemiesTypeEnum_t enemyType, float pos_x, floa
     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
-    _core->addComponent(enemy, ECS::Components::AI{enemyType});
+    _core->addComponent(enemy, ECS::Components::AI{enemyType, std::make_pair(pos_x, pos_y), std::make_pair(dest_x, dest_y)});
     _serverToLocalEnemiesId[enemy] = enemy;
+    return enemy;
 }
 
 void Rtype::Game::movePlayer(int id, float x, float y)
@@ -473,6 +474,31 @@ void Rtype::Game::initMenu(void)
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
+void Rtype::Game::createBoss1()
+{
+    createEnemy(BOSS1_Core, 8, -0.5, 20);
+    createCyclingEnemy(BOSS1_Tail0, 6.0f, 3.0f, 6.05f, 2.95f);
+    createCyclingEnemy(BOSS1_Tail1, 5.5f, 2.8f, 6.1f, 2.7f);
+    createCyclingEnemy(BOSS1_Tail2, 5.1f, 2.5f, 5.8f, 2.4f);
+    createCyclingEnemy(BOSS1_Tail3, 4.7f, 2.9f, 6.2f, 2.1f);
+    createCyclingEnemy(BOSS1_Tail4, 4.2f, 2.8f, 6.0f, 1.8f);
+    createCyclingEnemy(BOSS1_Tail5, 3.8f, 3.1f, 6.1f, 1.5f);
+    createCyclingEnemy(BOSS1_Tail6, 3.3f, 3.0f, 5.9f, 1.2f);
+    createCyclingEnemy(BOSS1_Tail7, 2.9f, 2.7f, 5.8f, 0.9f);
+    createCyclingEnemy(BOSS1_Tail8, 2.5f, 3.1f, 6.1f, 0.6f);
+    createCyclingEnemy(BOSS1_Tail9, 2.0f, 3.0f, 6.0f, 0.3f);
+    createCyclingEnemy(BOSS1_Tail10, 1.6f, 2.6f, 6.2f, 0.0f);
+    createCyclingEnemy(BOSS1_Tail11, 1.2f, 2.9f, 5.9f, -0.3f);
+    createCyclingEnemy(BOSS1_Tail12, 0.8f, 3.1f, 5.7f, -0.6f);
+    createCyclingEnemy(BOSS1_Tail13, 0.3f, 3.0f, 6.0f, -0.9f);
+    createCyclingEnemy(BOSS1_Tail14, -0.1f, 3.2f, 6.1f, -1.2f);
+    createCyclingEnemy(BOSS1_Tail15, -0.5f, 2.9f, 5.9f, -1.5f);
+    createCyclingEnemy(BOSS1_Tail16, -0.9f, 2.7f, 5.7f, -1.8f);
+    createCyclingEnemy(BOSS1_Tail17, -1.4f, 3.0f, 6.0f, -2.1f);
+    createCyclingEnemy(BOSS1_Tail18, -1.9f, 3.1f, 5.9f, -2.4f);
+    createCyclingEnemy(BOSS1_Tail19, -2.4f, 2.9f, 6.2f, -2.7f);
+}
+
 void Rtype::Game::initGame(void)
 {
     stopMusic("menu");
@@ -486,28 +512,30 @@ void Rtype::Game::initGame(void)
     switchState(GameState::PLAY);
     createPlayer(0, -10.0f, 0.0f);
 
-    createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
-    createBoss1Tail(BOSS1_Tail1, 5.5f, 2.8f);
-    createBoss1Tail(BOSS1_Tail2, 5.1f, 2.5f);
-    createBoss1Tail(BOSS1_Tail3, 4.7f, 2.9f);
-    createBoss1Tail(BOSS1_Tail4, 4.2f, 2.8f);
-    createBoss1Tail(BOSS1_Tail5, 3.8f, 3.1f);
-    createBoss1Tail(BOSS1_Tail6, 3.3f, 3.0f);
-    createBoss1Tail(BOSS1_Tail7, 2.9f, 2.7f);
-    createBoss1Tail(BOSS1_Tail8, 2.5f, 3.0f);
-    createBoss1Tail(BOSS1_Tail9, 2.0f, 3.0f);
-    createBoss1Tail(BOSS1_Tail10, 1.6f, 2.6f);
-    createBoss1Tail(BOSS1_Tail11, 1.2f, 2.9f);
-    createBoss1Tail(BOSS1_Tail12, 0.8f, 3.1f);
-    createBoss1Tail(BOSS1_Tail13, 0.3f, 3.0f);
-    createBoss1Tail(BOSS1_Tail14, -0.1f, 3.2f);
-    createBoss1Tail(BOSS1_Tail15, -0.5f, 2.9f);
-    createBoss1Tail(BOSS1_Tail16, -0.9f, 2.7f);
-    createBoss1Tail(BOSS1_Tail17, -1.4f, 3.0f);
-    createBoss1Tail(BOSS1_Tail18, -1.9f, 3.1f);
-    createBoss1Tail(BOSS1_Tail19, -2.4f, 2.9f);
+    createBoss1();
 
-    //((by-cy)/(2)) sin(((π)/(bx-cx)) (a-((bx+cx)/(2))))+((by+cy)/(2))
+    // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
+    // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);
+    // createBoss1Tail(BOSS1_Tail2, 5.8f, 2.4f);
+    // createBoss1Tail(BOSS1_Tail3, 6.2f, 2.1f);
+    // createBoss1Tail(BOSS1_Tail4, 6.0f, 1.8f);
+    // createBoss1Tail(BOSS1_Tail5, 6.1f, 1.5f);
+    // createBoss1Tail(BOSS1_Tail6, 5.9f, 1.2f);
+    // createBoss1Tail(BOSS1_Tail7, 5.8f, 0.9f);
+    // createBoss1Tail(BOSS1_Tail8, 6.1f, 0.6f);
+    // createBoss1Tail(BOSS1_Tail9, 6.0f, 0.3f);
+    // createBoss1Tail(BOSS1_Tail10, 6.2f, 0.0f);
+    // createBoss1Tail(BOSS1_Tail11, 5.9f, -0.3f);
+    // createBoss1Tail(BOSS1_Tail12, 5.7f, -0.6f);
+    // createBoss1Tail(BOSS1_Tail13, 6.0f, -0.9f);
+    // createBoss1Tail(BOSS1_Tail14, 6.1f, -1.2f);
+    // createBoss1Tail(BOSS1_Tail15, 5.9f, -1.5f);
+    // createBoss1Tail(BOSS1_Tail16, 5.7f, -1.8f);
+    // createBoss1Tail(BOSS1_Tail17, 6.0f, -2.1f);
+    // createBoss1Tail(BOSS1_Tail18, 5.9f, -2.4f);
+    // createBoss1Tail(BOSS1_Tail19, 6.2f, -2.7f);
+
+    //ay = ((by - cy) / 2) * sin((π / (bx - cx)) * (ax - ((bx + cx) / 2))) + ((by + cy) / 2)
     
     // createEnemy(PATAPATA, 10.5f, -3.0f);
     // createEnemy(PATAPATA, 11.5f, -2.9f);

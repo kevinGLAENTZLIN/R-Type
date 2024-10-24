@@ -20,23 +20,28 @@ namespace Rtype {
         ~EnemySpawnData() = default;
 
         void setType(enemiesTypeEnum_t type);
+        void setDifficulty(int difficulty);
         void setPositionX(float position_x);
         void setPositionY(float position_y);
+        void setHealth(int health);
         void setModel(std::string model);
         void setSpawnTime(std::pair <int, int> spawnTime);
 
         enemiesTypeEnum_t getType() const;
+        int getDifficulty() const;
         float getPositionX() const;
         float getPositionY() const;
+        int getHealth() const;
         std::string getModel() const;
         std::pair <int, int> getSpawnTime() const;
 
     private:
 
         enemiesTypeEnum_t _type;
-        int difficulty;
+        int _difficulty;
         float _position_x;
         float _position_y;
+        int _health;
         std::string _model;
         std::pair<int, int> _spawnTime;
     };

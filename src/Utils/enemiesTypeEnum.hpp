@@ -22,6 +22,7 @@ typedef enum enemiesTypeEnum_e {
     BINK,
     SCANT,
     BYDOSHOT,
+    BOSS1_Core,
     BOSS1_Tail0,
     BOSS1_Tail1,
     BOSS1_Tail2,
@@ -59,7 +60,48 @@ public:
             return SCANT;
         if (type == "BYDOSHOT")
             return BYDOSHOT;
-        
+        if (type == "BOSS1_Core")
+            return BOSS1_Core;
+        if (type == "BOSS1_Tail0")
+            return BOSS1_Tail0;
+        if (type == "BOSS1_Tail1")
+            return BOSS1_Tail1;
+        if (type == "BOSS1_Tail2")
+            return BOSS1_Tail2;
+        if (type == "BOSS1_Tail3")
+            return BOSS1_Tail3;
+        if (type == "BOSS1_Tail4")
+            return BOSS1_Tail4;
+        if (type == "BOSS1_Tail5")
+            return BOSS1_Tail5;
+        if (type == "BOSS1_Tail6")
+            return BOSS1_Tail6;
+        if (type == "BOSS1_Tail7")
+            return BOSS1_Tail7;
+        if (type == "BOSS1_Tail8")
+            return BOSS1_Tail8;
+        if (type == "BOSS1_Tail9")
+            return BOSS1_Tail9;
+        if (type == "BOSS1_Tail10")
+            return BOSS1_Tail10;
+        if (type == "BOSS1_Tail11")
+            return BOSS1_Tail11;
+        if (type == "BOSS1_Tail12")
+            return BOSS1_Tail12;
+        if (type == "BOSS1_Tail13")
+            return BOSS1_Tail13;
+        if (type == "BOSS1_Tail14")
+            return BOSS1_Tail14;
+        if (type == "BOSS1_Tail15")
+            return BOSS1_Tail15;
+        if (type == "BOSS1_Tail16")
+            return BOSS1_Tail16;
+        if (type == "BOSS1_Tail17")
+            return BOSS1_Tail17;
+        if (type == "BOSS1_Tail18")
+            return BOSS1_Tail18;
+        if (type == "BOSS1_Tail19")
+            return BOSS1_Tail19;
         return UNKNOWN;
     };
 

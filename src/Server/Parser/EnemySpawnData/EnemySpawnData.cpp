@@ -15,6 +15,11 @@ void Rtype::EnemySpawnData::setType(enemiesTypeEnum_t type)
     _type = type;
 }
 
+void Rtype::EnemySpawnData::setDifficulty(int difficulty)
+{
+    _difficulty = difficulty;
+}
+
 void Rtype::EnemySpawnData::setPositionX(float x)
 {
     _position_x = x;
@@ -23,6 +28,11 @@ void Rtype::EnemySpawnData::setPositionX(float x)
 void Rtype::EnemySpawnData::setPositionY(float y)
 {
     _position_y = y;
+}
+
+void Rtype::EnemySpawnData::setHealth(int health)
+{
+    _health = health;
 }
 
 void Rtype::EnemySpawnData::setModel(std::string model)
@@ -40,6 +50,11 @@ enemiesTypeEnum_t Rtype::EnemySpawnData::getType() const
     return _type;
 }
 
+int Rtype::EnemySpawnData::getHealth() const
+{
+    return _health;
+}
+
 float Rtype::EnemySpawnData::getPositionX() const
 {
     return _position_x;
@@ -48,6 +63,11 @@ float Rtype::EnemySpawnData::getPositionX() const
 float Rtype::EnemySpawnData::getPositionY() const
 {
     return _position_y;
+}
+
+int Rtype::EnemySpawnData::getDifficulty() const
+{
+    return _difficulty;
 }
 
 std::string Rtype::EnemySpawnData::getModel() const

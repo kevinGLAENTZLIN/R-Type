@@ -11,13 +11,13 @@ Rtype::Network::Network():
     _commandInvoker("client")
 {}
 
-Rtype::Network::Network(boost::asio::io_service& io_service, short port, std::string type):
+Rtype::Network::Network(boost::asio::io_service &io_service, short port, std::string type):
 	_ackToReceive(0), _ackToSend(0), _socket(std::make_shared<udp::socket>(udp::socket(io_service, udp::endpoint(udp::v4(), port)))),
 	_endpoint(), _commandInvoker(type), _commandFactory()
 {
 }
 
-Rtype::Network::Network(boost::asio::io_context io_context, const std::string &serverAddr, const int serverPort, std::string type):
+Rtype::Network::Network(boost::asio::io_context &io_context, const std::string &serverAddr, const int serverPort, std::string type):
 	_ackToReceive(0), _ackToSend(0), _socket(std::make_shared<udp::socket>(io_context, udp::endpoint(udp::v4(), 0))),
 	_endpoint(boost::asio::ip::make_address(serverAddr), serverPort), _commandInvoker(type), _commandFactory()
 {

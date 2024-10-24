@@ -11,7 +11,7 @@
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort):
     _id(-1), _ioContext()
 {
-    _network = std::make_shared<Rtype::Network>();
+    _network = std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client");
     _game = std::make_unique<Rtype::Game>(_network);
     setHandleMaps();
     connectClient();

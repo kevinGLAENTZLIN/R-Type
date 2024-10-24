@@ -62,7 +62,6 @@ namespace Rtype {
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
         void movePlayer(int id, float x, float y);
         void createEnemyProjectile(int id);
-        void setNetwork(std::shared_ptr<Rtype::Network> network);
 
     private:
         void createPlayerProjectile(std::size_t entityID);

@@ -50,6 +50,8 @@ int Rtype::Network::getAckToReceive()
 void Rtype::Network::addCommandToInvoker(std::unique_ptr<Rtype::Command::ACommand> cmd)
 {
 	_commandInvoker.addCommand(std::move(cmd));
+	accAckToSend();
+    executeInvoker();
 }
 
 void Rtype::Network::executeInvoker()

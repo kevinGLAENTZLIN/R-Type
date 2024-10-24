@@ -20,13 +20,8 @@
 #include <array>
 
 #include "../Utils/Network/Network.hpp"
-// #include "../Utils/ParametersMap/ParametersMap.hpp"
-// #include "../Command/Factory/Factory.hh"
-// #include "../Command/Invoker/Command_invoker.hh"
 
-//#include "./Game/Game.hh"
-
-#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
+#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
 using boost::asio::ip::udp;
 
@@ -58,17 +53,17 @@ namespace Rtype {
         void run();  // This will now spawn two threads: one for game, one for network.
 
     private:
-        template <typename T>
-        std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
-            static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
-            T* derived = dynamic_cast<T*>(base.get());
+        // template <typename T>
+        // std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
+        //     static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
+        //     T* derived = dynamic_cast<T*>(base.get());
 
-            if (derived) {
-                base.release();
-                return std::unique_ptr<T>(derived);
-            } else
-                return nullptr;
-        }
+        //     if (derived) {
+        //         base.release();
+        //         return std::unique_ptr<T>(derived);
+        //     } else
+        //         return nullptr;
+        // }
 
         void read_server();
 

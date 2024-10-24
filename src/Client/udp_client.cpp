@@ -50,7 +50,6 @@ void Rtype::udpClient::read_server()
 {
     udp::endpoint sender_endpoint;
 
-    _network->executeInvoker();
     _network->getSocket()->async_receive_from(boost::asio::buffer(_receiverBuffer), sender_endpoint,
     [this](const boost::system::error_code& error, std::size_t bytes_recv) {
         Utils::Network::Response clientResponse;
@@ -86,19 +85,32 @@ void Rtype::udpClient::setHandleGameInfoMap()
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::CreateGame] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Create_game>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::CreateGame)));
         int codeRoom = response.PopParam<int>();
+        std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+
+        if (codeRoom == -1) {
+            CONSOLE_INFO("Game failed to create, too many game.", "")
+        }
+        CONSOLE_INFO("Game created: ", codeRoom)
+        std::cout << _network->getSocket() << std::endl;
+        std::cout << _network->getSenderEndpoint().port() << std::endl;
+        std::cout << _network->getAckToSend() << std::endl;
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client(codeRoom);
+        _network->addCommandToInvoker(std::move(cmd));
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::JoinGame] = [this](Utils::Network::Response response) {
         std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Join_game>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)));
         bool accepted = response.PopParam<bool>();
-        int codeRoom = response.PopParam<int>();
+        int level = response.PopParam<int>();
 
         if (!accepted) {
             std::cerr << "Joining game failed." << std::endl;
             return;
         }
+        CONSOLE_INFO("Joining game at level: ", level)
+        std::cout << "Have to start the game from here now !" << std::endl;
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::GameWonLost] = [this](Utils::Network::Response response) {

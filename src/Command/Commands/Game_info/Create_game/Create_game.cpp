@@ -11,7 +11,7 @@ void Rtype::Command::GameInfo::Create_game::set_client()
 {
 }
 
-void Rtype::Command::GameInfo::Create_game::set_server(std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> games)
+void Rtype::Command::GameInfo::Create_game::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::Game_info>>> games)
 {
     _games = games;
 }
@@ -30,7 +30,7 @@ int Rtype::Command::GameInfo::Create_game::getRoomIdAvailable(bool set_seed) con
         srand(std::time(nullptr));
     room_id = (rand() % 9000) + 1000;
     for (auto game: *_games)
-        if (game->getRoomId() == room_id)
+        if (game.second->getRoomId() == room_id)
             return getRoomIdAvailable(false);
     return room_id;
 }
@@ -48,7 +48,7 @@ void Rtype::Command::GameInfo::Create_game::execute_server_side()
         CONSOLE_INFO("Impossible to create a game, no more room available.", "")
         return;
     }
-    _games->push_back(std::make_shared<Game_info>(room_id));
+    _games->insert({room_id, std::make_shared<Game_info>(room_id)});
     CONSOLE_INFO("Create a new game: ", room_id)
 	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame, room_id);
 }

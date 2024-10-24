@@ -22,7 +22,7 @@ namespace Rtype
                     ~Client_connection();
 
                     void set_client();
-                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> &clients);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> &clients, int port, std::string addr);
 
                     void execute_client_side();
                     void execute_server_side();
@@ -31,7 +31,9 @@ namespace Rtype
                 private:
                     int get_available_client_id();
 
-                    std::map<int, std::shared_ptr<Rtype::client_info>> _clients;
+                    std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _clients;
+                    int _port;
+                    std::string _addr;
             };
         }
     }

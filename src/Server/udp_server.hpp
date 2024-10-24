@@ -127,15 +127,10 @@ namespace Rtype {
             std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
 
             std::shared_ptr<Rtype::Network> _network;
-            // Rtype::Network _network;
-            // std::shared_ptr<udp::socket> _socket;
-            // udp::endpoint _senderEndpoint;
+            udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
-            std::map<int, std::shared_ptr<Rtype::client_info>> _clients;
-            std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
-            // Rtype::Command::Command_invoker _commandInvoker;
-            // Rtype::Command::Factory _commandFactory;
-
+            std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _clients;
+            std::shared_ptr<std::map<int, std::shared_ptr<Rtype::Game_info>>> _games;
     };
 }

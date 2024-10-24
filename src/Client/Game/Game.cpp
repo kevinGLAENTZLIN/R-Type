@@ -356,6 +356,11 @@ void Rtype::Game::initCreationGame(void)
     _core->addComponent(createButtonEntity, ECS::Components::Position{400, 500});
     _core->addComponent(createButtonEntity, ECS::Components::Text{"Create Game", 30, RAYWHITE});
     _core->addComponent(createButtonEntity, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Create_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
+        CONSOLE_INFO("Create game", " Sended")
         initGame();
     }});
 
@@ -385,6 +390,7 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinRandomGameEntity, ECS::Components::Position{400, 300});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+        CONSOLE_INFO("Join game", "")
         joinRandomGame();
     }});
 
@@ -392,6 +398,7 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinGameEntity, ECS::Components::Position{400, 400});
     _core->addComponent(joinGameEntity, ECS::Components::Text{"Search available game", 30, RAYWHITE});
     _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
+        CONSOLE_INFO("Get available game", "")
         joinGame();
     }});
 
@@ -399,6 +406,7 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinGameId, ECS::Components::Position{400, 500});
     _core->addComponent(joinGameId, ECS::Components::Text{"Join friends game", 30, RAYWHITE});
     _core->addComponent(joinGameId, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        CONSOLE_INFO("Join Game by ID", "")
         joinGameID();
     }});
 
@@ -464,7 +472,7 @@ void Rtype::Game::run() {
                 updateMusic("menu");
                 updateMenu();
                 renderMenu();
-                std::cout << "Level choose -> " << _selectedDifficulty << std::endl;
+                // std::cout << "Level choose -> " << _selectedDifficulty << std::endl;
                 break;
             case PLAY:
                 updateMusic("stage1");

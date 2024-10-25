@@ -14,14 +14,14 @@ endif()
 
 if (WIN32)
     set(CMAKE_GENERATOR "Visual Studio 17 2022")
-    set(CMAKE_GENERATOR_PLATFORM "x64")
+    set(CMAKE_GENERATOR_PLATFORM "x64") ou "Win32" selon votre besoin
 endif()
 
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 
 find_package(boost_asio CONFIG REQUIRED)
 find_package(doctest REQUIRED)
-find_package(JsonCpp REQUIRED)
+find_package(jsoncpp REQUIRED)
 find_package(raylib CONFIG REQUIRED)
 
 if (NOT DEFINED RAYLIB_CPP_VERSION)

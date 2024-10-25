@@ -78,6 +78,8 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
+    collisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
 
     Signature projectileCollisionSignature;
@@ -222,6 +224,7 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(player, ECS::Components::Input{});
+    _core->addComponent(player, ECS::Components::Health{5});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = player;
 }
@@ -476,7 +479,7 @@ void Rtype::Game::initMenu(void)
 
 void Rtype::Game::createBoss1()
 {
-    createEnemy(BOSS1_Core, 8, -0.5, 20);
+    createEnemy(BOSS1_Core, 8, -0.5, 1);
     createCyclingEnemy(BOSS1_Tail0, 6.0f, 3.0f, 6.05f, 2.95f);
     createCyclingEnemy(BOSS1_Tail1, 5.5f, 2.8f, 6.1f, 2.7f);
     createCyclingEnemy(BOSS1_Tail2, 5.1f, 2.5f, 5.8f, 2.4f);
@@ -655,6 +658,7 @@ void Rtype::Game::createEnemyProjectile(int id)
 
 void Rtype::Game::createPlayerProjectile(std::size_t entityID)
 {
+
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
@@ -676,11 +680,6 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
     playSound("blasterLego");
-}
-
-void Rtype::Game::destroyProjectile(std::size_t entityID)
-{
-    _core->destroyEntity(entityID);
 }
 
 void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel)
@@ -752,8 +751,10 @@ void Rtype::Game::update() {
                            _core->getComponents<ECS::Components::Velocity>(),
                            velocityEntities);
 
-    collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
+    collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),
+                           _core->getComponents<ECS::Components::Health>(),
+                           _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
                            collisionEntities);
 
     if (entityID <= 10000)
@@ -774,8 +775,9 @@ void Rtype::Game::update() {
             }
         }
         for (int j = 0; j < projectileEntities.size(); j++)
-            if (projectileEntities[j] == projectileEntityId[i])
+            if (projectileEntities[j] == projectileEntityId[i]) {
                 _core->destroyEntity(projectileEntityId[i]);
+            }
     }
 
     std::vector<std::size_t> deadEntities = getDeadEntitiesSystem->getDeadEntities(
@@ -784,8 +786,23 @@ void Rtype::Game::update() {
         damageableEntities);
 
     for (std::size_t i = 0; i < deadEntities.size(); i++) {
+        if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
+            sleep(3000);//GAMEOVER
+        else if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
+            for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
+                auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
+                int tailId = 0;
+                for (std::size_t j = 0; j < AIs.size(); j++)
+                    if (_core->getComponent<ECS::Components::AI>(AIs[j]).getEnemyType() == i) {
+                        tailId = AIs[j];
+                        break;
+                    }
+                _core->destroyEntity(tailId);
+            }
+        }
         _core->destroyEntity(deadEntities[i]);
     }
+
     for (std::size_t i = 0; i < AIProjectile.size(); i++)
         createEnemyProjectile(AIProjectile[i]);
 

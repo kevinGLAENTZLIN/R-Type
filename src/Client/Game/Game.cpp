@@ -7,9 +7,7 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include<unistd.h>
-#include <vector>
+#include <thread>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -143,7 +141,10 @@ Rtype::Game::Game()
     buttonClickSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
+}
 
+void Rtype::Game::loadMusic()
+{
     InitAudioDevice();
     createMusic("./resources/stage1/stage1.mp3", "stage1");
     createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
@@ -458,6 +459,9 @@ void Rtype::Game::initGame(void)
 }
 
 void Rtype::Game::run() {
+    std::thread musicThread(&Rtype::Game::loadMusic, this);
+
+    musicThread.join();
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
@@ -465,7 +469,6 @@ void Rtype::Game::run() {
                 updateMusic("menu");
                 updateMenu();
                 renderMenu();
-                std::cout << "Level choose -> " << _selectedDifficulty << std::endl;
                 break;
             case PLAY:
                 updateMusic("stage1");
@@ -475,7 +478,6 @@ void Rtype::Game::run() {
         }
     }
     CloseAudioDevice();
-
 }
 
 std::vector<std::size_t> getAllInputs() {

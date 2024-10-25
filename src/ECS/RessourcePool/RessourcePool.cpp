@@ -11,9 +11,6 @@
 ECS::RessourcePool::RessourcePool()
 {}
 
-// ECS::RessourcePool::~RessourcePool()
-// {}
-
 void ECS::RessourcePool::UnloadAll()
 {
     for (auto &model : _models) {

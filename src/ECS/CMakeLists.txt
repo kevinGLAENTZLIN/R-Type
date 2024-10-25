@@ -55,6 +55,7 @@ set(LIB_SOURCES
     ./Component/Render3D/Render3D.cpp
     ./Component/Button/Button.cpp
     ./Component/AI/AI.cpp
+    ./Component/Textfield/Textfield.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
     ./System/UpdateVelocityAI/UpdateVelocityAI.cpp
@@ -66,6 +67,8 @@ set(LIB_SOURCES
     ./System/RenderText/RenderText.cpp
     ./System/ButtonClick/ButtonClick.cpp
     ./System/RenderButton/RenderButton.cpp
+    ./System/TextfieldInput/TextfieldInput.cpp
+    ./System/RenderTextfield/RenderTextfield.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )

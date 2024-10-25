@@ -7,9 +7,7 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include<unistd.h>
-#include <vector>
+#include <thread>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -49,7 +47,6 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::AI>();
     _core->registerComponent<ECS::Components::Text>();
     _core->registerComponent<ECS::Components::Button>();
-    _core->registerComponent<ECS::Components::Light>();
     _core->registerComponent<ECS::Components::Musica>();
     _core->registerComponent<ECS::Components::SoundEffect>();
 
@@ -146,14 +143,10 @@ Rtype::Game::Game()
     buttonClickSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
+}
 
-    Signature lightSignature;
-    lightSignature.set(
-        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
-    lightSignature.set(
-        ECS::CTypeRegistry::getTypeId<ECS::Components::Light>());
-    _core->setSystemSignature<ECS::Systems::SystemLight>(lightSignature);
-
+void Rtype::Game::loadMusic()
+{
     InitAudioDevice();
     createMusic("./resources/stage1/stage1.mp3", "stage1");
     createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
@@ -467,13 +460,12 @@ void Rtype::Game::initGame(void)
     createEnemy(PATAPATA, 13.0f, -2.0f);
     std::size_t light = _core->createEntity();
     _core->addComponent(light, ECS::Components::Position{0.0f, 10.0f});
-    _core->addComponent(light, ECS::Components::Light{"lighting", ECS::Components::LIGHT_DIRECTIONAL, { 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, {255, 255, 255, 255},});
-    auto &lightComp = _core->getComponent<ECS::Components::Light>(light);
-    lightComp.initLight(_nbrLight, _ressourcePool.getShader("lighting"));
-    _nbrLight++;
 }
 
 void Rtype::Game::run() {
+    std::thread musicThread(&Rtype::Game::loadMusic, this);
+
+    musicThread.join();
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
@@ -481,7 +473,6 @@ void Rtype::Game::run() {
                 updateMusic("menu");
                 updateMenu();
                 renderMenu();
-                std::cout << "Level choose -> " << _selectedDifficulty << std::endl;
                 break;
             case PLAY:
                 updateMusic("stage1");
@@ -491,7 +482,6 @@ void Rtype::Game::run() {
         }
     }
     CloseAudioDevice();
-
 }
 
 std::vector<std::size_t> getAllInputs() {
@@ -567,10 +557,7 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
-    _core->addComponent(projectile, ECS::Components::Light{"lighting", ECS::Components::LIGHT_POINT, {entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()}, { 0.0f, 0.0f, 0.0f }, {254, 163, 71, 255}});
-    auto &lightComp = _core->getComponent<ECS::Components::Light>(projectile);
-    lightComp.initLight(_nbrLight, _ressourcePool.getShader("lighting"));
-    _nbrLight++;
+
 
     playSound("blasterLego");
 }
@@ -650,11 +637,6 @@ void Rtype::Game::update() {
     collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Hitbox>(),
                            collisionEntities);
-
-    lightSystem->update(_core->getComponents<ECS::Components::Position>(),
-                       _core->getComponents<ECS::Components::Light>(),
-                       LightEntities,
-                       _ressourcePool);
 
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),

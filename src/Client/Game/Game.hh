@@ -66,6 +66,7 @@ namespace Rtype {
         void createEnemyProjectile(int id);
 
     private:
+        void loadMusic();
         void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
@@ -94,6 +95,8 @@ namespace Rtype {
         void playSound(std::string name);
         void createSound(std::string path, std::string name);
         void updatePlayerCountText();
+        void DrawProgressBar(int progress);
+        void LoadAssets();
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;

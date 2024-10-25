@@ -1,7 +1,5 @@
 project(R-Type-Server-Cmd)
 
-find_package(boost_asio CONFIG REQUIRED)
-
 set(NAME_LIB_CMD ${RTYPE}-cmd CACHE INTERNAL "")
 
 set(LIB_CMD_SRC
@@ -37,12 +35,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
 add_library(${NAME_LIB_CMD} STATIC ${LIB_CMD_SRC})
-
 set_target_properties(${NAME_LIB_CMD} PROPERTIES
     OUTPUT_NAME ${NAME_LIB_CMD}
     SUFFIX ".a"
 )
-message(${NAME_LIB_CMD})
 
 target_link_libraries(${NAME_LIB_CMD} PRIVATE Boost::asio)
 target_link_libraries(${NAME_LIB_CMD} PRIVATE ${NAME_LIB})

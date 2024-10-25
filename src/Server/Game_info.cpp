@@ -5,6 +5,8 @@
 ** Game_info
 */
 
+#include "../Utils/Network/Network.hpp"
+#include "../Client/Game/Game.hh"
 #include "Game_info.hh"
 
 Rtype::Game_info::Game_info():

@@ -13,10 +13,13 @@
 #include <memory>
 #include <thread>
 #include "Client_info.hpp"
-#include "../Utils/Network/Network.hpp"
 
 namespace Rtype
 {
+    class Game;
+
+    class Network;
+
     class Game_info {
         public:
             Game_info();

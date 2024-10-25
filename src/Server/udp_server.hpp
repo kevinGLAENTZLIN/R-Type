@@ -18,11 +18,11 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <unordered_map>
-// #include "Client_info.hpp" -> dans Game_info.hh
+#include "Client_info.hpp"
 #include "Game_info.hh"
 
 #include "../Utils/Response/Response.hpp"
-// #include "../Utils/Network/Network.hpp" -> dans Game_info.hh
+#include "../Utils/Network/Network.hpp"
 
 using boost::asio::ip::udp;
 using boost::asio::ip::address;

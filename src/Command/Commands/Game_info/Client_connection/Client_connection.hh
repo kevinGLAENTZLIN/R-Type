@@ -7,12 +7,11 @@
 
 #pragma once
 #include "../../../ACommand.hpp"
-// #include "../../../../Server/Game_info.hh" -> contient client info
+#include "../../../../Server/Game_info.hh"
 #include <map>
 
 namespace Rtype
 {
-    class client_info;
 
     namespace Command
     {

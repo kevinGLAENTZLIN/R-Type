@@ -20,7 +20,7 @@
 #include "./ICommand.hh"
 #include "../Utils/ParametersMap/ParametersMap.hpp"
 #include "../Utils/Protocol/Protocol.hpp"
-// #include "../Server/Client_info.hpp" -> froward declaration
+#include "../Server/Client_info.hpp"
 
 using boost::asio::ip::udp;
 

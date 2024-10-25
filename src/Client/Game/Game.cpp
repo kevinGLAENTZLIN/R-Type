@@ -458,8 +458,6 @@ void Rtype::Game::initGame(void)
     createPlayer(0, -10.0f, 0.0f);
     createEnemy(PATAPATA, 10.0f, 2.0f);
     createEnemy(PATAPATA, 13.0f, -2.0f);
-    std::size_t light = _core->createEntity();
-    _core->addComponent(light, ECS::Components::Position{0.0f, 10.0f});
 }
 
 void Rtype::Game::run() {

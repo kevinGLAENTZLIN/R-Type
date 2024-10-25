@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(R-Type VERSION 1.0)
-
 set(RTYPE "r-type")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -16,21 +15,19 @@ endif()
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 
 find_package(boost_asio CONFIG REQUIRED)
+find_package(doctest REQUIRED)
+find_package(JsonCpp REQUIRED)
 find_package(raylib CONFIG REQUIRED)
-find_package(raylib_cpp)
-if (NOT raylib_cpp_FOUND)
-    if (NOT DEFINED RAYLIB_CPP_VERSION)
-        set(RAYLIB_CPP_VERSION v5.0.2)
-    endif()
-    include(FetchContent)
-    FetchContent_Declare(
-        raylib_cpp
-        GIT_REPOSITORY https://github.com/RobLoach/raylib-cpp.git
-        GIT_TAG ${RAYLIB_CPP_VERSION}
-    )
-    FetchContent_MakeAvailable(raylib_cpp)
+if (NOT DEFINED RAYLIB_CPP_VERSION)
+    set(RAYLIB_CPP_VERSION v5.0.2)
 endif()
-
+include(FetchContent)
+FetchContent_Declare(
+    raylib_cpp
+    GIT_REPOSITORY https://github.com/RobLoach/raylib-cpp.git
+    GIT_TAG ${RAYLIB_CPP_VERSION}
+)
+FetchContent_MakeAvailable(raylib_cpp)
 
 add_subdirectory(src/ECS)
 add_subdirectory(src/Utils)

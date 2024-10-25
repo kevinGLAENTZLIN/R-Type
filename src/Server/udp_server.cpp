@@ -184,7 +184,7 @@ void Rtype::udpServer::setHandlePlayerMap() {
         std::unique_ptr<Rtype::Command::Player::Move> cmd = convertACommandToCommand<Rtype::Command::Player::Move>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
         int gameID = _clients->at(get_sender_client_id())->getRoom();
 
-        cmd->set_server(_games->at(gameID)->getPlayers(),get_sender_client_id(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>());
+        cmd->set_server(_games->at(gameID)->getPlayers(),get_sender_client_id(), clientResponse.PopParam<float>(), clientResponse.PopParam<float>());
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
     };
@@ -236,7 +236,7 @@ void Rtype::udpServer::setHandleProjectileMap() {
         std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = convertACommandToCommand<Rtype::Command::Projectile::Fired>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Projectile), static_cast<uint8_t>(Utils::ProjectileEnum::ProjectileFired)));
         int gameID = _clients->at(get_sender_client_id())->getRoom();
 
-        cmd->set_server(_games->at(gameID)->getPlayers(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>());
+        cmd->set_server(_games->at(gameID)->getPlayers(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<float>(), clientResponse.PopParam<float>(), clientResponse.PopParam<float>(), clientResponse.PopParam<float>());
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
     };

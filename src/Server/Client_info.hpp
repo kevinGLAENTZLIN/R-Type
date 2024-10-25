@@ -72,28 +72,28 @@ namespace Rtype {
              * 
              * @return The X coordinate.
              */
-            int getX() const;
+            float getX() const;
 
             /**
              * @brief Sets the X coordinate of the client.
              * 
              * @param x The new X coordinate.
              */
-            void setX(int x);
+            void setX(float x);
 
             /**
              * @brief Gets the Y coordinate of the client.
              * 
              * @return The Y coordinate.
              */
-            int getY() const;
+            float getY() const;
 
             /**
              * @brief Sets the Y coordinate of the client.
              * 
              * @param y The new Y coordinate.
              */
-            void setY(int y);
+            void setY(float y);
 
             /**
              * @brief Gets the expected ACK number for the client.
@@ -208,8 +208,8 @@ namespace Rtype {
 
         private:
             int _id;
-            int _x;
-            int _y;
+            float _x;
+            float _y;
             int _AckExpected;
             int _AckToSend;
             int _gameRoom;

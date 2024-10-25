@@ -119,20 +119,20 @@ namespace Utils
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::SafetyCheck)}, {"", ""}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::LevelComplete)}, {"", "i"}},
 
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", "iii"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerDie)}, {"", "i"}},
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"ii", "iii"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"ff", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerAttack)}, {"i", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerGotPowerUp)}, {"i", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerHitAWall)}, {"", "i"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerScore)}, {"", "i"}},
 
-                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", "iii"}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", "iiff"}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyDie)}, {"", "i"}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyMove)}, {"", ""}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyAttack)}, {"", "i"}},
 
-                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iii"}},
+                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iff"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossDie)}, {"", "i"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossAttack)}, {"", "ii"}},
 
@@ -140,7 +140,7 @@ namespace Utils
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpDisappear)}, {"", ""}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpAttack)}, {"", ""}},
 
-                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"iiiiii", "iiiiii"}},
+                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"iiffff", "iiffff"}},
                     {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileHit)}, {"", "i"}},
                 };
             }

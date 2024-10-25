@@ -154,8 +154,8 @@ void Rtype::udpClient::setHandlePlayerMap() {
     _handlePlayerMap[Utils::PlayerEnum::PlayerSpawnOnGame] = [this](Utils::Network::Response response) {
         std::unique_ptr<Rtype::Command::Player::Spawn> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Spawn>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerSpawnOnGame)));
         int new_player_id = response.PopParam<int>();
-        int x = response.PopParam<int>();
-        int y = response.PopParam<int>();
+        float x = response.PopParam<float>();
+        float y = response.PopParam<float>();
     };
 
 
@@ -169,8 +169,8 @@ void Rtype::udpClient::setHandlePlayerMap() {
         std::unique_ptr<Rtype::Command::Player::Move> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Move>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
 
         int playerId = response.PopParam<int>();
-        int x = response.PopParam<int>();
-        int y = response.PopParam<int>();
+        float x = response.PopParam<float>();
+        float y = response.PopParam<float>();
 
     };
 
@@ -210,8 +210,8 @@ void Rtype::udpClient::setHandlePlayerMap() {
 void Rtype::udpClient::setHandleEnemyMap() {
     _handleEnemyMap[Utils::EnemyEnum::EnemySpawn] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();
-        int x = response.PopParam<int>();
-        int y = response.PopParam<int>();
+        float x = response.PopParam<float>();
+        float y = response.PopParam<float>();
     };
 
     _handleEnemyMap[Utils::EnemyEnum::EnemyDie] = [this](Utils::Network::Response response) {
@@ -243,10 +243,10 @@ void Rtype::udpClient::setHandleProjectileMap() {
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileFired] = [this](Utils::Network::Response response) {
         int ProjectileType = response.PopParam<int>();
         int ProjectileID = response.PopParam<int>();
-        int XOrigin = response.PopParam<int>();
-        int YOrigin = response.PopParam<int>();
-        int XVector = response.PopParam<int>();
-        int YVector = response.PopParam<int>();
+        float XOrigin = response.PopParam<float>();
+        float YOrigin = response.PopParam<float>();
+        float XVector = response.PopParam<float>();
+        float YVector = response.PopParam<float>();
     };
 
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileHit] = [this](Utils::Network::Response response) {
@@ -257,8 +257,8 @@ void Rtype::udpClient::setHandleProjectileMap() {
 void Rtype::udpClient::setHandleBossMap() {
     _handleBossMap[Utils::BossEnum::BossSpawn] = [this](Utils::Network::Response response) {
         int BossType = response.PopParam<int>();
-        int X = response.PopParam<int>();
-        int Y = response.PopParam<int>();
+        float X = response.PopParam<float>();
+        float Y = response.PopParam<float>();
     };
 
     _handleBossMap[Utils::BossEnum::BossDie] = [this](Utils::Network::Response response) {

@@ -470,9 +470,9 @@ void Rtype::Game::initGame(void)
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
     switchState(GameState::PLAY);
-    createPlayer(0, -10.0f, 0.0f);
-    createEnemy(PATAPATA, 10.0f, 2.0f);
-    createEnemy(PATAPATA, 13.0f, -2.0f);
+    createPlayer(0, -10.0f, 0.0f);       //To refactor
+    createEnemy(PATAPATA, 10.0f, 2.0f);  //To refactor
+    createEnemy(PATAPATA, 13.0f, -2.0f); //To refactor
 }
 
 void Rtype::Game::run() {

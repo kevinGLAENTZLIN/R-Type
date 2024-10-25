@@ -7,9 +7,7 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include<unistd.h>
-#include <vector>
+#include <thread>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -160,7 +158,10 @@ Rtype::Game::Game()
     renderTextFieldSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Text>());
     _core->setSystemSignature<ECS::Systems::RenderTextFieldSystem>(renderTextFieldSignature);
+}
 
+void Rtype::Game::loadMusic()
+{
     InitAudioDevice();
     createMusic("./resources/stage1/stage1.mp3", "stage1");
     createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
@@ -505,6 +506,9 @@ void Rtype::Game::initGame(void)
 }
 
 void Rtype::Game::run() {
+    std::thread musicThread(&Rtype::Game::loadMusic, this);
+
+    musicThread.join();
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {

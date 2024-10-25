@@ -276,10 +276,48 @@ void Rtype::Game::joinGame(void)
     destroyEntityMenu();
     destroyEntityLayer();
 
+    std::vector<std::tuple<int, int, int>> games = {
+        {101, 2, 4},
+        {102, 1, 4},
+        {103, 3, 4},
+        {103, 3, 4},
+        {103, 3, 4},
+        {102, 1, 4},
+        {103, 3, 4},
+        {103, 3, 4}
+    };
+
+    float yOffset = 200.0f;
+    short buttonCount = 0;
+
+    for (const auto &game : games) {
+        if (buttonCount >= 5)
+            break;
+        int gameID = std::get<0>(game);
+        int currentPlayerCount = std::get<1>(game);
+        int maxPlayerCount = std::get<2>(game);
+
+        std::size_t gameButton = _core->createEntity();
+
+        _core->addComponent(gameButton, ECS::Components::Position{400, yOffset});
+
+        std::string buttonText = "Game " + std::to_string(gameID) + " [" +
+                                std::to_string(currentPlayerCount) + "/" +
+                                 std::to_string(maxPlayerCount) + "]";
+        _core->addComponent(gameButton, ECS::Components::Text{buttonText, 20, RAYWHITE});
+
+        _core->addComponent(gameButton, ECS::Components::Button{Rectangle{350, yOffset - 10, 300, 40}, true, [this, gameID]() {
+            std::cout << "Joining game " << gameID << std::endl;
+        }});
+
+        yOffset += 60.0f;
+        buttonCount++;
+    }
+
     std::size_t back = _core->createEntity();
-    _core->addComponent(back, ECS::Components::Position{400, 200});
+    _core->addComponent(back, ECS::Components::Position{400, 500});
     _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
-    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
         initPlayOption();
     }});
     createBackgroundLayers(0.f, "bg_menu", 1);
@@ -417,12 +455,6 @@ void Rtype::Game::initPlayOption(void)
     destroyEntityLayer();
     destroyEntityText();
 
-    std::vector<std::size_t> entitiesText = _core->getEntitiesWithComponent<ECS::Components::TextField>();
-
-    for (auto &entity : entitiesText)
-        _core->destroyEntity(entity);
-
-    std::cout << "Init play option method" << std::endl;
     std::size_t createGame = _core->createEntity();
     _core->addComponent(createGame, ECS::Components::Position{400, 200});
     _core->addComponent(createGame, ECS::Components::Text{"Create Game", 30, RAYWHITE});

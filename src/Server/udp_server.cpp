@@ -102,15 +102,9 @@ void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
     if (client_id == -1 || game_room <= 0 || _clients->at(client_id)->getRoom() != -1)
         return;
     if (_games->at(game_room)) {
-        game.second->connectPlayer(_clients->at(client_id));
+        _games->at(game_room)->connectPlayer(_clients->at(client_id));
         return;
     }
-    // for (auto game: *_games) {
-    //     if (game.first == game_room) {
-    //         game.second->connectPlayer(_clients->at(client_id));
-    //         return;
-    //     }
-    // }
     Game_info tmp(game_room);
     _games->insert({game_room, std::make_shared<Game_info>(std::move(tmp))});
     _games->at(game_room)->connectPlayer(_clients->at(client_id));
@@ -128,7 +122,7 @@ void Rtype::udpServer::setHandleGameInfoMap() {
         std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)));
         cmd->set_server(_clients, (int)_network->getSenderEndpoint().port(), _network->getSenderEndpoint().address().to_string());
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), 0);
-        _network->addCommandToInvoker(std::move(cmd));  
+        _network->addCommandToInvoker(std::move(cmd));
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::CreateGame] = [this](Utils::Network::Response clientResponse) {

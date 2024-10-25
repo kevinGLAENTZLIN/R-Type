@@ -64,6 +64,16 @@ namespace Rtype {
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
         void movePlayer(int id, float x, float y);
         void createEnemyProjectile(int id);
+        void initGame();
+
+        bool getJoiningGame();
+        void setIsJoiningGame(bool state);
+        bool getIsAvailableGames();
+        void setIsAvailableGames(bool state);
+
+        std::vector<int> getAvailableGames();
+        void addAvailableGames(int game_id);
+        void clearAvailableGames();
 
     private:
         void createPlayerProjectile(std::size_t entityID);
@@ -75,7 +85,6 @@ namespace Rtype {
         void renderMenu();
         void switchState(GameState newState);
         void initMenu();
-        void initGame();
         void joinGame();
         void initOptions();
         void joinRandomGame();
@@ -109,5 +118,8 @@ namespace Rtype {
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
         std::shared_ptr<Rtype::Network> _network;
+        bool _isJoiningGame;
+        bool _isAvailableGames;
+        std::vector<int> _availableGames;
     };
 };

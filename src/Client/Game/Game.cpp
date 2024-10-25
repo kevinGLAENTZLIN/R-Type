@@ -16,7 +16,7 @@ int menuOption = 0;
 std::vector<std::string> options = { "Start Game", "Options", "Quit" };
 
 Rtype::Game::Game(std::shared_ptr<Rtype::Network> network)
-    : _network(network), _isRunning(true), _currentState(MENU)
+    : _network(network), _isRunning(true), _currentState(MENU), _isJoiningGame(false)
 {
     _core = std::make_unique<ECS::Core::Core>();
 
@@ -263,6 +263,8 @@ void Rtype::Game::joinGame(void)
     _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
         initPlayOption();
     }});
+    for (auto available_game: _availableGames)
+        std::cout << "Game available: " << available_game << std::endl;
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
@@ -360,8 +362,7 @@ void Rtype::Game::initCreationGame(void)
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         cmd->set_client();
         _network->addCommandToInvoker(std::move(cmd));
-        CONSOLE_INFO("Create game", " Sended")
-        initGame();
+        CONSOLE_INFO("Create game: ", " Sended")
     }});
 
     std::size_t back = _core->createEntity();
@@ -391,6 +392,11 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinRandomGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
         CONSOLE_INFO("Join game", "")
+        _isJoiningGame = true;
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
         joinRandomGame();
     }});
 
@@ -399,6 +405,11 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinGameEntity, ECS::Components::Text{"Search available game", 30, RAYWHITE});
     _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
         CONSOLE_INFO("Get available game", "")
+        _isJoiningGame = false;
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
         joinGame();
     }});
 
@@ -580,7 +591,7 @@ void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int
     }
 }
 
-//FUNCTIONS TO UPDATE GAME AND MENU -------------------------------------------
+//!FUNCTIONS TO UPDATE GAME AND MENU -------------------------------------------
 
 void Rtype::Game::updateMenu() {
 
@@ -646,7 +657,43 @@ void Rtype::Game::update() {
         _camera.Update(CAMERA_FREE);
 }
 
-//FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
+bool Rtype::Game::getJoiningGame()
+{
+    return _isJoiningGame;
+}
+
+void Rtype::Game::setIsJoiningGame(bool state)
+{
+    _isJoiningGame = state;
+}
+
+bool Rtype::Game::getIsAvailableGames()
+{
+    return _isAvailableGames;
+}
+
+void Rtype::Game::setIsAvailableGames(bool state)
+{
+    _isAvailableGames = state;
+}
+
+std::vector<int> Rtype::Game::getAvailableGames()
+{
+    return _availableGames;
+}
+
+void Rtype::Game::addAvailableGames(int game_id)
+{
+    _availableGames.push_back(game_id);
+}
+
+void Rtype::Game::clearAvailableGames()
+{
+    _availableGames.clear();
+}
+
+
+//!FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
 
 void Rtype::Game::renderMenu() {
     BeginDrawing();
@@ -728,7 +775,7 @@ void Rtype::Game::render() {
     EndDrawing();
 }
 
-//FUNCTIONS TO HANDLE MUSIC AND SOUND -----------------------------------------
+//!FUNCTIONS TO HANDLE MUSIC AND SOUND -----------------------------------------
 
 
 void Rtype::Game::createMusic(std::string path, std::string name) {

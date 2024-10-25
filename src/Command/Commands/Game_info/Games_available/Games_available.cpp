@@ -27,8 +27,14 @@ void Rtype::Command::GameInfo::Games_available::execute_client_side()
 
 void Rtype::Command::GameInfo::Games_available::execute_server_side()
 {
+    bool sended = false;
+
     for (auto game: *_games) {
-        if (game.second->isGameAvailable())
+        if (game.second->isGameAvailable()) {
     	    sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable, game.second->getRoomId());
+            sended |= true;
+        }
     }
+    if (!sended)
+    	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable, -1);
 }

@@ -80,8 +80,24 @@ void Rtype::udpClient::setHandleGameInfoMap()
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::GamesAvailable] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = _network->convertACommandToCommand<Rtype::Command::GameInfo::Games_available>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::GamesAvailable)));
         int codeRoom = response.PopParam<int>();
+        std::unique_ptr<Rtype::Command::GameInfo::Join_game> join_cmd ;
+
+        if (codeRoom == -1) {
+            CONSOLE_INFO("No Room available.", "");
+            return;
+        }
+        CONSOLE_INFO(codeRoom, ": is available");
+        if (_game->getJoiningGame()) {
+            join_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+            _game->setIsJoiningGame(false);
+            join_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            join_cmd->set_client(codeRoom);
+            _network->addCommandToInvoker(std::move(join_cmd));
+        }
+        if (_game->getIsAvailableGames()) {
+            _game->addAvailableGames(codeRoom);
+        }
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::CreateGame] = [this](Utils::Network::Response response) {
@@ -92,9 +108,6 @@ void Rtype::udpClient::setHandleGameInfoMap()
             CONSOLE_INFO("Game failed to create, too many game.", "")
         }
         CONSOLE_INFO("Game created: ", codeRoom)
-        std::cout << _network->getSocket() << std::endl;
-        std::cout << _network->getSenderEndpoint().port() << std::endl;
-        std::cout << _network->getAckToSend() << std::endl;
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         cmd->set_client(codeRoom);
         _network->addCommandToInvoker(std::move(cmd));
@@ -110,7 +123,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
             return;
         }
         CONSOLE_INFO("Joining game at level: ", level)
-        std::cout << "Have to start the game from here now !" << std::endl;
+        _game->initGame();
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::GameWonLost] = [this](Utils::Network::Response response) {

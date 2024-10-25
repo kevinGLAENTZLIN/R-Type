@@ -8,10 +8,14 @@
 #include "../Utils/Network/Network.hpp"
 #include "../Client/Game/Game.hh"
 #include "Game_info.hh"
+#include <iostream>
+#include <vector>
 
 Rtype::Game_info::Game_info():
-	_id(-1), _level(0), _nbMaxPlayer(6), _tick(0), _players()
+	_id(-1), _level(0), _nbMaxPlayer(6), _nextEnemyIndex(0), _tick(0), _players()
 {
+    _loadData.LoadDataFromFile("stage1.json");
+    _enemySpawnData = _loadData.GetEnemySpawnData();
 	_tickThread = std::thread([this]() { computeTick(); });
 }
 
@@ -67,8 +71,17 @@ void Rtype::Game_info::setNetwork(std::shared_ptr<Rtype::Network> network)
 
 void Rtype::Game_info::computeGame(void)
 {
-	if (_tick % 200 == 0)
-		std::cout << "Spawn a mob" << std::endl; //! To refactor by the commands
+    if (_nextEnemyIndex < _enemySpawnData.size()) {
+        std::cout << "Spawning enemy " << _nextEnemyIndex << std::endl;
+        const auto& enemyData = _enemySpawnData[_nextEnemyIndex];
+
+        _game->createEnemy(
+            enemyData.getType(),
+            enemyData.getPositionX(),
+            enemyData.getPositionY()
+        );
+        _nextEnemyIndex++;
+    }
 }
 
 void Rtype::Game_info::computeTick(void)

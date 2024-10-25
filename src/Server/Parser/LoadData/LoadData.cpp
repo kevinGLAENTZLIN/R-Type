@@ -33,6 +33,8 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
         const Json::Value& enemyData = root[enemyKey];
 
         std::string type = enemyData["type"].asString();
+        std::cout << "type: " << type << std::endl;
+        enemiesTypeEnum_t enemyType = convertStringToEnumType(type);
         float positionX = enemyData["position"]["x"].asFloat();
         float positionY = enemyData["position"]["y"].asFloat();
         std::string model = enemyData["model"].asString();
@@ -40,7 +42,7 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
         int timeSecond = enemyData["time second"].asInt();
 
         Rtype::EnemySpawnData enemy;
-        enemy.setType(type);
+        enemy.setType(enemyType);
         enemy.setPositionX(positionX);
         enemy.setPositionY(positionY);
         enemy.setModel(model);
@@ -48,6 +50,15 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
 
         _enemySpawnData.push_back(enemy);
     }
+}
+
+enemiesTypeEnum_t Rtype::LoadData::convertStringToEnumType(const std::string &text)
+{
+    if (text == "PATAPATA")
+        return PATAPATA;
+    if (text == "BINK")
+        return BINK;
+    return PATAPATA;
 }
 
 std::vector<Rtype::EnemySpawnData> Rtype::LoadData::GetEnemySpawnData() const

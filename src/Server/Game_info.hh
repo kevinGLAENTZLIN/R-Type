@@ -6,13 +6,16 @@
 */
 
 #pragma once
+#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <map>
 #include <string>
 #include <memory>
 #include <thread>
+#include <vector>
 #include "Client_info.hpp"
+#include "Parser/LoadData/LoadData.hh"
 
 namespace Rtype
 {
@@ -57,6 +60,9 @@ namespace Rtype
             std::map<int, std::shared_ptr<Rtype::client_info>> _players;
             std::shared_ptr<Rtype::Network> _network;
             std::unique_ptr<Rtype::Game> _game;
+            LoadData _loadData;
+            std::vector<Rtype::EnemySpawnData> _enemySpawnData;
+            std::size_t _nextEnemyIndex;
             // Todo compile with Game class
     };
 }

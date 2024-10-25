@@ -38,6 +38,15 @@ set(CLIENT_SOURCES
     ../Server/Game_info.cpp
     ../Utils/Protocol/Protocol.cpp
     ../Utils/Response/Response.cpp
+    ../Server/Parser/LoadData/LoadData.cpp         # Ajout de LoadData.cpp
+    ../Server/Parser/EnemySpawnData/EnemySpawnData.cpp
+)
+
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ../Server/Parser/LoadData
+    ../Server/Parser/EnemySpawnData
+    ../Utils
 )
 
 find_package(boost_asio CONFIG REQUIRED)
@@ -59,8 +68,10 @@ else()
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
     target_link_libraries(${NAME_CLIENT} PUBLIC Boost::asio)
     target_link_libraries(${NAME_CLIENT} PUBLIC raylib raylib_cpp ${NAME_LIB})
+    target_link_libraries(${NAME_CLIENT} PUBLIC jsoncpp)
     target_link_libraries(${NAME_CLIENT} PRIVATE ${NAME_LIB_CMD})
     target_link_libraries(${NAME_CLIENT} PRIVATE ${NAME_LIB_UTILS})
+
 endif()
 
 if(WIN32)

@@ -15,25 +15,26 @@ std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegi
 int menuOption = 0;
 std::vector<std::string> options = { "Start Game", "Options", "Quit" };
 
-Rtype::Game::Game(std::shared_ptr<Rtype::Network> network)
+Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
     : _network(network), _isRunning(true), _currentState(MENU), _isJoiningGame(false)
 {
     _core = std::make_unique<ECS::Core::Core>();
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    SetTargetFPS(60);
-    _window.Init(1280, 720, "R-Type Game");
-    SetWindowMinSize(1280, 720);
-    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
-    _ressourcePool.addModel("ship_yellow");
-    _ressourcePool.addModel("base_projectile");
-    _ressourcePool.addModel("enemy_one");
-    _ressourcePool.addTexture("bg_menu");
-    _ressourcePool.addTexture("background");
-    _ressourcePool.addTexture("background_layer0");
-    _ressourcePool.addTexture("background_layer1");
-    _ressourcePool.addTexture("background_layer2");
-
+    if (render) {
+        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+        SetTargetFPS(60);
+        _window.Init(1280, 720, "R-Type Game");
+        SetWindowMinSize(1280, 720);
+        _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+        _ressourcePool.addModel("ship_yellow");
+        _ressourcePool.addModel("base_projectile");
+        _ressourcePool.addModel("enemy_one");
+        _ressourcePool.addTexture("bg_menu");
+        _ressourcePool.addTexture("background");
+        _ressourcePool.addTexture("background_layer0");
+        _ressourcePool.addTexture("background_layer1");
+        _ressourcePool.addTexture("background_layer2");
+    }
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Rotate>();
     _core->registerComponent<ECS::Components::Scale>();
@@ -143,11 +144,13 @@ Rtype::Game::Game(std::shared_ptr<Rtype::Network> network)
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
 
-    InitAudioDevice();
-    createMusic("./resources/stage1/stage1.mp3", "stage1");
-    createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
-    createSound("./resources/blasterLego/blasterLego.mp3", "blasterLego");
-    createSound("./resources/breakLego/breakLego.mp3", "breakLego");
+    if (render) {
+        InitAudioDevice();
+        createMusic("./resources/stage1/stage1.mp3", "stage1");
+        createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
+        createSound("./resources/blasterLego/blasterLego.mp3", "blasterLego");
+        createSound("./resources/breakLego/breakLego.mp3", "breakLego");
+    }
 }
 
 Rtype::Game::~Game()
@@ -475,7 +478,8 @@ void Rtype::Game::initGame(void)
     createEnemy(PATAPATA, 13.0f, -2.0f); //To refactor
 }
 
-void Rtype::Game::run() {
+void Rtype::Game::run()
+{
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
@@ -493,7 +497,12 @@ void Rtype::Game::run() {
         }
     }
     CloseAudioDevice();
+}
 
+void Rtype::Game::runServer()
+{
+    while (_isRunning)
+        update();
 }
 
 std::vector<std::size_t> getAllInputs() {

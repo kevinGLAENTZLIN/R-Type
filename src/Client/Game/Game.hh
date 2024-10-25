@@ -55,10 +55,11 @@ namespace Rtype {
 
     class Game {
     public:
-        Game(std::shared_ptr<Rtype::Network> network);
+        Game(std::shared_ptr<Rtype::Network> network, bool render);
         ~Game();
 
         void run();
+        void runServer();
         void createPlayer(int id, float pos_x, float pos_y);
         void createOtherPlayer(int id, float pos_x, float pos_y);
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);

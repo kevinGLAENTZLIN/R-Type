@@ -57,6 +57,12 @@ Rtype::Game_info &Rtype::Game_info::operator=(Game_info &&other) noexcept
     return *this;
 }
 
+void Rtype::Game_info::setNetwork(std::shared_ptr<Rtype::Network> network)
+{
+	_network = network;
+    _game = std::make_unique<Rtype::Game>(_network, false);
+}
+
 void Rtype::Game_info::computeGame(void)
 {
 	if (_tick % 200 == 0)

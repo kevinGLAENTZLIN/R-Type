@@ -13,6 +13,7 @@
 #include <memory>
 #include <thread>
 #include "Client_info.hpp"
+#include "../Utils/Network/Network.hpp"
 
 namespace Rtype
 {
@@ -30,6 +31,8 @@ namespace Rtype
 
             void computeGame(void);
             void computeTick(void);
+
+            void setNetwork(std::shared_ptr<Rtype::Network> network);
 
             bool gameStatus(void);
             void goNextLevel(void);
@@ -49,6 +52,8 @@ namespace Rtype
             unsigned int _tick;
             std::thread _tickThread;
             std::map<int, std::shared_ptr<Rtype::client_info>> _players;
-
+            std::shared_ptr<Rtype::Network> _network;
+            std::unique_ptr<Rtype::Game> _game;
+            // Todo compile with Game class
     };
 }

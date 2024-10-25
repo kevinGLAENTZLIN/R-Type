@@ -24,6 +24,7 @@
 #include "../../ECS/Component/Button/Button.hh"
 #include "../../ECS/Component/Music/Music.hh"
 #include "../../ECS/Component/Sound/Sound.hh"
+#include "../../ECS/Component/Textfield/Textfield.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -38,6 +39,8 @@
 #include "../../ECS/System/RenderText/RenderText.hh"
 #include "../../ECS/System/RenderButton/RenderButton.hh"
 #include "../../ECS/System/ButtonClick/ButtonClick.hh"
+#include "../../ECS/System/TextfieldInput/TextfieldInput.hh"
+#include "../../ECS/System/RenderTextfield/RenderTextfield.hh"
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
@@ -77,6 +80,7 @@ namespace Rtype {
         void clearAvailableGames();
 
     private:
+        void loadMusic();
         void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
@@ -104,6 +108,8 @@ namespace Rtype {
         void playSound(std::string name);
         void createSound(std::string path, std::string name);
         void updatePlayerCountText();
+        void DrawProgressBar(int progress);
+        void LoadAssets();
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;

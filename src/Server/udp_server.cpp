@@ -107,6 +107,7 @@ void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
     }
     Game_info tmp(game_room);
     _games->insert({game_room, std::make_shared<Game_info>(std::move(tmp))});
+    _games->at(game_room)->setNetwork(_network);
     _games->at(game_room)->connectPlayer(_clients->at(client_id));
 }
 
@@ -145,12 +146,15 @@ void Rtype::udpServer::setHandleGameInfoMap() {
 
     _handleGameInfoMap[Utils::GameInfoEnum::JoinGame] = [this](Utils::Network::Response clientResponse) {
         int id_room = clientResponse.PopParam<int>();
-        std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Join_game>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)));
+        std::unique_ptr<Rtype::Command::GameInfo::Join_game> join_cmd = convertACommandToCommand<Rtype::Command::GameInfo::Join_game>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)));
+        // std::unique_ptr<Rtype::Command::Player::Spawn> spawn_cmd = convertACommandToCommand<Rtype::Command::Player::Spawn>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerSpawnOnGame)));
 
-        cmd->set_server(_games->at(id_room), _clients->at(get_sender_client_id()));
-        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
-        _network->addCommandToInvoker(std::move(cmd));
+        join_cmd->set_server(_games->at(id_room), _clients->at(get_sender_client_id()));
+        join_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
+        _network->addCommandToInvoker(std::move(join_cmd));
         CONSOLE_INFO("Player is joining game: ", id_room)
+        // spawn_cmd->set_server(*_clients, get_sender_client_id(), -10., 0.);
+        // spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend(), _games->at(id_room));
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::LevelComplete] = [this](Utils::Network::Response clientResponse) {

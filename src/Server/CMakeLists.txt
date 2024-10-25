@@ -14,8 +14,6 @@ set(SERVER_SOURCES
     ${CMAKE_SOURCE_DIR}/src/Client/Game/Game.cpp
 )
 
-find_package(boost_asio CONFIG REQUIRED)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_executable(${NAME_SERVER} ${SERVER_SOURCES})
 

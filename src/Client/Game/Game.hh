@@ -24,6 +24,7 @@
 #include "../../ECS/Component/Button/Button.hh"
 #include "../../ECS/Component/Music/Music.hh"
 #include "../../ECS/Component/Sound/Sound.hh"
+#include "../../ECS/Component/Textfield/Textfield.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -38,6 +39,8 @@
 #include "../../ECS/System/RenderText/RenderText.hh"
 #include "../../ECS/System/RenderButton/RenderButton.hh"
 #include "../../ECS/System/ButtonClick/ButtonClick.hh"
+#include "../../ECS/System/TextfieldInput/TextfieldInput.hh"
+#include "../../ECS/System/RenderTextfield/RenderTextfield.hh"
 
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 

@@ -48,6 +48,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::Button>();
     _core->registerComponent<ECS::Components::Musica>();
     _core->registerComponent<ECS::Components::SoundEffect>();
+    _core->registerComponent<ECS::Components::TextField>();
 
     _core->registerSystem<ECS::Systems::SystemVelocity>();
     _core->registerSystem<ECS::Systems::Collision>();
@@ -60,6 +61,8 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::RenderTextSystem>();
     _core->registerSystem<ECS::Systems::RenderButtonSystem>();
     _core->registerSystem<ECS::Systems::ButtonClickSystem>();
+    _core->registerSystem<ECS::Systems::TextFieldInputSystem>();
+    _core->registerSystem<ECS::Systems::RenderTextFieldSystem>();
 
     Signature velocitySystemSignature;
     velocitySystemSignature.set(
@@ -141,6 +144,20 @@ Rtype::Game::Game()
     buttonClickSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
+
+    Signature textFieldInputSignature;
+    textFieldInputSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::TextField>());
+    _core->setSystemSignature<ECS::Systems::TextFieldInputSystem>(textFieldInputSignature);
+
+    Signature renderTextFieldSignature;
+    renderTextFieldSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    renderTextFieldSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::TextField>());
+    renderTextFieldSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Text>());
+    _core->setSystemSignature<ECS::Systems::RenderTextFieldSystem>(renderTextFieldSignature);
 }
 
 void Rtype::Game::loadMusic()
@@ -272,11 +289,35 @@ void Rtype::Game::joinGameID(void)
 {
     destroyEntityMenu();
     destroyEntityLayer();
+    destroyEntityText();
+
+    std::size_t textFieldEntity = _core->createEntity();
+    _core->addComponent(textFieldEntity, ECS::Components::Position{400, 200});
+    _core->addComponent(textFieldEntity, ECS::Components::Text{"", 30, RAYWHITE});
+
+    ECS::Components::TextField textField(Rectangle{350, 190, 300, 60}, true, "");
+    textField.onTextChange([this, textFieldEntity](const std::string &newText) {
+        auto &text = _core->getComponent<ECS::Components::Text>(textFieldEntity);
+        text.setText(newText);
+    });
+    _core->addComponent(textFieldEntity, std::move(textField));
+
+    std::size_t joinButton = _core->createEntity();
+    _core->addComponent(joinButton, ECS::Components::Position{400, 300});
+    _core->addComponent(joinButton, ECS::Components::Text{"Join", 30, RAYWHITE});
+    _core->addComponent(joinButton, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this, textFieldEntity]() {
+        auto &textField = _core->getComponent<ECS::Components::TextField>(textFieldEntity);
+        std::string friendGameID = textField.getText();
+
+        if (!friendGameID.empty()) {
+            std::cout << "Joining game with ID: " << friendGameID << std::endl;
+        }
+    }});
 
     std::size_t back = _core->createEntity();
-    _core->addComponent(back, ECS::Components::Position{400, 200});
+    _core->addComponent(back, ECS::Components::Position{400, 500});
     _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
-    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
+    _core->addComponent(back, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
         initPlayOption();
     }});
     createBackgroundLayers(0.f, "bg_menu", 1);
@@ -376,6 +417,12 @@ void Rtype::Game::initPlayOption(void)
     destroyEntityLayer();
     destroyEntityText();
 
+    std::vector<std::size_t> entitiesText = _core->getEntitiesWithComponent<ECS::Components::TextField>();
+
+    for (auto &entity : entitiesText)
+        _core->destroyEntity(entity);
+
+    std::cout << "Init play option method" << std::endl;
     std::size_t createGame = _core->createEntity();
     _core->addComponent(createGame, ECS::Components::Position{400, 200});
     _core->addComponent(createGame, ECS::Components::Text{"Create Game", 30, RAYWHITE});
@@ -580,11 +627,15 @@ void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int
 void Rtype::Game::updateMenu() {
 
     auto clicSystem = _core->getSystem<ECS::Systems::ButtonClickSystem>();
+    auto inputTextfieldSystem = _core->getSystem<ECS::Systems::TextFieldInputSystem>();
 
     auto buttonEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ButtonClickSystem>());
+    auto textfieldEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::TextFieldInputSystem>());
 
     clicSystem->update(_core->getComponents<ECS::Components::Button>(),
                         buttonEntities);
+    inputTextfieldSystem->update(_core->getComponents<ECS::Components::TextField>(),
+                                 textfieldEntities);
 }
 
 void Rtype::Game::update() {
@@ -656,10 +707,13 @@ void Rtype::Game::renderMenu() {
     auto renderSystemText = _core->getSystem<ECS::Systems::RenderTextSystem>();
     auto renderButtons = _core->getSystem<ECS::Systems::RenderButtonSystem>();
     auto renderSystem2D = _core->getSystem<ECS::Systems::SystemRender2D>();
+    auto renderTextfield = _core->getSystem<ECS::Systems::RenderTextFieldSystem>();
 
     auto renderEntities2D  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemRender2D>());
     auto renderEntitiesText  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::RenderTextSystem>());
     auto renderEntitiesButton  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::RenderButtonSystem>());
+    auto renderEntitiesTextfield  = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::RenderTextFieldSystem>());
+
 
     for (auto entity : renderEntitiesButton) {
         auto &buttonPosition = _core->getComponent<ECS::Components::Position>(entity);
@@ -680,9 +734,14 @@ void Rtype::Game::renderMenu() {
                            renderEntities2D,
                            _ressourcePool);
 
+    renderTextfield->update(_core->getComponents<ECS::Components::TextField>(),
+                            _core->getComponents<ECS::Components::Text>(),
+                            _core->getComponents<ECS::Components::Position>(),
+                            renderEntitiesTextfield);
+
     renderSystemText->update(_core->getComponents<ECS::Components::Text>(),
-                             _core->getComponents<ECS::Components::Position>(),
-                             renderEntitiesText);
+                            _core->getComponents<ECS::Components::Position>(),
+                            renderEntitiesText);
 
     renderButtons->update(_core->getComponents<ECS::Components::Button>(),
                           _core->getComponents<ECS::Components::Text>(),

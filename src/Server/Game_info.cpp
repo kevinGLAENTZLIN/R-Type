@@ -9,6 +9,7 @@
 #include "../Client/Game/Game.hh"
 #include "Game_info.hh"
 #include <iostream>
+#include <memory>
 #include <vector>
 
 Rtype::Game_info::Game_info():
@@ -63,33 +64,36 @@ Rtype::Game_info &Rtype::Game_info::operator=(Game_info &&other) noexcept
     return *this;
 }
 
-void Rtype::Game_info::setNetwork(std::shared_ptr<Rtype::Network> network)
+void Rtype::Game_info::setNetwork(std::shared_ptr<Rtype::Network> network, std::shared_ptr<ECS::RessourcePool> ressourcePool)
 {
 	_network = network;
     _game = std::make_unique<Rtype::Game>(_network, false);
 }
 
-void Rtype::Game_info::computeGame(void)
+void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 {
     if (_nextEnemyIndex < _enemySpawnData.size()) {
-        std::cout << "Spawning enemy " << _nextEnemyIndex << std::endl;
         const auto& enemyData = _enemySpawnData[_nextEnemyIndex];
 
-        _game->createEnemy(
-            enemyData.getType(),
-            enemyData.getPositionX(),
-            enemyData.getPositionY()
-        );
-        _nextEnemyIndex++;
+        if (currentGameTimeInSeconds >= enemyData.getSpawnTimeInSeconds()) {
+            _game->createEnemy(
+                enemyData.getType(),
+                enemyData.getEnemyX(),
+                enemyData.getEnemyY()
+            );
+            _nextEnemyIndex += 1;
+        }
     }
 }
 
 void Rtype::Game_info::computeTick(void)
 {
+    int currentGameTimeInSeconds = 0;
 	while (!_players.empty()) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		_tick += 1;
-		computeGame();
+		currentGameTimeInSeconds = _tick / 20;
+		computeGame(currentGameTimeInSeconds);
 	}
 }
 
@@ -105,7 +109,13 @@ bool Rtype::Game_info::gameStatus(void)
 
 void Rtype::Game_info::goNextLevel(void)
 {
-	_level += 1;
+    const std::string nextLevel = "stage" + std::to_string(_level + 1) + ".json";
+
+    _loadData.clearEnemySpawnData();
+    _enemySpawnData.clear();
+    _level += 1;
+    _loadData.LoadDataFromFile(nextLevel);
+    _enemySpawnData = _loadData.GetEnemySpawnData();
 }
 
 int Rtype::Game_info::getLevel(void)

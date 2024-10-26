@@ -22,6 +22,7 @@ namespace Rtype {
 
             void LoadDataFromFile(const std::string &path);
             std::vector<Rtype::EnemySpawnData> GetEnemySpawnData() const;
+            void clearEnemySpawnData();
 
         private:
             enemiesTypeEnum_t convertStringToEnumType(const std::string &text);

@@ -23,7 +23,9 @@ namespace Rtype {
             void setPositionY(float position_y);
             void setModel(std::string model);
             void setSpawnTime(std::pair <int, int> spawnTime);
+            void setSpawnTimeInSeconds(int spawnTimeInSeconds);
 
+            int getSpawnTimeInSeconds() const;
             enemiesTypeEnum_t getType() const;
             float getPositionX() const;
             float getPositionY() const;
@@ -36,6 +38,7 @@ namespace Rtype {
             float _position_x;
             float _position_y;
             std::string _model;
+            int _spawnTimeInSeconds;
             std::pair<int, int> _spawnTime;
     };
 }

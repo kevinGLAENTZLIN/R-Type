@@ -35,7 +35,7 @@ namespace Rtype
             Game_info(Game_info&& other) noexcept;
             Game_info& operator=(Game_info&& other) noexcept;
 
-            void computeGame(void);
+            void computeGame(int currentGameTimeInSeconds);
             void computeTick(void);
 
             void setNetwork(std::shared_ptr<Rtype::Network> network);

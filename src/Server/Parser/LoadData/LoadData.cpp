@@ -61,6 +61,11 @@ enemiesTypeEnum_t Rtype::LoadData::convertStringToEnumType(const std::string &te
     return PATAPATA;
 }
 
+void Rtype::LoadData::clearEnemySpawnData()
+{
+    _enemySpawnData.clear();
+}
+
 std::vector<Rtype::EnemySpawnData> Rtype::LoadData::GetEnemySpawnData() const
 {
     return _enemySpawnData;

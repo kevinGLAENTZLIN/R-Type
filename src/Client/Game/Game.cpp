@@ -12,7 +12,7 @@
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
 int menuOption = 0;
-std::vector<std::string> options = { "Start Game", "Options", "Quit" };
+std::vector<std::string> options = {"Start Game", "Options", "Quit"};
 
 Rtype::Game::Game()
     : _isRunning(true), _currentState(MENU)
@@ -23,7 +23,7 @@ Rtype::Game::Game()
     SetTargetFPS(60);
     _window.Init(1280, 720, "R-Type Game");
     SetWindowMinSize(1280, 720);
-    _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+    _camera = raylib::Camera3D({0.0f, 10.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, 60.0f);
     _ressourcePool.addModel("ship_yellow");
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
@@ -46,6 +46,7 @@ Rtype::Game::Game()
     _core->registerComponent<ECS::Components::AI>();
     _core->registerComponent<ECS::Components::Text>();
     _core->registerComponent<ECS::Components::Button>();
+    _core->registerComponent<ECS::Components::Health>();
     _core->registerComponent<ECS::Components::Musica>();
     _core->registerComponent<ECS::Components::SoundEffect>();
     _core->registerComponent<ECS::Components::TextField>();
@@ -61,6 +62,8 @@ Rtype::Game::Game()
     _core->registerSystem<ECS::Systems::RenderTextSystem>();
     _core->registerSystem<ECS::Systems::RenderButtonSystem>();
     _core->registerSystem<ECS::Systems::ButtonClickSystem>();
+    _core->registerSystem<ECS::Systems::GetDeadEntities>();
+    _core->registerSystem<ECS::Systems::AIFiringProjectile>();
     _core->registerSystem<ECS::Systems::TextFieldInputSystem>();
     _core->registerSystem<ECS::Systems::RenderTextFieldSystem>();
 
@@ -76,6 +79,8 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
     collisionSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::Hitbox>());
+    collisionSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
     _core->setSystemSignature<ECS::Systems::Collision>(collisionSignature);
 
     Signature projectileCollisionSignature;
@@ -145,6 +150,20 @@ Rtype::Game::Game()
         ECS::CTypeRegistry::getTypeId<ECS::Components::Button>());
     _core->setSystemSignature<ECS::Systems::ButtonClickSystem>(buttonClickSignature);
 
+    Signature getDeadEntitiesSignature;
+    getDeadEntitiesSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Health>());
+    getDeadEntitiesSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
+    _core->setSystemSignature<ECS::Systems::GetDeadEntities>(getDeadEntitiesSignature);
+
+    Signature AIFiringProjectileSignature;
+    AIFiringProjectileSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::Position>());
+    AIFiringProjectileSignature.set(
+        ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
+    _core->setSystemSignature<ECS::Systems::AIFiringProjectile>(AIFiringProjectileSignature);
+
     Signature textFieldInputSignature;
     textFieldInputSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::TextField>());
@@ -174,7 +193,7 @@ Rtype::Game::~Game()
     _ressourcePool.UnloadAll();
 }
 
-void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y)
+void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t enemy = _core->createEntity();
@@ -185,18 +204,34 @@ void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float po
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType});
-    _mapID[enemy] = enemy;
+    _core->addComponent(enemy, ECS::Components::Health{life});
+    _serverToLocalEnemiesId[enemy] = enemy;
+}
+
+std::size_t Rtype::Game::createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y)
+{
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
+    std::size_t enemy = _core->createEntity();
+    _core->addComponent(enemy, ECS::Components::Position{pos_x, pos_y});
+    _core->addComponent(enemy, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Scale{1.0f});
+    _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
+    _core->addComponent(enemy, ECS::Components::AI{enemyType, std::make_pair(pos_x, pos_y), std::make_pair(dest_x, dest_y)});
+    _serverToLocalEnemiesId[enemy] = enemy;
+    return enemy;
 }
 
 void Rtype::Game::movePlayer(int id, float x, float y)
 {
-    auto &velocity = _core->getComponent<ECS::Components::Velocity>(_mapID[id]);
+    auto &velocity = _core->getComponent<ECS::Components::Velocity>(_serverToLocalPlayersId[id]);
 
     velocity.setX(x);
     velocity.setY(y);
 }
 
-void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
+void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibility)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t player = _core->createEntity();
@@ -207,22 +242,23 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(player, ECS::Components::Input{});
+    _core->addComponent(player, ECS::Components::Health{5, invincibility});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
-    _mapID[id] = player;
+    _serverToLocalPlayersId[id] = player;
 }
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t otherPlayer = _core->createEntity();
 
     _core->addComponent(otherPlayer, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(otherPlayer, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
     _core->addComponent(otherPlayer, ECS::Components::Scale{1.0f});
     _core->addComponent(otherPlayer, ECS::Components::Velocity{0.0f, 0.0f});
-    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     _core->addComponent(otherPlayer, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
-    _mapID[id] = otherPlayer;
+    _serverToLocalPlayersId[id] = otherPlayer;
 }
 
 void Rtype::Game::destroyEntityMenu(void)
@@ -521,6 +557,31 @@ void Rtype::Game::initMenu(void)
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
+void Rtype::Game::createBoss1()
+{
+    createEnemy(BOSS1_Core, 8, -0.5, 4);
+    createCyclingEnemy(BOSS1_Tail0, 6.0f, 3.0f, 6.05f, 2.95f);
+    createCyclingEnemy(BOSS1_Tail1, 5.5f, 2.8f, 6.1f, 2.7f);
+    createCyclingEnemy(BOSS1_Tail2, 5.1f, 2.5f, 5.8f, 2.4f);
+    createCyclingEnemy(BOSS1_Tail3, 4.7f, 2.9f, 6.2f, 2.1f);
+    createCyclingEnemy(BOSS1_Tail4, 4.2f, 2.8f, 6.0f, 1.8f);
+    createCyclingEnemy(BOSS1_Tail5, 3.8f, 3.1f, 6.1f, 1.5f);
+    createCyclingEnemy(BOSS1_Tail6, 3.3f, 3.0f, 5.9f, 1.2f);
+    createCyclingEnemy(BOSS1_Tail7, 2.9f, 2.7f, 5.8f, 0.9f);
+    createCyclingEnemy(BOSS1_Tail8, 2.5f, 3.1f, 6.1f, 0.6f);
+    createCyclingEnemy(BOSS1_Tail9, 2.0f, 3.0f, 6.0f, 0.3f);
+    createCyclingEnemy(BOSS1_Tail10, 1.6f, 2.6f, 6.2f, 0.0f);
+    createCyclingEnemy(BOSS1_Tail11, 1.2f, 2.9f, 5.9f, -0.3f);
+    createCyclingEnemy(BOSS1_Tail12, 0.8f, 3.1f, 5.7f, -0.6f);
+    createCyclingEnemy(BOSS1_Tail13, 0.3f, 3.0f, 6.0f, -0.9f);
+    createCyclingEnemy(BOSS1_Tail14, -0.1f, 3.2f, 6.1f, -1.2f);
+    createCyclingEnemy(BOSS1_Tail15, -0.5f, 2.9f, 5.9f, -1.5f);
+    createCyclingEnemy(BOSS1_Tail16, -0.9f, 2.7f, 5.7f, -1.8f);
+    createCyclingEnemy(BOSS1_Tail17, -1.4f, 3.0f, 6.0f, -2.1f);
+    createCyclingEnemy(BOSS1_Tail18, -1.9f, 3.1f, 5.9f, -2.4f);
+    createCyclingEnemy(BOSS1_Tail19, -2.4f, 2.9f, 6.2f, -2.7f);
+}
+
 void Rtype::Game::initGame(void)
 {
     stopMusic("menu");
@@ -532,9 +593,63 @@ void Rtype::Game::initGame(void)
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
     switchState(GameState::PLAY);
-    createPlayer(0, -10.0f, 0.0f);
-    createEnemy(PATAPATA, 10.0f, 2.0f);
-    createEnemy(PATAPATA, 13.0f, -2.0f);
+    createPlayer(0, -10.0f, 0.0f, 50);
+
+    createBoss1();
+
+    createEnemy(BINK, -5.0f, 3.0f, 1);
+
+    // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
+    // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);
+    // createBoss1Tail(BOSS1_Tail2, 5.8f, 2.4f);
+    // createBoss1Tail(BOSS1_Tail3, 6.2f, 2.1f);
+    // createBoss1Tail(BOSS1_Tail4, 6.0f, 1.8f);
+    // createBoss1Tail(BOSS1_Tail5, 6.1f, 1.5f);
+    // createBoss1Tail(BOSS1_Tail6, 5.9f, 1.2f);
+    // createBoss1Tail(BOSS1_Tail7, 5.8f, 0.9f);
+    // createBoss1Tail(BOSS1_Tail8, 6.1f, 0.6f);
+    // createBoss1Tail(BOSS1_Tail9, 6.0f, 0.3f);
+    // createBoss1Tail(BOSS1_Tail10, 6.2f, 0.0f);
+    // createBoss1Tail(BOSS1_Tail11, 5.9f, -0.3f);
+    // createBoss1Tail(BOSS1_Tail12, 5.7f, -0.6f);
+    // createBoss1Tail(BOSS1_Tail13, 6.0f, -0.9f);
+    // createBoss1Tail(BOSS1_Tail14, 6.1f, -1.2f);
+    // createBoss1Tail(BOSS1_Tail15, 5.9f, -1.5f);
+    // createBoss1Tail(BOSS1_Tail16, 5.7f, -1.8f);
+    // createBoss1Tail(BOSS1_Tail17, 6.0f, -2.1f);
+    // createBoss1Tail(BOSS1_Tail18, 5.9f, -2.4f);
+    // createBoss1Tail(BOSS1_Tail19, 6.2f, -2.7f);
+
+    //ay = ((by - cy) / 2) * sin((π / (bx - cx)) * (ax - ((bx + cx) / 2))) + ((by + cy) / 2)
+    
+    // createEnemy(PATAPATA, 10.5f, -3.0f);
+    // createEnemy(PATAPATA, 11.5f, -2.9f);
+    // createEnemy(PATAPATA, 12.5f, -2.8f);
+    // createEnemy(PATAPATA, 13.5f, -3.0f);
+    // createEnemy(PATAPATA, 14.5f, -3.2f);
+
+    // createEnemy(PATAPATA, 10.5f, 3.0f);
+    // createEnemy(PATAPATA, 11.5f, 2.9f);
+    // createEnemy(PATAPATA, 12.5f, 2.8f);
+    // createEnemy(PATAPATA, 13.5f, 3.2f);
+    // createEnemy(PATAPATA, 14.5f, 2.0f);
+
+    // createEnemy(BUG, 10.5f, 0.25f);
+    // createEnemy(BUG, 11.25f, 0.25f);
+    // createEnemy(BUG, 12.0f, 0.25f);
+    // createEnemy(BUG, 12.75f, 0.25f);
+    // createEnemy(BUG, 13.5f, 0.25f);
+    // createEnemy(BUG, 14.25f, 0.25f);
+    
+
+    // createEnemy(BUG, 10.5f, 3.25f);
+    // createEnemy(BUG, 11.25f, 3.25f);
+    // createEnemy(BUG, 12.0f, 3.25f);
+    // createEnemy(BUG, 12.75f, 3.25f);
+    // createEnemy(BUG, 13.5f, 3.25f);
+    // createEnemy(BUG, 14.25f, 3.25f);
+
+    // createEnemy(MINIKIT, 17.0f, -4.0f);
 }
 
 void Rtype::Game::run() {
@@ -559,7 +674,7 @@ void Rtype::Game::run() {
     CloseAudioDevice();
 }
 
-std::vector<std::size_t> getAllInputs() {
+std::vector<std::size_t> Rtype::Game::getAllInputs() {
     std::vector<std::size_t> vec;
 
     if (IsKeyDown(KEY_RIGHT))
@@ -578,24 +693,39 @@ void Rtype::Game::switchState(GameState newState)
     _currentState = newState;
 }
 
-void Rtype::Game::createEnemyProjectile(int id)
+void Rtype::Game::createEnemyBydoShots(int id)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
+    auto &ai = _core->getComponent<ECS::Components::AI>(_serverToLocalEnemiesId[id]);
 
-    if (!positions[_mapID[id]].has_value()) {
+    if (!positions[_serverToLocalEnemiesId[id]].has_value()) {
         std::cerr << "Enemy " << id << " does not have a valid position!" << std::endl;
         return;
     }
 
-    const ECS::Components::Position &enemyPos = positions[_mapID[id]].value();
-    const ECS::Components::Hitbox &enemyHitbox = hitboxes[_mapID[id]].value();
+    const ECS::Components::Position &enemyPos = positions[_serverToLocalEnemiesId[id]].value();
+    const ECS::Components::Hitbox &enemyHitbox = hitboxes[_serverToLocalEnemiesId[id]].value();
 
     std::size_t projectile = _core->createEntity();
 
+    std::cout << "AIProjectileId : " << projectile << std::endl;
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
 
     float projectileStartX = enemyPos.getX() - (enemyHitbox.getWidth() / 2) - TmpHitbox.first;
+
+    std::vector<std::pair<float, float>> playersPos;
+    for (const auto& player : _serverToLocalPlayersId)
+        playersPos.push_back(positions[player.second]->getPosPair());
+    std::size_t targetPlayer = ecsUtils::getClosestPlayer(
+        positions[id]->getPosPair(), playersPos);
+    for (const auto& player : _serverToLocalPlayersId)
+        if (positions[player.second]->getPosPair() == playersPos[targetPlayer])
+            targetPlayer = player.second;
+
+    float tmpVeloX = positions[targetPlayer]->getX() - positions[id]->getX();
+    float tmpVeloY = positions[targetPlayer]->getY() - positions[id]->getY();
+    float tmpMagnitude = std::sqrt(tmpVeloX * tmpVeloX + tmpVeloY * tmpVeloY);
 
     _core->addComponent(projectile, ECS::Components::Position{
         projectileStartX,
@@ -604,9 +734,9 @@ void Rtype::Game::createEnemyProjectile(int id)
     _core->addComponent(projectile, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Scale{1.0f});
     _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-
-    _core->addComponent(projectile, ECS::Components::Velocity{-0.2f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Velocity{tmpVeloX / tmpMagnitude * 0.075f, tmpVeloY / tmpMagnitude * 0.075f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
+    _core->addComponent(projectile, ECS::Components::AI{BYDOSHOT});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
 }
 
@@ -624,6 +754,8 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
 
     std::size_t projectile = _core->createEntity();
 
+    std::cout << "PlayerProjectileId : " << projectile << std::endl;
+
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
     _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
     _core->addComponent(projectile, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
@@ -633,11 +765,6 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
     playSound("blasterLego");
-}
-
-void Rtype::Game::destroyProjectile(std::size_t entityID)
-{
-    _core->destroyEntity(entityID);
 }
 
 void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel)
@@ -676,50 +803,109 @@ void Rtype::Game::update() {
     auto projectileCollisionSystem = _core->getSystem<ECS::Systems::ProjectileCollision>();
     auto inputUpdatesSystem = _core->getSystem<ECS::Systems::InputUpdates>();
     auto backgroundSystem = _core->getSystem<ECS::Systems::SystemBackground>();
-    auto AISystem = _core->getSystem<ECS::Systems::UpdateVelocityAI>();
+    auto AIVelocitySystem = _core->getSystem<ECS::Systems::UpdateVelocityAI>();
+    auto AIFiringProjectileSystem = _core->getSystem<ECS::Systems::AIFiringProjectile>();
+    auto getDeadEntitiesSystem = _core->getSystem<ECS::Systems::GetDeadEntities>();
 
-    auto velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
-    auto collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
-    auto projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
-    auto inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
-    auto backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
-    auto AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
+    std::vector<std::size_t> velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
+    std::vector<std::size_t> playerCollisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
+    std::vector<std::size_t> projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
+    std::vector<std::size_t> inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
+    std::vector<std::size_t> backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
+    std::vector<std::size_t> AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
+    std::vector<std::size_t> collisionEntities = _core->getEntitiesWithComponent<ECS::Components::Position,
+                                                                                 ECS::Components::Hitbox>();
+    std::vector<std::size_t> damageableEntities = _core->getEntitiesWithComponent<ECS::Components::Health>();
 
-    AISystem->update(_core->getComponents<ECS::Components::Velocity>(),
-                     _core->getComponents<ECS::Components::Position>(),
-                     _core->getComponents<ECS::Components::AI>(),
-                     AIEntities);
-
+    AIVelocitySystem->update(_core->getComponents<ECS::Components::Velocity>(),
+                             _core->getComponents<ECS::Components::Position>(),
+                             _core->getComponents<ECS::Components::AI>(),
+                             AIEntities, _serverToLocalPlayersId);
+    
+    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
+        _core->getComponents<ECS::Components::AI>(),
+        _core->getComponents<ECS::Components::Position>(),
+        AIEntities);
+    
     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
-                                     _core->getComponents<ECS::Components::Input>(),
-                                     inputEntities);
+                                                            _core->getComponents<ECS::Components::Input>(),
+                                                            inputEntities);
 
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);
 
     backgroundSystem->update(_core->getComponents<ECS::Components::Position>(),
-                            _core->getComponents<ECS::Components::Background>(),
-                            backgroundEntities);
+                             _core->getComponents<ECS::Components::Background>(),
+                             backgroundEntities);
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
                            velocityEntities);
 
+    collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
+                           _core->getComponents<ECS::Components::Hitbox>(),
+                           _core->getComponents<ECS::Components::Health>(),
+                           _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
+                           playerCollisionEntities);
+
     if (entityID <= 10000)
         createPlayerProjectile(entityID);
-
-    collisionSystem->isHit(_core->getComponents<ECS::Components::Position>(),
-                           _core->getComponents<ECS::Components::Hitbox>(),
-                           collisionEntities);
+    entityID = 10001;
 
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
         _core->getComponents<ECS::Components::Hitbox>(),
+        _core->getComponents<ECS::Components::AI>(),
         projectileEntities, collisionEntities);
 
-    for (int i = 0; i < projectileEntityId.size(); i++)
-        destroyProjectile(projectileEntityId[i]);
+    auto healthComponents = _core->getComponents<ECS::Components::Health>();
+    std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
+    for (int i = 0; i < projectileEntityId.size(); i++) {
+        for (int j = 0; j < damageableEntities.size(); j++) {
+            if (damageableEntities[j] == projectileEntityId[i]) {
+                if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
+                    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
+                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+                }
+            }
+            
+        }
+        for (int j = 0; j < projectileEntities.size(); j++)
+            if (projectileEntities[j] == projectileEntityId[i]) {
+                _core->destroyEntity(projectileEntityId[i]);
+            }
+    }
+    projectileEntityId.clear();
+
+    std::vector<std::size_t> deadEntities = getDeadEntitiesSystem->getDeadEntities(
+        _core->getComponents<ECS::Components::Health>(),
+        _core->getComponents<ECS::Components::Position>(),
+        damageableEntities);
+
+    for (std::size_t i = 0; i < deadEntities.size(); i++) {
+        if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
+            sleep(3000);//GAMEOVER
+        else if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
+            for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
+                auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
+                int tailId = 0;
+                for (std::size_t j = 0; j < AIs.size(); j++)
+                    if (_core->getComponent<ECS::Components::AI>(AIs[j]).getEnemyType() == i) {
+                        tailId = AIs[j];
+                        break;
+                    }
+                _core->destroyEntity(tailId);
+            }
+        }
+        _core->destroyEntity(deadEntities[i]);
+    }
+    deadEntities.clear();
+
+    for (std::size_t i = 0; i < AIBydoShots.size(); i++)
+        createEnemyBydoShots(AIBydoShots[i]);
+    AIBydoShots.clear();
+
     if (false)
         _camera.Update(CAMERA_FREE);
 }

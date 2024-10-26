@@ -5,13 +5,15 @@
 ** AI movement System
 */
 #pragma once
-#include <cmath>
+
 #include "../System/System.hpp"
 
 #include "../../Component/ComponentManager/SparseArray.hpp"
 #include "../../Component/Velocity/Velocity.hh"
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/AI/AI.hh"
+#include <map>
+#include <cmath>
 
 namespace ECS {
     namespace Systems {
@@ -25,7 +27,8 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Velocity> & velocities,
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
-                std::vector<std::size_t> pataPatas);
+                std::vector<std::size_t> entities,
+                const std::map<int, std::size_t> & serverToLocalPlayersId) const;
         };
     }
 }

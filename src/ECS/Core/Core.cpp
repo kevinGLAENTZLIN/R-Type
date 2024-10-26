@@ -33,7 +33,6 @@ std::size_t ECS::Core::Core::createEntity()
 {
     std::size_t temp = _entityManager->createEntity();
 
-//    std::cout << "Core created entity: " << temp << std::endl;
     return temp;
 }
 
@@ -53,7 +52,6 @@ void ECS::Core::Core::destroyEntity(std::size_t entity)
     _systemManager->entityDestroyed(entity);
     _componentManager->entityDestroyed(entity, signature);
 
-//    std::cout << "Core destroyed entity: " << entity << std::endl;
 }
 
 /**

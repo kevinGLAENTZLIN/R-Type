@@ -36,5 +36,5 @@ void Rtype::Command::Player::Spawn::execute_server_side()
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
         sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerSpawnOnGame, _playerID, _x, _y);
     }
-    _game->createPlayer(_playerID, _x * 1.f, _y * 1.f);
+    _game->createPlayer(_playerID, _x * 1.f, _y * 1.f, 50);
 }

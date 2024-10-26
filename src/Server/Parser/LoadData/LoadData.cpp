@@ -32,17 +32,21 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
     for (const auto& enemyKey : root.getMemberNames()) {
         const Json::Value& enemyData = root[enemyKey];
 
-        std::string type = enemyData["type"].asString();
+        enemiesTypeEnum_t type = ecsUtils::getTypeFromString(enemyData["type"].asString());
+        int difficulty = enemyData["difficulty"].asInt();
         float positionX = enemyData["position"]["x"].asFloat();
         float positionY = enemyData["position"]["y"].asFloat();
+        int health = enemyData["health"].asInt();
         std::string model = enemyData["model"].asString();
         int timeMinute = enemyData["time minute"].asInt();
         int timeSecond = enemyData["time second"].asInt();
 
         Rtype::EnemySpawnData enemy;
         enemy.setType(type);
+        enemy.setDifficulty(difficulty);
         enemy.setPositionX(positionX);
         enemy.setPositionY(positionY);
+        enemy.setHealth(health);
         enemy.setModel(model);
         enemy.setSpawnTime({timeMinute, timeSecond});
 

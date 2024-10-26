@@ -16,7 +16,6 @@ std::size_t ECS::Systems::InputUpdates::updateInputs(
     for (std::size_t i = 0; i < entities.size(); i++) {
         inputComponents[entities[i]]->setInputs(inputs);
         if (IsKeyPressed(KEY_SPACE)) {
-            std::cout << "Projectile created!" << std::endl;
             return entities[i];
         }
     }

@@ -39,6 +39,8 @@
 #include "../../ECS/System/RenderText/RenderText.hh"
 #include "../../ECS/System/RenderButton/RenderButton.hh"
 #include "../../ECS/System/ButtonClick/ButtonClick.hh"
+#include "../../ECS/System/GetDeadEntities/GetDeadEntities.hh"
+#include "../../ECS/System/AIFiringProjectile/AIFiringProjectile.hh"
 #include "../../ECS/System/TextfieldInput/TextfieldInput.hh"
 #include "../../ECS/System/RenderTextfield/RenderTextfield.hh"
 
@@ -58,13 +60,16 @@ namespace Rtype {
         ~Game();
 
         void run();
-        void createPlayer(int id, float pos_x, float pos_y);
+        void createPlayer(int id, float pos_x, float pos_y, int invincibility);
         void createOtherPlayer(int id, float pos_x, float pos_y);
-        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
+        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
+        void createBoss1();
         void movePlayer(int id, float x, float y);
-        void createEnemyProjectile(int id);
+        void createEnemyBydoShots(int id);
+        std::vector<std::size_t> getAllInputs();
 
     private:
+        std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
         void loadMusic();
         void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
@@ -107,7 +112,8 @@ namespace Rtype {
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;
-        std::map<int, std::size_t> _mapID;
+        std::map<int, std::size_t> _serverToLocalPlayersId;
+        std::map<int, std::size_t> _serverToLocalEnemiesId;
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
     };

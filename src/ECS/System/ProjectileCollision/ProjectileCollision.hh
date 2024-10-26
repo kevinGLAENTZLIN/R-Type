@@ -13,6 +13,7 @@
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/Hitbox/Hitbox.hh"
 #include "../../Component/Projectile/Projectile.hh"
+#include "../../Component/AI/AI.hh"
 
 namespace ECS {
     namespace Systems {
@@ -53,6 +54,7 @@ namespace ECS {
             std::vector<std::size_t> projectileIsHit(
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
+                ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
                 std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities);
         };
     }

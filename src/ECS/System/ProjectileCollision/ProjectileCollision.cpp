@@ -23,12 +23,12 @@ std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
         auto &projectilePos = positions[projectile].value();
         auto &projectileHitbox = hitboxes[projectile].value();
 
-        entityCollided.push_back(projectile);
-        if (projectilePos.getX() >= 11.0 || projectilePos.getX() <= -11.0)
-            return entityCollided;
+        if (projectilePos.getX() >= 11.0 || projectilePos.getX() <= -11.0) {
+            entityCollided.push_back(projectile);
+            continue;
+        }
 
         isAIShot = AIs[projectile].has_value();
-
         for (std::size_t i = 0; i < entities.size(); ++i) {
             for (std::size_t temp = 0; temp < projectileEntities.size(); temp++)
                 if (entities[i] == projectileEntities[temp]) {
@@ -45,17 +45,13 @@ std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
             bool isAIEntity = AIs[entity].has_value();
 
             if ((isAIShot && isAIEntity) || (!isAIShot && !isAIEntity)) {
-                entityCollided.clear();
                 continue;
             }
             if (ECS::Utils::checkCollision(entityPos, entityHitbox, projectilePos, projectileHitbox)) {
                 entityCollided.push_back(entity);
                 entityCollided.push_back(projectile);
-                return entityCollided;
             }
         }
-        entityCollided.clear();
     }
-    entityCollided.clear();
     return entityCollided;
 }

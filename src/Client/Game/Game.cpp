@@ -7,9 +7,7 @@
 */
 
 #include "Game.hh"
-#include <cstddef>
-#include<unistd.h>
-#include <vector>
+#include <thread>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -162,7 +160,10 @@ Rtype::Game::Game()
     AIFiringProjectileSignature.set(
         ECS::CTypeRegistry::getTypeId<ECS::Components::AI>());
     _core->setSystemSignature<ECS::Systems::AIFiringProjectile>(AIFiringProjectileSignature);
+}
 
+void Rtype::Game::loadMusic()
+{
     InitAudioDevice();
     createMusic("./resources/stage1/stage1.mp3", "stage1");
     createMusic("./resources/menuMusic/menuMusic.mp3", "menu");
@@ -213,7 +214,7 @@ void Rtype::Game::movePlayer(int id, float x, float y)
     velocity.setY(y);
 }
 
-void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
+void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibility)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t player = _core->createEntity();
@@ -224,7 +225,7 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
     _core->addComponent(player, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(player, ECS::Components::Input{});
-    _core->addComponent(player, ECS::Components::Health{5});
+    _core->addComponent(player, ECS::Components::Health{5, invincibility});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = player;
 }
@@ -479,7 +480,7 @@ void Rtype::Game::initMenu(void)
 
 void Rtype::Game::createBoss1()
 {
-    createEnemy(BOSS1_Core, 8, -0.5, 1);
+    createEnemy(BOSS1_Core, 8, -0.5, 4);
     createCyclingEnemy(BOSS1_Tail0, 6.0f, 3.0f, 6.05f, 2.95f);
     createCyclingEnemy(BOSS1_Tail1, 5.5f, 2.8f, 6.1f, 2.7f);
     createCyclingEnemy(BOSS1_Tail2, 5.1f, 2.5f, 5.8f, 2.4f);
@@ -513,9 +514,11 @@ void Rtype::Game::initGame(void)
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
     switchState(GameState::PLAY);
-    createPlayer(0, -10.0f, 0.0f);
+    createPlayer(0, -10.0f, 0.0f, 50);
 
     createBoss1();
+
+    createEnemy(BINK, -5.0f, 3.0f, 1);
 
     // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
     // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);
@@ -559,7 +562,6 @@ void Rtype::Game::initGame(void)
     // createEnemy(BUG, 13.5f, 0.25f);
     // createEnemy(BUG, 14.25f, 0.25f);
     
-    // createEnemy(BINK, -5.0f, 3.0f);
 
     // createEnemy(BUG, 10.5f, 3.25f);
     // createEnemy(BUG, 11.25f, 3.25f);
@@ -572,6 +574,9 @@ void Rtype::Game::initGame(void)
 }
 
 void Rtype::Game::run() {
+    std::thread musicThread(&Rtype::Game::loadMusic, this);
+
+    musicThread.join();
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
@@ -588,7 +593,6 @@ void Rtype::Game::run() {
         }
     }
     CloseAudioDevice();
-
 }
 
 std::vector<std::size_t> Rtype::Game::getAllInputs() {
@@ -610,7 +614,7 @@ void Rtype::Game::switchState(GameState newState)
     _currentState = newState;
 }
 
-void Rtype::Game::createEnemyProjectile(int id)
+void Rtype::Game::createEnemyBydoShots(int id)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
@@ -626,6 +630,7 @@ void Rtype::Game::createEnemyProjectile(int id)
 
     std::size_t projectile = _core->createEntity();
 
+    std::cout << "AIProjectileId : " << projectile << std::endl;
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
 
     float projectileStartX = enemyPos.getX() - (enemyHitbox.getWidth() / 2) - TmpHitbox.first;
@@ -658,7 +663,6 @@ void Rtype::Game::createEnemyProjectile(int id)
 
 void Rtype::Game::createPlayerProjectile(std::size_t entityID)
 {
-
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
@@ -670,6 +674,8 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     const ECS::Components::Hitbox &entityHitbox = hitboxes[entityID].value();
 
     std::size_t projectile = _core->createEntity();
+
+    std::cout << "PlayerProjectileId : " << projectile << std::endl;
 
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
     _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
@@ -718,11 +724,13 @@ void Rtype::Game::update() {
     auto getDeadEntitiesSystem = _core->getSystem<ECS::Systems::GetDeadEntities>();
 
     std::vector<std::size_t> velocityEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemVelocity>());
-    std::vector<std::size_t> collisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
+    std::vector<std::size_t> playerCollisionEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::Collision>());
     std::vector<std::size_t> projectileEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::ProjectileCollision>());
     std::vector<std::size_t> inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     std::vector<std::size_t> backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
     std::vector<std::size_t> AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
+    std::vector<std::size_t> collisionEntities = _core->getEntitiesWithComponent<ECS::Components::Position,
+                                                                                 ECS::Components::Hitbox>();
     std::vector<std::size_t> damageableEntities = _core->getEntitiesWithComponent<ECS::Components::Health>();
 
     AIVelocitySystem->update(_core->getComponents<ECS::Components::Velocity>(),
@@ -730,7 +738,7 @@ void Rtype::Game::update() {
                              _core->getComponents<ECS::Components::AI>(),
                              AIEntities, _serverToLocalPlayersId);
     
-    std::vector<std::size_t> AIProjectile = AIFiringProjectileSystem->aiFiringProjectile(
+    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
@@ -755,10 +763,11 @@ void Rtype::Game::update() {
                            _core->getComponents<ECS::Components::Hitbox>(),
                            _core->getComponents<ECS::Components::Health>(),
                            _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
-                           collisionEntities);
+                           playerCollisionEntities);
 
     if (entityID <= 10000)
         createPlayerProjectile(entityID);
+    entityID = 10001;
 
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
@@ -767,18 +776,23 @@ void Rtype::Game::update() {
         projectileEntities, collisionEntities);
 
     auto healthComponents = _core->getComponents<ECS::Components::Health>();
+    std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
     for (int i = 0; i < projectileEntityId.size(); i++) {
         for (int j = 0; j < damageableEntities.size(); j++) {
             if (damageableEntities[j] == projectileEntityId[i]) {
-                std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
-                _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+                if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
+                    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
+                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+                }
             }
+            
         }
         for (int j = 0; j < projectileEntities.size(); j++)
             if (projectileEntities[j] == projectileEntityId[i]) {
                 _core->destroyEntity(projectileEntityId[i]);
             }
     }
+    projectileEntityId.clear();
 
     std::vector<std::size_t> deadEntities = getDeadEntitiesSystem->getDeadEntities(
         _core->getComponents<ECS::Components::Health>(),
@@ -802,9 +816,11 @@ void Rtype::Game::update() {
         }
         _core->destroyEntity(deadEntities[i]);
     }
+    deadEntities.clear();
 
-    for (std::size_t i = 0; i < AIProjectile.size(); i++)
-        createEnemyProjectile(AIProjectile[i]);
+    for (std::size_t i = 0; i < AIBydoShots.size(); i++)
+        createEnemyBydoShots(AIBydoShots[i]);
+    AIBydoShots.clear();
 
     if (false)
         _camera.Update(CAMERA_FREE);

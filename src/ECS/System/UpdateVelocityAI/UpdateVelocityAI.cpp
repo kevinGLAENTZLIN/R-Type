@@ -39,7 +39,10 @@ void ECS::Systems::UpdateVelocityAI::update (
             velocities[aiId]->setY(0.5);
             if (positions[aiId]->getY() > 4.0)
                 velocities[aiId]->setY(0);
-            
+            if (AIs[aiId]->isFiring()) {
+                velocities[aiId]->setX(0);
+                continue;
+            }
             std::vector<std::pair<float, float>> playersPos;
             for (const auto& player : serverToLocalPlayersId)
                 playersPos.push_back(positions[player.second]->getPosPair());

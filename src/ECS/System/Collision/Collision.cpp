@@ -26,6 +26,7 @@ void ECS::Systems::Collision::playerIsHit(
 
         if (ECS::Utils::checkCollision(posEntity, hitboxEntity, posPlayer, hitboxPlayer)) {
             if (healths[player]->getInvincibility() == 0) {
+                std::cout << "OOF!!" << std::endl;
                 healths[player]->modifyHealthBy(-1);
                 healths[player]->setInvincibility(200);
             } 

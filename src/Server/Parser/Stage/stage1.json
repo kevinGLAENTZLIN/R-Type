@@ -329,12 +329,278 @@
         "time second": 21
     }
 
+    "PataPata3_0": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": -1.5
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 23
+    }
+    "PataPata3_1": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.25,
+            "y": 0.9
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 23
+    }
+    "PataPata3_2": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 12,
+            "y": -0.1
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 23
+    }
+    "PataPata3_3": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": 1.5
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 24
+    }
+    "PataPata3_4": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.25,
+            "y": 0.6
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 24
+    }
+    "PataPata3_5": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 12,
+            "y": -1.7
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 24
+    }
+    "PataPata3_6": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": -0.1
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 25
+    }
+    "PataPata3_7": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.25,
+            "y": -0.7
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 25
+    }
+    "PataPata3_8": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 12,
+            "y": 0.6
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 25
+    }
+    "PataPata3_9": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": -1.9
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 26
+    }
+    "PataPata3_10": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.25,
+            "y": 1.5
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 26
+    }
+    "PataPata3_11": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 12,
+            "y": 1.1
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 26
+    }
+    "PataPata3_12": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": -1.9
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 27
+    }
+    "PataPata3_13": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.25,
+            "y": -1
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 27
+    }
+    "PataPata3_14": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 12,
+            "y": 0.1
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 27
+    }
+    "PataPata3_15": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": 2.1
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 28
+    }
+    "PataPata3_16": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.25,
+            "y": 0.7
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 28
+    }
+    "PataPata3_17": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 12,
+            "y": -0.9
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 28
+    }
+    "PataPata3_18": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": 1.1
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 29
+    }
+    "PataPata3_19": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 11.25,
+            "y": -0.7
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 29
+    }
+    "PataPata3_20": {
+        "type": "PATAPATA",
+        "difficulty": 1,
+        "position": {
+            "x": 12,
+            "y": -1.5
+        },
+        "health": 1,
+        "model": "enemy_one"
+        "time minute": 0,
+        "time second": 29
+    }
+
+    "Minikit0" : {
+        "type": "MINIKIT",
+        "difficulty": 1,
+        "position": {
+            "x": 11.5,
+            "y": 3.0
+        }
+        "health": 1,
+        "model": "enmy_one",
+        "time minute": 0,
+        "time second": 29
+    }
+    
     "BOSS1_Core": {
         "type": "BOSS1_core",
         "difficulty": 1,
         "position": {
             "x": 8,
-            "y": -0.5,
+            "y": 2.0,
         },
         "health": 20,
         "model": "boss1_core",

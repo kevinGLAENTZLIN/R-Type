@@ -57,16 +57,17 @@ namespace Rtype {
         ~Game();
 
         void run();
-        void createPlayer(int id, float pos_x, float pos_y);
+        void createPlayer(int id, float pos_x, float pos_y, int invincibility);
         void createOtherPlayer(int id, float pos_x, float pos_y);
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void createBoss1();
         void movePlayer(int id, float x, float y);
-        void createEnemyProjectile(int id);
+        void createEnemyBydoShots(int id);
         std::vector<std::size_t> getAllInputs();
 
     private:
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
+        void loadMusic();
         void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
@@ -95,6 +96,8 @@ namespace Rtype {
         void playSound(std::string name);
         void createSound(std::string path, std::string name);
         void updatePlayerCountText();
+        void DrawProgressBar(int progress);
+        void LoadAssets();
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;

@@ -8,17 +8,21 @@
 #include "../Utils/Network/Network.hpp"
 #include "../Client/Game/Game.hh"
 #include "Game_info.hh"
+#include <iostream>
+#include <memory>
+#include <vector>
 
 Rtype::Game_info::Game_info():
 	_id(-1), _level(0), _nbMaxPlayer(6), _tick(0), _players(), _toSetNetwork(true)
 {
+    _loadData.LoadDataFromFile("stage1.json");
+    _enemySpawnData = _loadData.GetEnemySpawnData();
 	_tickThread = std::thread([this]() { computeTick(); });
 }
 
 Rtype::Game_info::Game_info(int id):
 	_id(id), _level(0), _nbMaxPlayer(6), _tick(0), _players(), _toSetNetwork(true)
-{
-}
+{}
 
 Rtype::Game_info::~Game_info()
 {
@@ -85,18 +89,30 @@ void Rtype::Game_info::runGame()
 	_gameThread = std::thread([this]() { _game->runServer(); });
 }
 
-void Rtype::Game_info::computeGame(void)
+void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 {
-	if (_tick % 200 == 0)
-		std::cout << "Spawn a mob" << std::endl; //! To refactor by the commands
+    if (_nextEnemyIndex < _enemySpawnData.size()) {
+        const auto& enemyData = _enemySpawnData[_nextEnemyIndex];
+
+        if (currentGameTimeInSeconds >= enemyData.getSpawnTimeInSeconds()) {
+            _game->createEnemy(
+                enemyData.getType(),
+                enemyData.getPositionX(),
+                enemyData.getPositionY()
+            );
+            _nextEnemyIndex += 1;
+        }
+    }
 }
 
 void Rtype::Game_info::computeTick(void)
 {
-	while (!_players->empty()) {
+  int currentGameTimeInSeconds = 0;
+	while (!_players.empty()) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		_tick += 1;
-		computeGame();
+		currentGameTimeInSeconds = _tick / 20;
+		computeGame(currentGameTimeInSeconds);
 	}
 }
 
@@ -112,7 +128,13 @@ bool Rtype::Game_info::gameStatus(void)
 
 void Rtype::Game_info::goNextLevel(void)
 {
-	_level += 1;
+    const std::string nextLevel = "stage" + std::to_string(_level + 1) + ".json";
+
+    _loadData.clearEnemySpawnData();
+    _enemySpawnData.clear();
+    _level += 1;
+    _loadData.LoadDataFromFile(nextLevel);
+    _enemySpawnData = _loadData.GetEnemySpawnData();
 }
 
 int Rtype::Game_info::getLevel(void)

@@ -6,13 +6,16 @@
 */
 
 #pragma once
+#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <map>
 #include <string>
 #include <memory>
 #include <thread>
+#include <vector>
 #include "Client_info.hpp"
+#include "Parser/LoadData/LoadData.hh"
 
 namespace Rtype
 {
@@ -32,7 +35,7 @@ namespace Rtype
             Game_info(Game_info&& other) noexcept;
             Game_info& operator=(Game_info&& other) noexcept;
 
-            void computeGame(void);
+            void computeGame(int currentGameTimeInSeconds);
             void computeTick(void);
 
             void setNetwork(std::shared_ptr<Rtype::Network> network);
@@ -60,6 +63,9 @@ namespace Rtype
             std::thread _tickThread;
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
             std::shared_ptr<Rtype::Network> _network;
+            LoadData _loadData;
+            std::vector<Rtype::EnemySpawnData> _enemySpawnData;
+            std::size_t _nextEnemyIndex;
             std::shared_ptr<Rtype::Game> _game;
             bool _toSetNetwork;
             std::thread _gameThread;

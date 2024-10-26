@@ -9,6 +9,7 @@
 #include <iostream>
 #include <numeric>
 #include <utility>
+#include "../../../Utils/enemiesTypeEnum.hpp"
 
 namespace Rtype {
 
@@ -17,13 +18,15 @@ namespace Rtype {
             EnemySpawnData();
             ~EnemySpawnData() = default;
 
-            void setType(const std::string &type);
+            void setType(enemiesTypeEnum_t type);
             void setPositionX(float position_x);
             void setPositionY(float position_y);
             void setModel(std::string model);
             void setSpawnTime(std::pair <int, int> spawnTime);
+            void setSpawnTimeInSeconds(int spawnTimeInSeconds);
 
-            std::string getType() const;
+            int getSpawnTimeInSeconds() const;
+            enemiesTypeEnum_t getType() const;
             float getPositionX() const;
             float getPositionY() const;
             std::string getModel() const;
@@ -31,10 +34,11 @@ namespace Rtype {
 
         private:
 
-            std::string _type;
+            enemiesTypeEnum_t _type;
             float _position_x;
             float _position_y;
             std::string _model;
+            int _spawnTimeInSeconds;
             std::pair<int, int> _spawnTime;
     };
 }

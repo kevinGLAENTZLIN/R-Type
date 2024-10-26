@@ -46,7 +46,7 @@ namespace Rtype
             int getRoomId(void);
             bool isGameAvailable(void);
             bool getToSetNetwork();
-            const std::map<int, std::shared_ptr<Rtype::client_info>> &getPlayers(void) const;
+            std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> getPlayers(void);
 
             void connectPlayer(std::shared_ptr<Rtype::client_info> player);
             void disconnectPlayer(int id);
@@ -58,7 +58,7 @@ namespace Rtype
             int _nbMaxPlayer;
             unsigned int _tick;
             std::thread _tickThread;
-            std::map<int, std::shared_ptr<Rtype::client_info>> _players;
+            std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
             std::shared_ptr<Rtype::Network> _network;
             std::shared_ptr<Rtype::Game> _game;
             bool _toSetNetwork;

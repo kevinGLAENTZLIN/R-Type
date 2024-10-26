@@ -35,6 +35,5 @@ void Rtype::Command::GameInfo::Join_game::execute_server_side()
         return;
     }
     _gameInfo->connectPlayer(_clientInfo);
-    CONSOLE_INFO(_gameInfo->getRoomId(), " successfully connect to the room")
 	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame, true, _gameInfo->getLevel());
 }

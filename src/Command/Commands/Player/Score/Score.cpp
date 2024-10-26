@@ -7,7 +7,7 @@
 
 #include "Score.hh"
 
-void Rtype::Command::Player::Score::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int score)
+void Rtype::Command::Player::Score::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int score)
 {
     _players = players;
     _score = score;

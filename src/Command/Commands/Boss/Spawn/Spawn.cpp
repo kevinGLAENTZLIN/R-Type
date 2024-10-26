@@ -7,7 +7,7 @@
 
 #include "Spawn.hh"
 
-void Rtype::Command::Boss::Spawn::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int bossType, float x, float y)
+void Rtype::Command::Boss::Spawn::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int bossType, double x, double y)
 {
     _players = players;
     _bossType = bossType;

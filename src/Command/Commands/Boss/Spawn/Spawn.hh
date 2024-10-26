@@ -20,7 +20,7 @@ namespace Rtype
                     Spawn() = default;
                     ~Spawn();
 
-                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int bossType, float x, float y);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int bossType, double x, double y);
                     void set_client();
 
                     void execute_client_side();
@@ -30,8 +30,8 @@ namespace Rtype
                 private:
                     std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _bossType;
-                    float _x;
-                    float _y;
+                    double _x;
+                    double _y;
             };
         }
     }

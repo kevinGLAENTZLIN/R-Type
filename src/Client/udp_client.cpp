@@ -69,6 +69,11 @@ void Rtype::udpClient::read_server()
 void Rtype::udpClient::setHandleMaps()
 {
     setHandleGameInfoMap();
+    setHandlePlayerMap();
+    setHandleEnemyMap();
+    setHandleBossMap();
+    setHandlePowerUpMap();
+    setHandleProjectileMap();
 }
 
 void Rtype::udpClient::setHandleGameInfoMap()
@@ -111,6 +116,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         cmd->set_client(codeRoom);
         _network->addCommandToInvoker(std::move(cmd));
+        CONSOLE_INFO("Join game sended: ", codeRoom)
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::JoinGame] = [this](Utils::Network::Response response) {
@@ -152,10 +158,11 @@ void Rtype::udpClient::setHandleGameInfoMap()
 
 void Rtype::udpClient::setHandlePlayerMap() {
     _handlePlayerMap[Utils::PlayerEnum::PlayerSpawnOnGame] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Spawn> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Spawn>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerSpawnOnGame)));
         int new_player_id = response.PopParam<int>();
-        float x = response.PopParam<float>();
-        float y = response.PopParam<float>();
+        float x = response.PopParam<double>();
+        float y = response.PopParam<double>();
+
+        _game->createOtherPlayer(new_player_id, x, y);
     };
 
 
@@ -169,8 +176,8 @@ void Rtype::udpClient::setHandlePlayerMap() {
         std::unique_ptr<Rtype::Command::Player::Move> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Move>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
 
         int playerId = response.PopParam<int>();
-        float x = response.PopParam<float>();
-        float y = response.PopParam<float>();
+        float x = response.PopParam<double>();
+        float y = response.PopParam<double>();
 
     };
 
@@ -210,8 +217,8 @@ void Rtype::udpClient::setHandlePlayerMap() {
 void Rtype::udpClient::setHandleEnemyMap() {
     _handleEnemyMap[Utils::EnemyEnum::EnemySpawn] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();
-        float x = response.PopParam<float>();
-        float y = response.PopParam<float>();
+        float x = response.PopParam<double>();
+        float y = response.PopParam<double>();
     };
 
     _handleEnemyMap[Utils::EnemyEnum::EnemyDie] = [this](Utils::Network::Response response) {
@@ -243,10 +250,10 @@ void Rtype::udpClient::setHandleProjectileMap() {
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileFired] = [this](Utils::Network::Response response) {
         int ProjectileType = response.PopParam<int>();
         int ProjectileID = response.PopParam<int>();
-        float XOrigin = response.PopParam<float>();
-        float YOrigin = response.PopParam<float>();
-        float XVector = response.PopParam<float>();
-        float YVector = response.PopParam<float>();
+        float XOrigin = response.PopParam<double>();
+        float YOrigin = response.PopParam<double>();
+        float XVector = response.PopParam<double>();
+        float YVector = response.PopParam<double>();
     };
 
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileHit] = [this](Utils::Network::Response response) {
@@ -257,8 +264,8 @@ void Rtype::udpClient::setHandleProjectileMap() {
 void Rtype::udpClient::setHandleBossMap() {
     _handleBossMap[Utils::BossEnum::BossSpawn] = [this](Utils::Network::Response response) {
         int BossType = response.PopParam<int>();
-        float X = response.PopParam<float>();
-        float Y = response.PopParam<float>();
+        float X = response.PopParam<double>();
+        float Y = response.PopParam<double>();
     };
 
     _handleBossMap[Utils::BossEnum::BossDie] = [this](Utils::Network::Response response) {
@@ -280,6 +287,8 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
 
+    CONSOLE_INFO("Handle Response: ", (int)cmd_category)
+    CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
     switch (cmd_category) {
     case Utils::InfoTypeEnum::GameInfo:
         _handleGameInfoMap[static_cast<Utils::GameInfoEnum>(clientResponse.GetInfoFunction())](clientResponse);

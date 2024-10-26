@@ -13,7 +13,7 @@
 #include <vector>
 
 Rtype::Game_info::Game_info():
-	_id(-1), _level(0), _nbMaxPlayer(6), _nextEnemyIndex(0), _tick(0), _players()
+	_id(-1), _level(0), _nbMaxPlayer(6), _tick(0), _players(), _toSetNetwork(true)
 {
     _loadData.LoadDataFromFile("stage1.json");
     _enemySpawnData = _loadData.GetEnemySpawnData();
@@ -21,20 +21,22 @@ Rtype::Game_info::Game_info():
 }
 
 Rtype::Game_info::Game_info(int id):
-	_id(id), _level(0), _nbMaxPlayer(6), _tick(0), _players()
-{
-}
+	_id(id), _level(0), _nbMaxPlayer(6), _tick(0), _players(), _toSetNetwork(true)
+{}
 
 Rtype::Game_info::~Game_info()
 {
 	if (_tickThread.joinable()) {
         _tickThread.join();
     }
+	if (_gameThread.joinable()) {
+        _gameThread.join();
+    }
 }
 
 Rtype::Game_info::Game_info(Game_info &&other) noexcept:
 	_id(other._id), _level(other._level), _nbMaxPlayer(other._nbMaxPlayer), _tick(other._tick),
-    _tickThread(std::move(other._tickThread)), _players(std::move(other._players))
+    _tickThread(std::move(other._tickThread)), _players(std::move(other._players)), _toSetNetwork(other._toSetNetwork)
 {
     other._id = -1;
     other._level = 0;
@@ -55,6 +57,7 @@ Rtype::Game_info &Rtype::Game_info::operator=(Game_info &&other) noexcept
         _tick = other._tick;
         _tickThread = std::move(other._tickThread);
         _players = std::move(other._players);
+		_toSetNetwork = other._toSetNetwork;
 
         other._id = -1;
         other._level = 0;
@@ -64,10 +67,26 @@ Rtype::Game_info &Rtype::Game_info::operator=(Game_info &&other) noexcept
     return *this;
 }
 
-void Rtype::Game_info::setNetwork(std::shared_ptr<Rtype::Network> network, std::shared_ptr<ECS::RessourcePool> ressourcePool)
+bool Rtype::Game_info::getToSetNetwork()
 {
+	return _toSetNetwork;
+}
+
+void Rtype::Game_info::setNetwork(std::shared_ptr<Rtype::Network> network)
+{
+	_toSetNetwork = false;
 	_network = network;
-    _game = std::make_unique<Rtype::Game>(_network, false);
+    _game = std::make_shared<Rtype::Game>(_network, false);
+}
+
+std::shared_ptr<Rtype::Game> Rtype::Game_info::getGame()
+{
+	return _game;
+}
+
+void Rtype::Game_info::runGame()
+{
+	_gameThread = std::thread([this]() { _game->runServer(); });
 }
 
 void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
@@ -78,8 +97,8 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
         if (currentGameTimeInSeconds >= enemyData.getSpawnTimeInSeconds()) {
             _game->createEnemy(
                 enemyData.getType(),
-                enemyData.getEnemyX(),
-                enemyData.getEnemyY()
+                enemyData.getPositionX(),
+                enemyData.getPositionY()
             );
             _nextEnemyIndex += 1;
         }

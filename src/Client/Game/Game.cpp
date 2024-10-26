@@ -17,7 +17,8 @@ int menuOption = 0;
 std::vector<std::string> options = { "Start Game", "Options", "Quit" };
 
 Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
-    : _network(network), _isRunning(true), _currentState(MENU), _isJoiningGame(false)
+    : _network(network), _isRunning(true), _currentState(MENU),
+    _isJoiningGame(false), _isAvailableGames(false), _isRendering(render), _modelCreated(false)
 {
     _core = std::make_unique<ECS::Core::Core>();
 
@@ -201,6 +202,11 @@ void Rtype::Game::movePlayer(int id, float x, float y)
 
 void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
 {
+    if (!_isRendering && !_modelCreated) {
+        _ressourcePool.addModel("ship_yellow");
+        std::cout << "Model Loaded" << std::endl;
+        _modelCreated = true;
+    }
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t player = _core->createEntity();
 
@@ -216,6 +222,11 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y)
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
+    if (!_isRendering && !_modelCreated) {
+        std::cout << "Model Loaded" << std::endl;
+        _ressourcePool.addModel("ship_yellow");
+        _modelCreated = true;
+    }
     std::size_t otherPlayer = _core->createEntity();
 
     _core->addComponent(otherPlayer, ECS::Components::Position{pos_x, pos_y});
@@ -585,8 +596,13 @@ void Rtype::Game::run()
 
 void Rtype::Game::runServer()
 {
+    _currentState = PLAY;
+
     while (_isRunning)
-        update();
+        switch (_currentState) {
+            case PLAY:
+                update();
+        }
 }
 
 std::vector<std::size_t> getAllInputs() {
@@ -788,7 +804,6 @@ void Rtype::Game::clearAvailableGames()
 {
     _availableGames.clear();
 }
-
 
 //!FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
 

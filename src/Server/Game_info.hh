@@ -36,12 +36,16 @@ namespace Rtype
             void computeTick(void);
 
             void setNetwork(std::shared_ptr<Rtype::Network> network);
+            std::shared_ptr<Rtype::Game> getGame();
+
+            void runGame();
 
             bool gameStatus(void);
             void goNextLevel(void);
             int getLevel(void);
             int getRoomId(void);
             bool isGameAvailable(void);
+            bool getToSetNetwork();
             const std::map<int, std::shared_ptr<Rtype::client_info>> &getPlayers(void) const;
 
             void connectPlayer(std::shared_ptr<Rtype::client_info> player);
@@ -56,7 +60,9 @@ namespace Rtype
             std::thread _tickThread;
             std::map<int, std::shared_ptr<Rtype::client_info>> _players;
             std::shared_ptr<Rtype::Network> _network;
-            std::unique_ptr<Rtype::Game> _game;
+            std::shared_ptr<Rtype::Game> _game;
+            bool _toSetNetwork;
+            std::thread _gameThread;
             // Todo compile with Game class
     };
 }

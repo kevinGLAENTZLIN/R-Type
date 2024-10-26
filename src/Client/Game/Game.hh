@@ -127,6 +127,8 @@ namespace Rtype {
         std::shared_ptr<Rtype::Network> _network;
         bool _isJoiningGame;
         bool _isAvailableGames;
+        bool _isRendering;
+        bool _modelCreated;
         std::vector<int> _availableGames;
     };
 };

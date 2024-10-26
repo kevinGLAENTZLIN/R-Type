@@ -7,7 +7,7 @@
 
 #include "Move.hh"
 
-void Rtype::Command::Player::Move::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, float x, float y)
+void Rtype::Command::Player::Move::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, double x, double y)
 {
     _players = players;
     _playerID = playerID;
@@ -15,7 +15,7 @@ void Rtype::Command::Player::Move::set_server(std::map<int, std::shared_ptr<Rtyp
     _y = y;
 }
 
-void Rtype::Command::Player::Move::set_client(udp::endpoint endpoint, float x, float y)
+void Rtype::Command::Player::Move::set_client(udp::endpoint endpoint, double x, double y)
 {
     _endpoint = endpoint;
     _x = x;

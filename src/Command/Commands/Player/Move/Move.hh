@@ -20,8 +20,8 @@ namespace Rtype
                     Move() = default;
                     ~Move();
 
-                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, float x, float y);
-                    void set_client(udp::endpoint endpoint, float x, float y);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, double x, double y);
+                    void set_client(udp::endpoint endpoint, double x, double y);
 
                     void execute_client_side();
                     void execute_server_side();
@@ -31,8 +31,8 @@ namespace Rtype
                     udp::endpoint _endpoint;
                     std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _playerID;
-                    float _x;
-                    float _y;
+                    double _x;
+                    double _y;
             };
         }
     }

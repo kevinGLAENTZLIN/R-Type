@@ -7,6 +7,7 @@
 */
 
 #include "Game.hh"
+#include <cmath>
 #include <thread>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
@@ -27,6 +28,8 @@ Rtype::Game::Game()
     _ressourcePool.addModel("ship_yellow");
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
+    _ressourcePool.addModel("boss_1");
+    _ressourcePool.addModel("boss_1_tail");
     _ressourcePool.addTexture("bg_menu");
     _ressourcePool.addTexture("background");
     _ressourcePool.addTexture("background_layer0");
@@ -217,7 +220,7 @@ std::size_t Rtype::Game::createCyclingEnemy(enemiesTypeEnum_t enemyType, float p
     _core->addComponent(enemy, ECS::Components::Scale{1.0f});
     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
+    _core->addComponent(enemy, ECS::Components::Render3D{"boss_1_tail"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType, std::make_pair(pos_x, pos_y), std::make_pair(dest_x, dest_y)});
     _serverToLocalEnemiesId[enemy] = enemy;
     return enemy;
@@ -245,6 +248,12 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
     _core->addComponent(player, ECS::Components::Health{5, invincibility});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = player;
+
+    std::size_t boss = _core->createEntity();
+    _core->addComponent(boss, ECS::Components::Position{10.0f, 0.0f});
+    _core->addComponent(boss, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(boss, ECS::Components::Scale{1.0f});
+    _core->addComponent(boss, ECS::Components::Render3D{"boss_1"});
 }
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
@@ -621,7 +630,7 @@ void Rtype::Game::initGame(void)
     // createBoss1Tail(BOSS1_Tail19, 6.2f, -2.7f);
 
     //ay = ((by - cy) / 2) * sin((π / (bx - cx)) * (ax - ((bx + cx) / 2))) + ((by + cy) / 2)
-    
+
     // createEnemy(PATAPATA, 10.5f, -3.0f);
     // createEnemy(PATAPATA, 11.5f, -2.9f);
     // createEnemy(PATAPATA, 12.5f, -2.8f);
@@ -640,7 +649,7 @@ void Rtype::Game::initGame(void)
     // createEnemy(BUG, 12.75f, 0.25f);
     // createEnemy(BUG, 13.5f, 0.25f);
     // createEnemy(BUG, 14.25f, 0.25f);
-    
+
 
     // createEnemy(BUG, 10.5f, 3.25f);
     // createEnemy(BUG, 11.25f, 3.25f);
@@ -760,7 +769,7 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
     _core->addComponent(projectile, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Scale{1.0f});
-    _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    //_core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
@@ -821,12 +830,12 @@ void Rtype::Game::update() {
                              _core->getComponents<ECS::Components::Position>(),
                              _core->getComponents<ECS::Components::AI>(),
                              AIEntities, _serverToLocalPlayersId);
-    
+
     std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
-    
+
     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                                             _core->getComponents<ECS::Components::Input>(),
                                                             inputEntities);
@@ -869,7 +878,7 @@ void Rtype::Game::update() {
                     _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
                 }
             }
-            
+
         }
         for (int j = 0; j < projectileEntities.size(); j++)
             if (projectileEntities[j] == projectileEntityId[i]) {
@@ -885,7 +894,8 @@ void Rtype::Game::update() {
 
     for (std::size_t i = 0; i < deadEntities.size(); i++) {
         if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
-            sleep(3000);//GAMEOVER
+            std::cout << "GAMEOVER" << std::endl;
+            //sleep(3000);//GAMEOVER
         else if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
             for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
                 auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();

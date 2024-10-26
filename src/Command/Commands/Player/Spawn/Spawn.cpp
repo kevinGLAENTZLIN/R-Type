@@ -7,7 +7,7 @@
 
 #include "Spawn.hh"
 
-void Rtype::Command::Player::Spawn::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, double x, double y)
+void Rtype::Command::Player::Spawn::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID, double x, double y)
 {
     _players = players;
     _playerID = playerID;
@@ -30,16 +30,16 @@ void Rtype::Command::Player::Spawn::execute_client_side()
 
 void Rtype::Command::Player::Spawn::execute_server_side()
 {
-    _players[_playerID]->setX(_x);
-    _players[_playerID]->setX(_y);
-    for (auto player: _players) {
+    _players->at(_playerID)->setX(_x);
+    _players->at(_playerID)->setX(_y);
+    for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
         if (player.first != _playerID)
             sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerSpawnOnGame, _playerID, _x, _y);
         else
-            for (auto tmp: _players)
+            for (auto tmp: *_players)
                 if (tmp.first != _playerID)
-                    sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerSpawnOnGame, tmp.first, _players[tmp.first]->getX(), _players[tmp.first]->getY());
+                    sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerSpawnOnGame, tmp.first, _players->at(tmp.first)->getX(), _players->at(tmp.first)->getY());
     }
-    _game->createOtherPlayer(_playerID, _x, _y); //! Issue
+    // _game->createOtherPlayer(_playerID, _x, _y); //! Issue
 }

@@ -7,7 +7,7 @@
 
 #include "Fired.hh"
 
-void Rtype::Command::Projectile::Fired::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int projectileType, int projectileID, double xOrigin, double yOrigin, double xVector, double yVector)
+void Rtype::Command::Projectile::Fired::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int projectileType, int projectileID, double xOrigin, double yOrigin, double xVector, double yVector)
 {
     _players = players;
     _projectileType = projectileType;

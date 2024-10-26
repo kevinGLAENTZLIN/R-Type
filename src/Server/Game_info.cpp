@@ -107,7 +107,7 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 
 void Rtype::Game_info::computeTick(void)
 {
-    int currentGameTimeInSeconds = 0;
+  int currentGameTimeInSeconds = 0;
 	while (!_players.empty()) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		_tick += 1;
@@ -118,7 +118,7 @@ void Rtype::Game_info::computeTick(void)
 
 bool Rtype::Game_info::isGameAvailable(void)
 {
-	return !(_players.max_size() == _nbMaxPlayer);
+	return !(_players->max_size() == _nbMaxPlayer);
 }
 
 bool Rtype::Game_info::gameStatus(void)
@@ -151,25 +151,27 @@ void Rtype::Game_info::connectPlayer(std::shared_ptr<Rtype::client_info> player)
 {
 	if (!isGameAvailable())
 		return;
-	_players[player->getId()] = player;
+	if (!_players)
+		_players = std::make_shared<std::map<int, std::shared_ptr<Rtype::client_info>>>();
+	_players->insert({player->getId(), player});
 	player->setRoom(_id);
-	player->setX(42);
-	player->setY(42);
+	player->setX(-10.);
+	player->setY(0.);
 }
 
-const std::map<int, std::shared_ptr<Rtype::client_info>>& Rtype::Game_info::getPlayers(void) const {
+std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> Rtype::Game_info::getPlayers(void) {
     return _players;
 }
 
 void Rtype::Game_info::disconnectPlayer(int id)
 {
-	for (auto i_player = _players.begin(); i_player != _players.end(); i_player++) {
+	for (auto i_player = _players->begin(); i_player != _players->end(); i_player++) {
 		std::shared_ptr<Rtype::client_info> player = i_player->second;
 		if (id == player->getId()) {
 			player->setRoom(-1);
-			player->setX(0);
-			player->setY(0);
-			_players.erase(i_player);
+			player->setX(42.);
+			player->setY(42.);
+			_players->erase(i_player);
 			return;
 		}
 	}

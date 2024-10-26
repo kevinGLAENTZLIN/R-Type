@@ -7,7 +7,7 @@
 
 #include "Die.hh"
 
-void Rtype::Command::Player::Die::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID)
+void Rtype::Command::Player::Die::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID)
 {
     _players = players;
     _playerID = playerID;
@@ -29,9 +29,9 @@ void Rtype::Command::Player::Die::execute_client_side()
 void Rtype::Command::Player::Die::execute_server_side()
 {
     CONSOLE_INFO(_playerID, ": die (RIP)")
-    for (auto player: _players) {
+    for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
         sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerDie, _playerID);
     }
-    _players[_playerID]->setAliveStatus(false);
+    _players->at(_playerID)->setAliveStatus(false);
 }

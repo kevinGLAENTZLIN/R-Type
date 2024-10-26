@@ -20,7 +20,7 @@ namespace Rtype
                     Attack() = default;
                     ~Attack();
 
-                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int projectileID);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int projectileID);
                     void set_client(udp::endpoint endpoint, int projectileID);
 
                     void execute_client_side();
@@ -29,7 +29,7 @@ namespace Rtype
                 protected:
                 private:
                     udp::endpoint _endpoint;
-                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
+                    std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
                     int _projectileID;
             };
         }

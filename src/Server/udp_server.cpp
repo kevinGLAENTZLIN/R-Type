@@ -65,19 +65,19 @@ int Rtype::udpServer::get_sender_id()
 }
 
 // ! Refactor: to remove -> handle by Command
-int Rtype::udpServer::get_available_client_id()
-{
-    bool available = false;
+// int Rtype::udpServer::get_available_client_id()
+// {
+//     bool available = false;
 
-    for (int i = 0; i < INT32_MAX; i++) {
-        available = true;
-        for (auto client: *_clients)
-            available &= client.second->getId() != i;
-        if (available)
-            return i;
-    }
-    return -1;
-}
+//     for (int i = 0; i < INT32_MAX; i++) {
+//         available = true;
+//         for (auto client: *_clients)
+//             available &= client.second->getId() != i;
+//         if (available)
+//             return i;
+//     }
+//     return -1;
+// }
 
 int Rtype::udpServer::get_client_id_by_addr(std::string addr, int port)
 {
@@ -160,9 +160,8 @@ void Rtype::udpServer::setHandleGameInfoMap() {
         join_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(join_cmd));
         CONSOLE_INFO("Player is joining game: ", id_room)
-        spawn_cmd->set_server(*_clients, get_sender_client_id(), -10., 0.);
+        spawn_cmd->set_server(_clients, get_sender_client_id(), -10., 0.);
         spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend(), _games->at(id_room)->getGame());
-        CONSOLE_INFO("Player is spawning in game: ", id_room)
         _network->addCommandToInvoker(std::move(spawn_cmd));
         CONSOLE_INFO("Player is spawning in game: ", id_room)
     };

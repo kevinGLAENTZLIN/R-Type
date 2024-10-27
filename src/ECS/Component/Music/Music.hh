@@ -24,10 +24,13 @@ namespace ECS {
             void resume();
             void update();
             float getTimePlayed() const;
+            void setVolume(float volume);
+            float getVolume() const;
 
         private:
             Music _musicStream;
             bool _isPaused;
+            float _volume;
         };
 
     }

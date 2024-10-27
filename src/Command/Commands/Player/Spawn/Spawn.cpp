@@ -41,5 +41,5 @@ void Rtype::Command::Player::Spawn::execute_server_side()
                 if (tmp.first != _playerID)
                     sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerSpawnOnGame, tmp.first, _players->at(tmp.first)->getX(), _players->at(tmp.first)->getY());
     }
-    // _game->createOtherPlayer(_playerID, _x, _y); //! Issue
+    // _game->createOtherPlayer(_playerID, _x, _y, 50); //! Issue
 }

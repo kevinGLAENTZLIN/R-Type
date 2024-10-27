@@ -5,7 +5,7 @@ PROJECT_NAME           = "ECS Project"
 PROJECT_NUMBER         = "1.0"
 PROJECT_BRIEF          = "Documentation for the ECS project"
 OUTPUT_DIRECTORY       = docs
-INPUT                  = src/ECS
+INPUT                  = src/
 RECURSIVE              = YES
 
 # File pattern settings

@@ -39,6 +39,8 @@
 #include "../../ECS/System/RenderText/RenderText.hh"
 #include "../../ECS/System/RenderButton/RenderButton.hh"
 #include "../../ECS/System/ButtonClick/ButtonClick.hh"
+#include "../../ECS/System/GetDeadEntities/GetDeadEntities.hh"
+#include "../../ECS/System/AIFiringProjectile/AIFiringProjectile.hh"
 #include "../../ECS/System/TextfieldInput/TextfieldInput.hh"
 #include "../../ECS/System/RenderTextfield/RenderTextfield.hh"
 
@@ -63,9 +65,6 @@ namespace Rtype {
 
         void run();
         void runServer();
-        void createPlayer(int id, float pos_x, float pos_y);
-        void createOtherPlayer(int id, float pos_x, float pos_y);
-        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
         void movePlayer(int id, double x, double y);
         void createEnemyProjectile(int id);
         void initGame();
@@ -78,8 +77,14 @@ namespace Rtype {
         std::vector<int> getAvailableGames();
         void addAvailableGames(int game_id);
         void clearAvailableGames();
+        void createPlayer(int id, float pos_x, float pos_y, int invincibility);
+        void createOtherPlayer(int id, float pos_x, float pos_y);
+        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
+        void createBoss1();
+        void createEnemyBydoShots(int id);
 
     private:
+        std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
         void loadMusic();
         void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
@@ -123,7 +128,8 @@ namespace Rtype {
         std::unique_ptr<ECS::Core::Core> _core;
         raylib::Window _window;
         raylib::Camera3D _camera;
-        std::map<int, std::size_t> _mapID;
+        std::map<int, std::size_t> _serverToLocalPlayersId;
+        std::map<int, std::size_t> _serverToLocalEnemiesId;
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
         std::shared_ptr<Rtype::Network> _network;

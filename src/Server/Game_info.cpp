@@ -98,7 +98,8 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
             _game->createEnemy(
                 enemyData.getType(),
                 enemyData.getPositionX(),
-                enemyData.getPositionY()
+                enemyData.getPositionY(),
+                enemyData.getHealth()
             );
             _nextEnemyIndex += 1;
         }

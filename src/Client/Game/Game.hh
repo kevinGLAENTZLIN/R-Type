@@ -66,7 +66,6 @@ namespace Rtype {
         void run();
         void runServer();
         void movePlayer(int id, double x, double y);
-        void createEnemyProjectile(int id);
         void initGame();
 
         bool getJoiningGame();
@@ -81,12 +80,13 @@ namespace Rtype {
         void createOtherPlayer(int id, float pos_x, float pos_y);
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void createBoss1();
-        void createEnemyBydoShots(int id);
+        void createProjectile(int id);
 
     private:
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
+        void createEnemyBydoShots(int id);
+        void createPlayerProjectile(int id);
         void loadMusic();
-        void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
         void update();
@@ -130,6 +130,7 @@ namespace Rtype {
         raylib::Camera3D _camera;
         std::map<int, std::size_t> _serverToLocalPlayersId;
         std::map<int, std::size_t> _serverToLocalEnemiesId;
+        std::map<int, std::size_t> _serverToLocalProjectilesId;
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
         std::shared_ptr<Rtype::Network> _network;

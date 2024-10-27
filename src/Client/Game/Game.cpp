@@ -863,19 +863,19 @@ void Rtype::Game::createEnemyBydoShots(int id)
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::AI{BYDOSHOT});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+    _serverToLocalProjectilesId[id] = projectile;
 }
 
-void Rtype::Game::createPlayerProjectile(std::size_t entityID)
+void Rtype::Game::createPlayerProjectile(int id)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
-    if (!positions[entityID].has_value()) {
-        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+    if (!positions[_serverToLocalPlayersId[id]].has_value()) {
         return;
     }
-    const ECS::Components::Position &entityPos = positions[entityID].value();
-    const ECS::Components::Hitbox &entityHitbox = hitboxes[entityID].value();
+    const ECS::Components::Position &entityPos = positions[_serverToLocalPlayersId[id]].value();
+    const ECS::Components::Hitbox &entityHitbox = hitboxes[_serverToLocalPlayersId[id]].value();
 
     std::size_t projectile = _core->createEntity();
 
@@ -890,6 +890,15 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
     playSound("blasterLego");
+    _serverToLocalProjectilesId[id] = projectile;
+}
+
+void Rtype::Game::createProjectile(int id)
+{
+    if (_serverToLocalEnemiesId.find(id) != _serverToLocalEnemiesId.end())
+        createEnemyBydoShots(id);
+    else if (_serverToLocalPlayersId.find(id) != _serverToLocalPlayersId.end())
+        createPlayerProjectile(id);
 }
 
 void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel)
@@ -954,9 +963,9 @@ void Rtype::Game::update() {
 
     std::vector<std::size_t> inputs = getAllInputs();
     sendInput(inputs);
-    std::size_t entityID = inputUpdatesSystem->updateInputs(inputs,
-                                     _core->getComponents<ECS::Components::Input>(),
-                                     inputEntities);
+    inputUpdatesSystem->updateInputs(inputs,
+                        _core->getComponents<ECS::Components::Input>(),
+                        inputEntities);
 
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
@@ -968,7 +977,7 @@ void Rtype::Game::update() {
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
-                           _mapID,
+                           _serverToLocalPlayersId,
                            velocityEntities);
 
     collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
@@ -977,9 +986,9 @@ void Rtype::Game::update() {
                            _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
                            playerCollisionEntities);
 
-    if (entityID <= 10000)
-        createPlayerProjectile(entityID);
-    entityID = 10001;
+    // if (entityID <= 10000)
+    //     createPlayerProjectile(entityID);
+   // entityID = 10001;
 
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),

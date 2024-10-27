@@ -29,7 +29,6 @@ namespace Rtype {
         void setSpawnTime(std::pair <int, int> spawnTime);
         int getSpawnTimeInSeconds() const;
 
-        int getSpawnTimeInSeconds() const;
         enemiesTypeEnum_t getType() const;
         int getDifficulty() const;
         float getPositionX() const;

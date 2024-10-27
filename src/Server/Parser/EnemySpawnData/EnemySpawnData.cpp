@@ -12,7 +12,7 @@ Rtype::EnemySpawnData::EnemySpawnData()
 
 void Rtype::EnemySpawnData::setType(enemiesTypeEnum_t enemyType)
 {
-    _type = type;
+    _type = enemyType;
 }
 
 void Rtype::EnemySpawnData::setDifficulty(int difficulty)

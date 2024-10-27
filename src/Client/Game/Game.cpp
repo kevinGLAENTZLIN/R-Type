@@ -782,6 +782,7 @@ void Rtype::Game::update() {
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
+                           _mapID,
                            velocityEntities);
 
     if (entityID <= 10000)

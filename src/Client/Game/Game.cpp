@@ -8,6 +8,7 @@
 
 #include "Game.hh"
 #include <thread>
+#include<unistd.h>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -303,6 +304,54 @@ void Rtype::Game::initOptions(void)
     _core->addComponent(back, ECS::Components::Text{"Back", 30, RAYWHITE});
     _core->addComponent(back, ECS::Components::Button{Rectangle{350, 190, 300, 60}, true, [this]() {
         initMenu();
+    }});
+
+    std::size_t musicIncrease = _core->createEntity();
+    _core->addComponent(musicIncrease, ECS::Components::Position{400, 300});
+    _core->addComponent(musicIncrease, ECS::Components::Text{"Music +", 30, RAYWHITE});
+    _core->addComponent(musicIncrease, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+        std::vector<std::size_t> entitiesMusic = _core->getEntitiesWithComponent<ECS::Components::Musica>();
+        for (auto &entity : entitiesMusic) {
+            auto &musicComponent = _core->getComponent<ECS::Components::Musica>(entity);
+            float newVolume = std::min(musicComponent.getVolume() + 0.1f, 1.0f);
+            musicComponent.setVolume(newVolume);
+        }
+    }});
+
+    std::size_t musicDecrease = _core->createEntity();
+    _core->addComponent(musicDecrease, ECS::Components::Position{400, 400});
+    _core->addComponent(musicDecrease, ECS::Components::Text{"Music -", 30, RAYWHITE});
+    _core->addComponent(musicDecrease, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
+        std::vector<std::size_t> entitiesMusic = _core->getEntitiesWithComponent<ECS::Components::Musica>();
+        for (auto &entity : entitiesMusic) {
+            auto &musicComponent = _core->getComponent<ECS::Components::Musica>(entity);
+            float newVolume = std::max(musicComponent.getVolume() - 0.1f, 0.0f);
+            musicComponent.setVolume(newVolume);
+        }
+    }});
+
+    std::size_t soundEffectIncrease = _core->createEntity();
+    _core->addComponent(soundEffectIncrease, ECS::Components::Position{400, 500});
+    _core->addComponent(soundEffectIncrease, ECS::Components::Text{"Sound Effect +", 30, RAYWHITE});
+    _core->addComponent(soundEffectIncrease, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        std::vector<std::size_t> entitiesSoundEffect = _core->getEntitiesWithComponent<ECS::Components::SoundEffect>();
+        for (auto &entity : entitiesSoundEffect) {
+            auto &soundEffectComponent = _core->getComponent<ECS::Components::SoundEffect>(entity);
+            float newVolume = std::min(soundEffectComponent.getVolume() + 0.1f, 1.0f);
+            soundEffectComponent.setVolume(newVolume);
+        }
+    }});
+
+    std::size_t soundEffectDecrease = _core->createEntity();
+    _core->addComponent(soundEffectDecrease, ECS::Components::Position{400, 600});
+    _core->addComponent(soundEffectDecrease, ECS::Components::Text{"Sound Effect -", 30, RAYWHITE});
+    _core->addComponent(soundEffectDecrease, ECS::Components::Button{Rectangle{350, 590, 300, 60}, true, [this]() {
+        std::vector<std::size_t> entitiesSoundEffect = _core->getEntitiesWithComponent<ECS::Components::SoundEffect>();
+        for (auto &entity : entitiesSoundEffect) {
+            auto &soundEffectComponent = _core->getComponent<ECS::Components::SoundEffect>(entity);
+            float newVolume = std::max(soundEffectComponent.getVolume() - 0.1f, 0.0f);
+            soundEffectComponent.setVolume(newVolume);
+        }
     }});
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
@@ -621,7 +670,7 @@ void Rtype::Game::initGame(void)
     // createBoss1Tail(BOSS1_Tail19, 6.2f, -2.7f);
 
     //ay = ((by - cy) / 2) * sin((π / (bx - cx)) * (ax - ((bx + cx) / 2))) + ((by + cy) / 2)
-    
+
     // createEnemy(PATAPATA, 10.5f, -3.0f);
     // createEnemy(PATAPATA, 11.5f, -2.9f);
     // createEnemy(PATAPATA, 12.5f, -2.8f);
@@ -640,7 +689,7 @@ void Rtype::Game::initGame(void)
     // createEnemy(BUG, 12.75f, 0.25f);
     // createEnemy(BUG, 13.5f, 0.25f);
     // createEnemy(BUG, 14.25f, 0.25f);
-    
+
 
     // createEnemy(BUG, 10.5f, 3.25f);
     // createEnemy(BUG, 11.25f, 3.25f);
@@ -821,12 +870,12 @@ void Rtype::Game::update() {
                              _core->getComponents<ECS::Components::Position>(),
                              _core->getComponents<ECS::Components::AI>(),
                              AIEntities, _serverToLocalPlayersId);
-    
+
     std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
-    
+
     std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
                                                             _core->getComponents<ECS::Components::Input>(),
                                                             inputEntities);
@@ -869,7 +918,7 @@ void Rtype::Game::update() {
                     _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
                 }
             }
-            
+
         }
         for (int j = 0; j < projectileEntities.size(); j++)
             if (projectileEntities[j] == projectileEntityId[i]) {

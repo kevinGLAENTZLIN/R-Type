@@ -20,6 +20,7 @@ namespace ECS {
             void play();
             void stop();
             void setVolume(float volume);
+            float getVolume() const;
 
         private:
             Sound _soundEffect;

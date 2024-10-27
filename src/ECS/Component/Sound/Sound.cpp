@@ -27,3 +27,8 @@ void ECS::Components::SoundEffect::setVolume(float volume)
     _volume = volume;
     SetSoundVolume(_soundEffect, _volume);
 }
+
+float ECS::Components::SoundEffect::getVolume() const
+{
+    return _volume;
+}

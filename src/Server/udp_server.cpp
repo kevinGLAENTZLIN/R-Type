@@ -47,37 +47,10 @@ void Rtype::udpServer::read_clients()
     });
 }
 
-// bool Rtype::udpServer::check_ACK()
-// {
-//     return true; //! To refactor by the protocol control
-// }
-
 int Rtype::udpServer::get_sender_id()
 {
-    int id = get_client_id_by_addr(_network->getSenderEndpoint().address().to_string(), (int)_network->getSenderEndpoint().port());
-
-    // if (id == -1) {
-        // id = get_available_client_id();
-        // _clients->insert({id, std::make_shared<Rtype::client_info>(Rtype::client_info(id, (int)_network->getSenderEndpoint().port(), _network->getSenderEndpoint().address().to_string()))});
-        // connect_client_to_game(id, 4242); //! To refactor by the protocol control & for Defense purpose only
-    // }
-    return id;
+    return get_client_id_by_addr(_network->getSenderEndpoint().address().to_string(), (int)_network->getSenderEndpoint().port());
 }
-
-// ! Refactor: to remove -> handle by Command
-// int Rtype::udpServer::get_available_client_id()
-// {
-//     bool available = false;
-
-//     for (int i = 0; i < INT32_MAX; i++) {
-//         available = true;
-//         for (auto client: *_clients)
-//             available &= client.second->getId() != i;
-//         if (available)
-//             return i;
-//     }
-//     return -1;
-// }
 
 int Rtype::udpServer::get_client_id_by_addr(std::string addr, int port)
 {
@@ -101,22 +74,6 @@ void Rtype::udpServer::disconnect_client(int client_id)
 {
     _clients->erase(client_id);
 }
-
-// void Rtype::udpServer::connect_client_to_game(int client_id, int game_room)
-// {
-//     if (client_id == -1 || game_room <= 0 || _clients->at(client_id)->getRoom() != -1)
-//         return;
-//     if (_games->at(game_room)) {
-//         _games->at(game_room)->connectPlayer(_clients->at(client_id));
-//         return;
-//     }
-//     Game_info tmp(game_room);
-//     _games->insert({game_room, std::make_shared<Game_info>(std::move(tmp))});
-//     _games->at(game_room)->setNetwork(_network);
-//     _games->at(game_room)->getGame()->runServer();
-//     CONSOLE_INFO("Server is running", "")
-//     _games->at(game_room)->connectPlayer(_clients->at(client_id));
-// }
 
 void Rtype::udpServer::setHandleMaps() {
     setHandleGameInfoMap();

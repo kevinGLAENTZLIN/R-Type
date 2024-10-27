@@ -54,22 +54,10 @@ namespace Rtype {
 
         private:
             /**
-             * @brief Checks for an ACK from the client.
-             * @return true if ACK is received, false otherwise.
-             */
-            bool check_ACK();
-
-            /**
              * @brief Retrieves the ID of the sender.
              * @return Sender's ID.
              */
             int get_sender_id();
-
-            /**
-             * @brief Finds an available client ID.
-             * @return Available client ID.
-             */
-            int get_available_client_id(); // ! Refactor: to remove -> handle by Command
 
             /**
              * @brief Retrieves the client ID by its address.
@@ -98,8 +86,6 @@ namespace Rtype {
              * @param client_id Client's ID.
              */
             void disconnect_client(int client_id);
-
-            void connect_client_to_game(int client_id, int game_room);
 
             template <typename T>
             std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {

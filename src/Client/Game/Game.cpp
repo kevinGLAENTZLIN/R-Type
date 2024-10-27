@@ -582,7 +582,6 @@ void Rtype::Game::run()
                 updateMusic("menu");
                 updateMenu();
                 renderMenu();
-                // std::cout << "Level choose -> " << _selectedDifficulty << std::endl;
                 break;
             case PLAY:
                 updateMusic("stage1");
@@ -629,16 +628,9 @@ void Rtype::Game::sendInput(std::vector<std::size_t> vec)
             break;
         }
     }
-    // if (axe == 'y') {
     cmd->set_client(x, y);
     cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
     _network->addCommandToInvoker(std::move(cmd));
-    // }
-    // if (axe == 'x') {
-    //     cmd->set_client(value, 0.);
-    //     cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-    //     _network->addCommandToInvoker(std::move(cmd));
-    // }
 }
 
 std::vector<std::size_t> Rtype::Game::getAllInputs() {

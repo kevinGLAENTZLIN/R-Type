@@ -53,18 +53,6 @@ namespace Rtype {
         void run();  // This will now spawn two threads: one for game, one for network.
 
     private:
-        // template <typename T>
-        // std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
-        //     static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
-        //     T* derived = dynamic_cast<T*>(base.get());
-
-        //     if (derived) {
-        //         base.release();
-        //         return std::unique_ptr<T>(derived);
-        //     } else
-        //         return nullptr;
-        // }
-
         void read_server();
 
         /**
@@ -98,14 +86,8 @@ namespace Rtype {
         int _id;
         boost::asio::io_context _ioContext;
         std::shared_ptr<Rtype::Network> _network;
-        // int _ackToSend;
-        // int _ackToReceive;
-        // std::shared_ptr<udp::socket> _socket;
-        // udp::endpoint _serverEndpoint;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
-        // std::shared_ptr<Rtype::Command::Command_invoker> _commandInvoker;
-        // std::shared_ptr<Rtype::Command::Factory> _commandFactory;
         std::unique_ptr<Rtype::Game> _game;
     };
 }

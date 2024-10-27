@@ -8,7 +8,7 @@
 #include "Music.hh"
 
 ECS::Components::Musica::Musica(const std::string &filePath):
-    _isPaused(false)
+    _isPaused(false), _volume(1.0f)
 {
     _musicStream = LoadMusicStream(filePath.c_str());
 }
@@ -52,4 +52,15 @@ void ECS::Components::Musica::update()
 float ECS::Components::Musica::getTimePlayed() const
 {
     return GetMusicTimePlayed(_musicStream) / GetMusicTimeLength(_musicStream);
+}
+
+void ECS::Components::Musica::setVolume(float volume)
+{
+    _volume = volume;
+    SetMusicVolume(_musicStream, volume);
+}
+
+float ECS::Components::Musica::getVolume() const
+{
+    return _volume;
 }

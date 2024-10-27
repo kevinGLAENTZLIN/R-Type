@@ -29,7 +29,9 @@ Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
         _window.Init(1280, 720, "R-Type Game");
         SetWindowMinSize(1280, 720);
         _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+        std::cout << "CONNARD" << std::endl;
         _ressourcePool.addModel("ship_yellow");
+        std::cout << "CONNARED" << std::endl;
         _ressourcePool.addModel("base_projectile");
         _ressourcePool.addModel("enemy_one");
         _ressourcePool.addTexture("bg_menu");
@@ -238,14 +240,12 @@ void Rtype::Game::movePlayer(int id, double x, double y)
 
 void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibility)
 {
-    if (!_isRendering && !_modelCreated) {
-        _ressourcePool.addModel("ship_yellow");
-        std::cout << "Model Loaded" << std::endl;
-        _modelCreated = true;
-    }
+    std::cout << "Crash ?" << std::endl;
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
+    std::cout << "Crash ??" << std::endl;
     std::size_t player = _core->createEntity();
 
+    std::cout << "Player creating..." << std::endl;
     _core->addComponent(player, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(player, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
     _core->addComponent(player, ECS::Components::Scale{1.0f});
@@ -255,6 +255,7 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
     _core->addComponent(player, ECS::Components::Health{5, invincibility});
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = player;
+    std::cout << "Player created !" << std::endl;
 }
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
@@ -666,6 +667,7 @@ void Rtype::Game::createBoss1()
 
 void Rtype::Game::initGame(void)
 {
+    std::cout << "OUIIII" << std::endl;
     stopMusic("menu");
     destroyEntityMenu();
     destroyEntityLayer();
@@ -674,13 +676,14 @@ void Rtype::Game::initGame(void)
     createBackgroundLayers(2.f , "background_layer0", 3);
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
-    switchState(GameState::PLAY);
+    std::cout << "OUIIII" << std::endl;
     createPlayer(0, -10.0f, 0.0f, 50);
+    switchState(GameState::PLAY);
 
     createBoss1();
 
     createEnemy(BINK, -5.0f, 3.0f, 1);
-
+    std::cout << "OUIIII" << std::endl;
     // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
     // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);
     // createBoss1Tail(BOSS1_Tail2, 5.8f, 2.4f);
@@ -956,13 +959,9 @@ void Rtype::Game::update() {
                              _core->getComponents<ECS::Components::AI>(),
                              AIEntities, _serverToLocalPlayersId);
 
-    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
-        _core->getComponents<ECS::Components::AI>(),
-        _core->getComponents<ECS::Components::Position>(),
-        AIEntities);
-
     std::vector<std::size_t> inputs = getAllInputs();
     sendInput(inputs);
+    std::cout << "lolo1" << std::endl;
     inputUpdatesSystem->updateInputs(inputs,
                         _core->getComponents<ECS::Components::Input>(),
                         inputEntities);
@@ -970,21 +969,29 @@ void Rtype::Game::update() {
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
                                               inputEntities);
+    std::cout << "lolo2" << std::endl;
 
     backgroundSystem->update(_core->getComponents<ECS::Components::Position>(),
                              _core->getComponents<ECS::Components::Background>(),
                              backgroundEntities);
+    std::cout << "lolo3" << std::endl;
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
                            _serverToLocalPlayersId,
                            velocityEntities);
+    std::cout << "lolo4" << std::endl;
 
-    collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
-                           _core->getComponents<ECS::Components::Hitbox>(),
-                           _core->getComponents<ECS::Components::Health>(),
-                           _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
-                           playerCollisionEntities);
+    if (_isRendering && _currentState == PLAY) {
+        std::cout << "lol" << std::endl;
+        std::cout << "size t: " << _core->getEntitiesWithComponent<ECS::Components::Input>()[0] << std::endl;
+        collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
+                       _core->getComponents<ECS::Components::Hitbox>(),
+                       _core->getComponents<ECS::Components::Health>(),
+                       _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
+                       playerCollisionEntities);
+    }
+    std::cout << "lolo5" << std::endl;
 
     // if (entityID <= 10000)
     //     createPlayerProjectile(entityID);
@@ -996,22 +1003,25 @@ void Rtype::Game::update() {
         _core->getComponents<ECS::Components::AI>(),
         projectileEntities, collisionEntities);
 
-    auto healthComponents = _core->getComponents<ECS::Components::Health>();
-    std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
-    for (int i = 0; i < projectileEntityId.size(); i++) {
-        for (int j = 0; j < damageableEntities.size(); j++) {
-            if (damageableEntities[j] == projectileEntityId[i]) {
-                if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
-                    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
-                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+    if (_isRendering && _currentState == PLAY) {
+        auto healthComponents = _core->getComponents<ECS::Components::Health>();
+        std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
+        for (int i = 0; i < projectileEntityId.size(); i++) {
+            for (int j = 0; j < damageableEntities.size(); j++) {
+                if (damageableEntities[j] == projectileEntityId[i]) {
+                    if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
+                        std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
+                        _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+                    }
                 }
-            }
 
-        }
-        for (int j = 0; j < projectileEntities.size(); j++)
-            if (projectileEntities[j] == projectileEntityId[i]) {
-                _core->destroyEntity(projectileEntityId[i]);
             }
+            for (int j = 0; j < projectileEntities.size(); j++)
+                if (projectileEntities[j] == projectileEntityId[i]) {
+                    _core->destroyEntity(projectileEntityId[i]);
+                }
+        }
+        std::cout << "lolo" << std::endl;
     }
     projectileEntityId.clear();
 
@@ -1038,6 +1048,12 @@ void Rtype::Game::update() {
         _core->destroyEntity(deadEntities[i]);
     }
     deadEntities.clear();
+    std::cout << "lolo" << std::endl;
+
+    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
+        _core->getComponents<ECS::Components::AI>(),
+        _core->getComponents<ECS::Components::Position>(),
+        AIEntities);
 
     for (std::size_t i = 0; i < AIBydoShots.size(); i++)
         createEnemyBydoShots(AIBydoShots[i]);
@@ -1045,6 +1061,7 @@ void Rtype::Game::update() {
 
     if (false)
         _camera.Update(CAMERA_FREE);
+    std::cout << "lolo" << std::endl;
 }
 
 bool Rtype::Game::getJoiningGame()

@@ -644,6 +644,8 @@ std::vector<std::size_t> Rtype::Game::getAllInputs() {
         vec.push_back(3);
     if (IsKeyDown(KEY_DOWN))
         vec.push_back(4);
+    if (IsKeyPressed(KEY_SPACE))
+        vec.push_back(5);
     return vec;
 }
 

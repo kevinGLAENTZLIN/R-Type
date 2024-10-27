@@ -1,4 +1,6 @@
 #include "UpdateVelocityAI.hh"
+#include <cstdlib>
+#include <ctime>
 
 void ECS::Systems::UpdateVelocityAI::update (
     ECS::ComponentManager::SparseArray<ECS::Components::Velocity> & velocities,
@@ -7,6 +9,7 @@ void ECS::Systems::UpdateVelocityAI::update (
     std::vector<std::size_t> entities,
     const std::map<int, std::size_t> & serverToLocalPlayersId) const
 {
+    std::size_t boss2CoreId = 0;
     for (std::size_t i = 0; i < entities.size(); i++) {
         std::size_t aiId = entities[i];
         enemiesTypeEnum_t aiType = AIs[aiId]->getEnemyType();
@@ -72,6 +75,28 @@ void ECS::Systems::UpdateVelocityAI::update (
             velocities[aiId]->setX(deltaBetweenThePoints);
             nextY = ((p1y - p2y) / 2) * std::sin(M_PI / (p1x - p2x)) * (curX - ((p1x + p2x) / 2)) + ((p1y + p2y) / 2);
             velocities[aiId]->setY(nextY - positions[aiId]->getY());
+        }
+        if (aiType >= BOSS2_Core && aiType <= BOSS2_Ball38) {
+            if (aiType == BOSS2_Core && !AIs[aiId]->isFiring()) {
+                std::srand(std::time(nullptr));
+                int randX = std::rand() % 16 - 8;
+                int randY = std::rand() % 8 - 4;
+                AIs[aiId]->setFiring(true);
+                AIs[aiId]->setCooldown(200);
+                velocities[aiId]->setX((randX - positions[aiId]->getX()) / 200);
+                velocities[aiId]->setY((randY - positions[aiId]->getY()) / 200);
+                boss2CoreId = aiId;
+                continue;
+            }
+            if (aiType == BOSS2_Core && AIs[aiId]->isFiring()) {
+                AIs[aiId]->setCooldown(AIs[aiId]->getCooldown() - 1);
+                boss2CoreId = aiId;
+                continue;
+            }
+            if (!AIs[aiId]->isFiring()) {
+                velocities[aiId]->setX(velocities[boss2CoreId]->getX());
+                velocities[aiId]->setY(velocities[boss2CoreId]->getY());
+            }
         }
     }
 }

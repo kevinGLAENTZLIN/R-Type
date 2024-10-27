@@ -62,8 +62,9 @@ namespace Rtype {
         void run();
         void createPlayer(int id, float pos_x, float pos_y, int invincibility);
         void createOtherPlayer(int id, float pos_x, float pos_y);
-        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
+        std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void createBoss1();
+        void createBoss2();
         void movePlayer(int id, float x, float y);
         void createEnemyBydoShots(int id);
         std::vector<std::size_t> getAllInputs();
@@ -116,5 +117,6 @@ namespace Rtype {
         std::map<int, std::size_t> _serverToLocalEnemiesId;
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
+        std::vector<std::size_t> _boss2Balls;
     };
 };

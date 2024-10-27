@@ -66,7 +66,7 @@ namespace Rtype {
         void createPlayer(int id, float pos_x, float pos_y);
         void createOtherPlayer(int id, float pos_x, float pos_y);
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y);
-        void movePlayer(int id, float x, float y);
+        void movePlayer(int id, double x, double y);
         void createEnemyProjectile(int id);
         void initGame();
 
@@ -110,6 +110,8 @@ namespace Rtype {
         void updatePlayerCountText();
         void DrawProgressBar(int progress);
         void LoadAssets();
+        std::vector<std::size_t> getAllInputs();
+        void sendInput(std::vector<std::size_t> vec);
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;

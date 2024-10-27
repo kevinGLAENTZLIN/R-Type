@@ -107,8 +107,9 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 
 void Rtype::Game_info::computeTick(void)
 {
-  int currentGameTimeInSeconds = 0;
-	while (!_players.empty()) {
+    int currentGameTimeInSeconds = 0;
+
+	while (!_players->empty()) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		_tick += 1;
 		currentGameTimeInSeconds = _tick / 20;

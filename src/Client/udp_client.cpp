@@ -48,10 +48,10 @@ void Rtype::udpClient::runNetwork()
 
 void Rtype::udpClient::read_server()
 {
-    udp::endpoint sender_endpoint;
+    auto sender_endpoint = std::make_shared<udp::endpoint>();
 
-    _network->getSocket()->async_receive_from(boost::asio::buffer(_receiverBuffer), sender_endpoint,
-    [this](const boost::system::error_code& error, std::size_t bytes_recv) {
+    _network->getSocket()->async_receive_from(boost::asio::buffer(_receiverBuffer), *sender_endpoint,
+    [this, sender_endpoint](const boost::system::error_code& error, std::size_t bytes_recv) {
         Utils::Network::Response clientResponse;
         Utils::Network::bytes data;
 
@@ -173,12 +173,11 @@ void Rtype::udpClient::setHandlePlayerMap() {
 
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerMove] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::Player::Move> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Move>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
+        int player_id = response.PopParam<int>();
+        double x = response.PopParam<double>();
+        double y = response.PopParam<double>();
 
-        int playerId = response.PopParam<int>();
-        float x = response.PopParam<double>();
-        float y = response.PopParam<double>();
-
+        _game->movePlayer(player_id, x, y);
     };
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerAttack] = [this](Utils::Network::Response response) {

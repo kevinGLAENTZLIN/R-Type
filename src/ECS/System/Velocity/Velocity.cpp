@@ -16,5 +16,7 @@ void ECS::Systems::SystemVelocity::update(
         auto &velocity = velocities[entity].value();
         position.setX(position.getX() + velocity.getX());
         position.setY(position.getY() + velocity.getY());
+        velocity.setX(0.); //? Temp -> parallax issue
+        velocity.setY(0.); //? Temp -> parallax issue
     }
 }

@@ -104,6 +104,37 @@ namespace Rtype
                 }
 
                 /**
+                 * @brief Sends a command to the last sender client.
+                 *
+                 * This function uses variadic arguments to handle parameters of the command to send.
+                 * Also it pushes the command with its parameters to the client's history.
+                 *
+                 * @param function_type The type of command to be sent.
+                 * @param function_index The index of the command to be sent.
+                 * @param ... Parameters for the command to send in the right order.
+                 */
+                template <Utils::FunctionIndex T>
+                void sendToEndpoint(udp::endpoint endpoint, Utils::InfoTypeEnum function_type, T function_index, ...)
+                {
+                    va_list params;
+                    va_list params_copy;
+                    Utils::Network::bytes msg;
+                    std::string params_type = getParamsType(function_type, function_index);
+
+                    va_start(params, function_index);
+                    va_copy(params_copy, params);
+                    // if (!_history.empty())
+                    //     std::cerr << "Warning, the history has not been dev" << std::endl;
+                    //     // pushCmdToHistory(function_type, function_index, params);
+                    // else
+                    //     std::cerr << "Warning, the history has not been set" << std::endl;
+                    msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
+                    va_end(params);
+                    _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
+                    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                }
+
+                /**
                  * @brief Gets the parameter types for a given function.
                  *
                  * This method returns the parameter types for a given function type and index.

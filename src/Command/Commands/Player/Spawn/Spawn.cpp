@@ -31,7 +31,7 @@ void Rtype::Command::Player::Spawn::execute_client_side()
 void Rtype::Command::Player::Spawn::execute_server_side()
 {
     _players->at(_playerID)->setX(_x);
-    _players->at(_playerID)->setX(_y);
+    _players->at(_playerID)->setY(_y);
     for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
         if (player.first != _playerID)

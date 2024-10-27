@@ -21,7 +21,7 @@ namespace Rtype
                     ~Move();
 
                     void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID, double x, double y);
-                    void set_client(udp::endpoint endpoint, double x, double y);
+                    void set_client(double x, double y);
 
                     void execute_client_side();
                     void execute_server_side();

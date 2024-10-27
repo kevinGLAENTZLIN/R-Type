@@ -48,6 +48,11 @@ void Rtype::client_info::setX(float x)
 	_x = x;
 }
 
+void Rtype::client_info::moveX(float x)
+{
+	_x += x;
+}
+
 float Rtype::client_info::getY() const
 {
 	return _y;
@@ -56,6 +61,11 @@ float Rtype::client_info::getY() const
 void Rtype::client_info::setY(float y)
 {
 	_y = y;
+}
+
+void Rtype::client_info::moveY(float y)
+{
+	_y += y;
 }
 
 int Rtype::client_info::getAckToExpect() const

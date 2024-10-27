@@ -194,11 +194,13 @@ void Rtype::udpServer::setHandlePlayerMap() {
     };
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerMove] = [this](Utils::Network::Response clientResponse) {
-        std::unique_ptr<Rtype::Command::Player::Move> cmd = convertACommandToCommand<Rtype::Command::Player::Move>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove)));
+        std::unique_ptr<Rtype::Command::Player::Move> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Move, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove);
         int gameID = _clients->at(get_sender_client_id())->getRoom();
+        double x = clientResponse.PopParam<double>();
+        double y = clientResponse.PopParam<double>();
 
-        cmd->set_server(_games->at(gameID)->getPlayers(),get_sender_client_id(), clientResponse.PopParam<double>(), clientResponse.PopParam<double>());
-        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
+        cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id(), x, y);
+        cmd->setCommonPart(_network->getSocket(), udp::endpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
     };
 
@@ -264,8 +266,10 @@ void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
 
-    CONSOLE_INFO("Handle Response: ", (int)cmd_category)
-    CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
+    if ((int)cmd_category != 1 && (int)clientResponse.GetInfoFunction() != 2) {
+        CONSOLE_INFO("Handle Response: ", (int)cmd_category)
+        CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
+    }
     switch (cmd_category)
     {
     case Utils::InfoTypeEnum::GameInfo:

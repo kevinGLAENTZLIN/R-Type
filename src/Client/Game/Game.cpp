@@ -192,7 +192,7 @@ void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float po
     _mapID[enemy] = enemy;
 }
 
-void Rtype::Game::movePlayer(int id, float x, float y)
+void Rtype::Game::movePlayer(int id, double x, double y)
 {
     auto &velocity = _core->getComponent<ECS::Components::Velocity>(_mapID[id]);
 
@@ -605,7 +605,43 @@ void Rtype::Game::runServer()
         }
 }
 
-std::vector<std::size_t> getAllInputs() {
+void Rtype::Game::sendInput(std::vector<std::size_t> vec)
+{
+    std::unique_ptr<Rtype::Command::Player::Move> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Move, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove);
+    double x = 0.;
+    double y = 0.;
+
+    if (vec.empty())
+        return;
+    for (auto input: vec) {
+        switch (input) {
+        case 1:
+            x += 0.1;
+            break;
+        case 2:
+            y -= 0.1;
+            break;
+        case 3:
+            x -= 0.1;
+            break;
+        case 4:
+            y += 0.1;
+            break;
+        }
+    }
+    // if (axe == 'y') {
+    cmd->set_client(x, y);
+    cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    _network->addCommandToInvoker(std::move(cmd));
+    // }
+    // if (axe == 'x') {
+    //     cmd->set_client(value, 0.);
+    //     cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    //     _network->addCommandToInvoker(std::move(cmd));
+    // }
+}
+
+std::vector<std::size_t> Rtype::Game::getAllInputs() {
     std::vector<std::size_t> vec;
 
     if (IsKeyDown(KEY_RIGHT))
@@ -736,7 +772,9 @@ void Rtype::Game::update() {
                      _core->getComponents<ECS::Components::AI>(),
                      AIEntities);
 
-    std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
+    std::vector<std::size_t> inputs = getAllInputs();
+    sendInput(inputs);
+    std::size_t entityID = inputUpdatesSystem->updateInputs(inputs,
                                      _core->getComponents<ECS::Components::Input>(),
                                      inputEntities);
 

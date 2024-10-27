@@ -82,6 +82,13 @@ namespace Rtype {
             void setX(float x);
 
             /**
+             * @brief Moves the X coordinate of the client.
+             * 
+             * @param x The Add x to X coordinate.
+             */
+            void moveX(float x);
+
+            /**
              * @brief Gets the Y coordinate of the client.
              * 
              * @return The Y coordinate.
@@ -94,6 +101,13 @@ namespace Rtype {
              * @param y The new Y coordinate.
              */
             void setY(float y);
+
+            /**
+             * @brief Moves the Y coordinate of the client.
+             * 
+             * @param x The Add y to Y coordinate.
+             */
+            void moveY(float y);
 
             /**
              * @brief Gets the expected ACK number for the client.

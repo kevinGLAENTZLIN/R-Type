@@ -764,7 +764,10 @@ void Rtype::Game::initGame(int id)
     // createBoss2();
 
     // createEnemy(BINK, -5.0f, 3.0f, 1);
-    // createEnemy(BLASTER, 11.0f, 4.67f, 1);
+    createEnemy(BLASTER, 11.0f, 4.67f, 1);
+    createEnemy(BLASTER, 12.0f, 4.67f, 1);
+    createEnemy(BLASTER, 13.0f, 4.67f, 1);
+    createEnemy(BLASTER, 14.0f, 4.67f, 1);
 
     // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
     // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);
@@ -1154,8 +1157,8 @@ void Rtype::Game::update() {
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
 
-    // for (std::size_t i = 0; i < AIHomingShots.size(); i++)
-    //     createEnemyProjectile(AIHomingShots[i], HOMINGSHOT);
+    // for (std::size_t i = 0; i < _AIHomingShots.size(); i++)
+    //     createEnemyProjectile(_AIHomingShots[i], 250, HOMINGSHOT);
 
     if (false)
         _camera.Update(CAMERA_FREE);

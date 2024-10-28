@@ -65,6 +65,26 @@ void ECS::Systems::UpdateVelocityAI::update (
         if (aiType == BLASTER) {
             velocities[aiId]->setX(-0.01);
         }
+        if (aiType == HOMINGSHOT) {
+            std::vector<std::pair<float, float>> playersPos;
+            for (const auto& player : serverToLocalPlayersId)
+                playersPos.push_back(positions[player.second]->getPosPair());
+            std::size_t targetPlayer = ecsUtils::getClosestPlayer(
+                positions[aiId]->getPosPair(), playersPos);
+            for (const auto& player : serverToLocalPlayersId)
+                if (positions[player.second]->getPosPair() == playersPos[targetPlayer])
+                    targetPlayer = player.second;
+            float playerX = positions[targetPlayer]->getX();
+            float playerY = positions[targetPlayer]->getY();
+            float aiOrigX = positions[aiId]->getOriginalX();
+            float aiX = positions[aiId]->getX();
+            float aiY = positions[aiId]->getY();
+
+            if (aiX > playerX + 1 && aiOrigX > playerX) {
+                velocities[aiId]->setX(-0.1);
+                velocities[aiId]->setY((playerY - aiY) / 25);
+            }
+        }
         if (aiType >= BOSS1_Tail0 && aiType <= BOSS1_Tail19) {
             float p1x = AIs[aiId]->getP1().first;
             float p1y = AIs[aiId]->getP1().second;

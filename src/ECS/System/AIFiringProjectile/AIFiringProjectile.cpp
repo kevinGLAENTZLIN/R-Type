@@ -38,7 +38,7 @@ std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringHomingShots(
     for (std::size_t i = 0; i < entities.size(); i++) {
         if (AIs[entities[i]]->getEnemyType() == BLASTER && AIs[entities[i]]->getCooldown() == 0) {
             firingEntities.push_back(entities[i]);
-            AIs[entities[i]]->setCooldown(400);
+            AIs[entities[i]]->setCooldown(250);
         }
     }
     return firingEntities;

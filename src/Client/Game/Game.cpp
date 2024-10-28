@@ -28,8 +28,8 @@ Rtype::Game::Game()
     _ressourcePool.addModel("ship_yellow");
     _ressourcePool.addModel("base_projectile");
     _ressourcePool.addModel("enemy_one");
-    _ressourcePool.addModel("boss_1");
-    _ressourcePool.addModel("boss_1_tail");
+    _ressourcePool.addModel("boss_one");
+    _ressourcePool.addModel("boss_one_part");
     _ressourcePool.addTexture("bg_menu");
     _ressourcePool.addTexture("background");
     _ressourcePool.addTexture("background_layer0");
@@ -220,7 +220,7 @@ std::size_t Rtype::Game::createCyclingEnemy(enemiesTypeEnum_t enemyType, float p
     _core->addComponent(enemy, ECS::Components::Scale{1.0f});
     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(enemy, ECS::Components::Render3D{"boss_1_tail"});
+    _core->addComponent(enemy, ECS::Components::Render3D{"boss_one_part"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType, std::make_pair(pos_x, pos_y), std::make_pair(dest_x, dest_y)});
     _serverToLocalEnemiesId[enemy] = enemy;
     return enemy;
@@ -250,10 +250,10 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
     _serverToLocalPlayersId[id] = player;
 
     std::size_t boss = _core->createEntity();
-    _core->addComponent(boss, ECS::Components::Position{10.0f, 0.0f});
+    _core->addComponent(boss, ECS::Components::Position{8.0f, 2.0f, -1.0f});
     _core->addComponent(boss, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(boss, ECS::Components::Scale{1.0f});
-    _core->addComponent(boss, ECS::Components::Render3D{"boss_1"});
+    _core->addComponent(boss, ECS::Components::Render3D{"boss_one"});
 }
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)

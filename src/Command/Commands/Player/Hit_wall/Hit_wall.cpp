@@ -7,7 +7,7 @@
 
 #include "Hit_wall.hh"
 
-void Rtype::Command::Player::Hit_wall::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID)
+void Rtype::Command::Player::Hit_wall::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID)
 {
     _players = players;
     _playerID = playerID;

@@ -28,10 +28,10 @@ void Rtype::Command::Command_invoker::executeCommand()
         } else
             std::cerr << "Wrong invoker type set. No commands executed." << std::endl;
     }
-    
+
 }
 
-void Rtype::Command::Command_invoker::addCommand(std::unique_ptr<ACommand> cmd)
+void Rtype::Command::Command_invoker::addCommand(std::unique_ptr<Rtype::Command::ACommand> cmd)
 {
     cmd->setOrigins(_invokerType);
     _commandQueue.push(std::move(cmd));

@@ -12,6 +12,7 @@ set(SERVER_SOURCES
     ${CMAKE_SOURCE_DIR}/src/Utils/Protocol/Protocol.cpp
     ${CMAKE_SOURCE_DIR}/src/Utils/Response/Response.cpp
     ${CMAKE_SOURCE_DIR}/src/Client/Game/Game.cpp
+    ${CMAKE_SOURCE_DIR}/src/Utils/Network/Network.cpp
 )
 
 find_package(boost_asio CONFIG REQUIRED)

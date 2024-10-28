@@ -14,19 +14,20 @@
 
 #include <boost/asio.hpp>
 #include <iostream>
+#include <memory>
 #include <thread>
 #include <vector>
 #include <array>
-#include "../Utils/ParametersMap/ParametersMap.hpp"
-#include "../Command/Factory/Factory.hh"
-#include "../Command/Invoker/Command_invoker.hh"
-#include "./Game/Game.hh"
 
-#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  convertACommandToCommand<TYPE>(_commandFactory.createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
+#include "../Utils/Network/Network.hpp"
+
+#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
 using boost::asio::ip::udp;
 
 namespace Rtype {
+
+    class Network;
     /**
      * @class udpClient
      * @brief Class to manage a UDP client.
@@ -52,18 +53,6 @@ namespace Rtype {
         void run();  // This will now spawn two threads: one for game, one for network.
 
     private:
-        template <typename T>
-        std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
-            static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
-            T* derived = dynamic_cast<T*>(base.get());
-
-            if (derived) {
-                base.release();
-                return std::unique_ptr<T>(derived);
-            } else
-                return nullptr;
-        }
-
         void read_server();
 
         /**
@@ -73,7 +62,7 @@ namespace Rtype {
         void handleResponse(Utils::Network::Response clientResponse);
 
         void connectClient();
-    
+
         void setHandleMaps();
         void setHandleGameInfoMap();
         void setHandlePlayerMap();
@@ -95,15 +84,10 @@ namespace Rtype {
         void runNetwork();  // New method to handle the networking thread.
 
         int _id;
-        int _ackToSend;
-        int _ackToReceive;
         boost::asio::io_context _ioContext;
-        std::shared_ptr<udp::socket> _socket;
-        udp::endpoint _serverEndpoint;
+        std::shared_ptr<Rtype::Network> _network;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
-        Rtype::Command::Command_invoker _commandInvoker;
-        Rtype::Command::Factory _commandFactory;
-        Rtype::Game _game;
+        std::unique_ptr<Rtype::Game> _game;
     };
 }

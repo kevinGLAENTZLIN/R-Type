@@ -63,3 +63,33 @@ void ECS::RessourcePool::addModel(const std::string &modelPath)
 
     _models.emplace(modelPath, std::move(defaultModel));
 }
+
+void ECS::RessourcePool::queueModelLoad(const std::string &modelPath)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    _pendingLoads.push(modelPath);
+}
+
+void ECS::RessourcePool::requestLoadTexture(const std::string &texturePath)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    _pendingTextureLoads.push(texturePath);
+}
+
+void ECS::RessourcePool::processLoadQueue()
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    while (!_pendingLoads.empty()) {
+        std::string modelPath = _pendingLoads.front();
+        _pendingLoads.pop();
+        addModel(modelPath);
+    }
+    while (!_pendingTextureLoads.empty()) {
+            std::string texturePath = _pendingTextureLoads.front();
+            _pendingTextureLoads.pop();
+            addTexture(texturePath);
+        }
+}

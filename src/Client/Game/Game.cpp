@@ -7,6 +7,8 @@
 */
 
 #include "Game.hh"
+
+#include "../../Utils/Network/Network.hpp"
 #include <thread>
 #include<unistd.h>
 
@@ -15,25 +17,29 @@ std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegi
 int menuOption = 0;
 std::vector<std::string> options = {"Start Game", "Options", "Quit"};
 
-Rtype::Game::Game()
-    : _isRunning(true), _currentState(MENU)
+Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
+    : _network(network), _isRunning(true), _currentState(MENU),
+    _isJoiningGame(false), _isAvailableGames(false), _isRendering(render), _modelCreated(false)
 {
     _core = std::make_unique<ECS::Core::Core>();
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    SetTargetFPS(60);
-    _window.Init(1280, 720, "R-Type Game");
-    SetWindowMinSize(1280, 720);
-    _camera = raylib::Camera3D({0.0f, 10.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, 60.0f);
-    _ressourcePool.addModel("ship_yellow");
-    _ressourcePool.addModel("base_projectile");
-    _ressourcePool.addModel("enemy_one");
-    _ressourcePool.addTexture("bg_menu");
-    _ressourcePool.addTexture("background");
-    _ressourcePool.addTexture("background_layer0");
-    _ressourcePool.addTexture("background_layer1");
-    _ressourcePool.addTexture("background_layer2");
-
+    if (render) {
+        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+        SetTargetFPS(60);
+        _window.Init(1280, 720, "R-Type Game");
+        SetWindowMinSize(1280, 720);
+        _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+        std::cout << "CONNARD" << std::endl;
+        _ressourcePool.addModel("ship_yellow");
+        std::cout << "CONNARED" << std::endl;
+        _ressourcePool.addModel("base_projectile");
+        _ressourcePool.addModel("enemy_one");
+        _ressourcePool.addTexture("bg_menu");
+        _ressourcePool.addTexture("background");
+        _ressourcePool.addTexture("background_layer0");
+        _ressourcePool.addTexture("background_layer1");
+        _ressourcePool.addTexture("background_layer2");
+    }
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Rotate>();
     _core->registerComponent<ECS::Components::Scale>();
@@ -224,7 +230,7 @@ std::size_t Rtype::Game::createCyclingEnemy(enemiesTypeEnum_t enemyType, float p
     return enemy;
 }
 
-void Rtype::Game::movePlayer(int id, float x, float y)
+void Rtype::Game::movePlayer(int id, double x, double y)
 {
     auto &velocity = _core->getComponent<ECS::Components::Velocity>(_serverToLocalPlayersId[id]);
 
@@ -250,6 +256,11 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
+    if (!_isRendering && !_modelCreated) {
+        std::cout << "Model Loaded" << std::endl;
+        _ressourcePool.addModel("ship_yellow");
+        _modelCreated = true;
+    }
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t otherPlayer = _core->createEntity();
 
@@ -356,26 +367,14 @@ void Rtype::Game::initOptions(void)
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
-void Rtype::Game::joinGame(void)
+void Rtype::Game::joinGame()
 {
     destroyEntityMenu();
     destroyEntityLayer();
-
-    std::vector<std::tuple<int, int, int>> games = {
-        {101, 2, 4},
-        {102, 1, 4},
-        {103, 3, 4},
-        {103, 3, 4},
-        {103, 3, 4},
-        {102, 1, 4},
-        {103, 3, 4},
-        {103, 3, 4}
-    };
-
     float yOffset = 200.0f;
     short buttonCount = 0;
 
-    for (const auto &game : games) {
+    for (const auto &game : _availableGames) {
         if (buttonCount >= 5)
             break;
         int gameID = std::get<0>(game);
@@ -392,7 +391,11 @@ void Rtype::Game::joinGame(void)
         _core->addComponent(gameButton, ECS::Components::Text{buttonText, 20, RAYWHITE});
 
         _core->addComponent(gameButton, ECS::Components::Button{Rectangle{350, yOffset - 10, 300, 40}, true, [this, gameID]() {
-            std::cout << "Joining game " << gameID << std::endl;
+            std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_client(gameID);
+            _network->addCommandToInvoker(std::move(cmd));
+            std::cout << "Joining game with ID: " << gameID << std::endl;
         }});
 
         yOffset += 60.0f;
@@ -405,7 +408,14 @@ void Rtype::Game::joinGame(void)
     _core->addComponent(back, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
         initPlayOption();
     }});
+    for (auto available_game: _availableGames)
+        std::cout << "Game available: " << std::get<0>(available_game) << std::endl;
     createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
+void Rtype::Game::failToConnect()
+{
+    std::cout << "There is no room available with this ID." << std::endl;
 }
 
 void Rtype::Game::joinGameID(void)
@@ -432,8 +442,14 @@ void Rtype::Game::joinGameID(void)
         auto &textField = _core->getComponent<ECS::Components::TextField>(textFieldEntity);
         std::string friendGameID = textField.getText();
 
-        if (!friendGameID.empty()) {
+        if (!friendGameID.empty() && friendGameID.size() == 4 && std::all_of(friendGameID.begin(), friendGameID.end(), ::isdigit)) {
+            std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_client(std::stoi(friendGameID));
+            _network->addCommandToInvoker(std::move(cmd));
             std::cout << "Joining game with ID: " << friendGameID << std::endl;
+        } else if (friendGameID.empty() || friendGameID.size() != 4 || !std::all_of(friendGameID.begin(), friendGameID.end(), ::isdigit)) {
+            std::cout << "A game ID can't be empty and is only a number of 4 digits only." << friendGameID << std::endl;
         }
     }});
 
@@ -522,7 +538,11 @@ void Rtype::Game::initCreationGame(void)
     _core->addComponent(createButtonEntity, ECS::Components::Position{400, 500});
     _core->addComponent(createButtonEntity, ECS::Components::Text{"Create Game", 30, RAYWHITE});
     _core->addComponent(createButtonEntity, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
-        initGame();
+        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Create_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
+        CONSOLE_INFO("Create game: ", " Sended")
     }});
 
     std::size_t back = _core->createEntity();
@@ -551,6 +571,13 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinRandomGameEntity, ECS::Components::Position{400, 300});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+        CONSOLE_INFO("Join game", "")
+        _isAvailableGames = false;
+        _isJoiningGame = true;
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
         joinRandomGame();
     }});
 
@@ -558,13 +585,20 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinGameEntity, ECS::Components::Position{400, 400});
     _core->addComponent(joinGameEntity, ECS::Components::Text{"Search available game", 30, RAYWHITE});
     _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
-        joinGame();
+        CONSOLE_INFO("Get available game", "")
+        _isJoiningGame = false;
+        _isAvailableGames = true;
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
     }});
 
     std::size_t joinGameId = _core->createEntity();
     _core->addComponent(joinGameId, ECS::Components::Position{400, 500});
     _core->addComponent(joinGameId, ECS::Components::Text{"Join friends game", 30, RAYWHITE});
     _core->addComponent(joinGameId, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        CONSOLE_INFO("Join Game by ID", "")
         joinGameID();
     }});
 
@@ -631,7 +665,7 @@ void Rtype::Game::createBoss1()
     createCyclingEnemy(BOSS1_Tail19, -2.4f, 2.9f, 6.2f, -2.7f);
 }
 
-void Rtype::Game::initGame(void)
+void Rtype::Game::initGame(int id)
 {
     stopMusic("menu");
     destroyEntityMenu();
@@ -641,13 +675,12 @@ void Rtype::Game::initGame(void)
     createBackgroundLayers(2.f , "background_layer0", 3);
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
+    createPlayer(id, -10.0f, 0.0f, 50);
     switchState(GameState::PLAY);
-    createPlayer(0, -10.0f, 0.0f, 50);
 
     createBoss1();
 
     createEnemy(BINK, -5.0f, 3.0f, 1);
-
     // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
     // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);
     // createBoss1Tail(BOSS1_Tail2, 5.8f, 2.4f);
@@ -701,26 +734,79 @@ void Rtype::Game::initGame(void)
     // createEnemy(MINIKIT, 17.0f, -4.0f);
 }
 
-void Rtype::Game::run() {
-    std::thread musicThread(&Rtype::Game::loadMusic, this);
+void Rtype::Game::run()
+{
+    // std::thread musicThread(&Rtype::Game::loadMusic, this);
 
-    musicThread.join();
+    // musicThread.join();
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
             case MENU:
-                updateMusic("menu");
+                // updateMusic("menu");
                 updateMenu();
                 renderMenu();
                 break;
             case PLAY:
-                updateMusic("stage1");
+                // updateMusic("stage1");
                 update();
                 render();
                 break;
         }
     }
     CloseAudioDevice();
+}
+
+void Rtype::Game::runServer()
+{
+    _currentState = PLAY;
+
+    while (_isRunning)
+        switch (_currentState) {
+            case PLAY:
+                update();
+        }
+}
+
+void Rtype::Game::sendProjectile()
+{
+    std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Projectile::Fired, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);
+
+    cmd->set_client();
+    cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    _network->addCommandToInvoker(std::move(cmd));
+}
+
+void Rtype::Game::sendInput(std::vector<std::size_t> vec)
+{
+    std::unique_ptr<Rtype::Command::Player::Move> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Move, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove);
+    double x = 0.;
+    double y = 0.;
+
+    if (vec.empty())
+        return;
+    for (auto input: vec) {
+        switch (input) {
+        case 1:
+            x += 0.1;
+            break;
+        case 2:
+            y -= 0.1;
+            break;
+        case 3:
+            x -= 0.1;
+            break;
+        case 4:
+            y += 0.1;
+            break;
+        case 5:
+            sendProjectile();
+            break;
+        }
+    }
+    cmd->set_client(x, y);
+    cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    _network->addCommandToInvoker(std::move(cmd));
 }
 
 std::vector<std::size_t> Rtype::Game::getAllInputs() {
@@ -734,6 +820,8 @@ std::vector<std::size_t> Rtype::Game::getAllInputs() {
         vec.push_back(3);
     if (IsKeyDown(KEY_DOWN))
         vec.push_back(4);
+    if (IsKeyPressed(KEY_SPACE))
+        vec.push_back(5);
     return vec;
 }
 
@@ -787,23 +875,21 @@ void Rtype::Game::createEnemyBydoShots(int id)
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::AI{BYDOSHOT});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+    _serverToLocalProjectilesId[id] = projectile;
 }
 
-void Rtype::Game::createPlayerProjectile(std::size_t entityID)
+void Rtype::Game::createPlayerProjectile(int entityId, int projectileId)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
-    if (!positions[entityID].has_value()) {
-        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+    if (!positions[_serverToLocalPlayersId[entityId]].has_value()) {
         return;
     }
-    const ECS::Components::Position &entityPos = positions[entityID].value();
-    const ECS::Components::Hitbox &entityHitbox = hitboxes[entityID].value();
+    const ECS::Components::Position &entityPos = positions[_serverToLocalPlayersId[entityId]].value();
+    const ECS::Components::Hitbox &entityHitbox = hitboxes[_serverToLocalPlayersId[entityId]].value();
 
     std::size_t projectile = _core->createEntity();
-
-    std::cout << "PlayerProjectileId : " << projectile << std::endl;
 
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
     _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
@@ -814,6 +900,15 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
     playSound("blasterLego");
+    _serverToLocalProjectilesId[projectileId] = projectile;
+}
+
+void Rtype::Game::createProjectile(int entityId, int projectileId)
+{
+    if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end())
+        createEnemyBydoShots(projectileId);
+    else if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end())
+        createPlayerProjectile(entityId, projectileId);
 }
 
 void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel)
@@ -830,7 +925,7 @@ void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int
     }
 }
 
-//FUNCTIONS TO UPDATE GAME AND MENU -------------------------------------------
+//!FUNCTIONS TO UPDATE GAME AND MENU -------------------------------------------
 
 void Rtype::Game::updateMenu() {
 
@@ -871,14 +966,11 @@ void Rtype::Game::update() {
                              _core->getComponents<ECS::Components::AI>(),
                              AIEntities, _serverToLocalPlayersId);
 
-    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
-        _core->getComponents<ECS::Components::AI>(),
-        _core->getComponents<ECS::Components::Position>(),
-        AIEntities);
-
-    std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
-                                                            _core->getComponents<ECS::Components::Input>(),
-                                                            inputEntities);
+    std::vector<std::size_t> inputs = getAllInputs();
+    sendInput(inputs);
+    inputUpdatesSystem->updateInputs(inputs,
+                        _core->getComponents<ECS::Components::Input>(),
+                        inputEntities);
 
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
@@ -890,17 +982,20 @@ void Rtype::Game::update() {
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
+                           _serverToLocalPlayersId,
                            velocityEntities);
 
-    collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
-                           _core->getComponents<ECS::Components::Hitbox>(),
-                           _core->getComponents<ECS::Components::Health>(),
-                           _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
-                           playerCollisionEntities);
+    if (_isRendering && _currentState == PLAY) {
+        collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
+                       _core->getComponents<ECS::Components::Hitbox>(),
+                       _core->getComponents<ECS::Components::Health>(),
+                       _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
+                       playerCollisionEntities);
+    }
 
-    if (entityID <= 10000)
-        createPlayerProjectile(entityID);
-    entityID = 10001;
+    // if (entityID <= 10000)
+    //     createPlayerProjectile(entityID);
+   // entityID = 10001;
 
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
@@ -908,22 +1003,24 @@ void Rtype::Game::update() {
         _core->getComponents<ECS::Components::AI>(),
         projectileEntities, collisionEntities);
 
-    auto healthComponents = _core->getComponents<ECS::Components::Health>();
-    std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
-    for (int i = 0; i < projectileEntityId.size(); i++) {
-        for (int j = 0; j < damageableEntities.size(); j++) {
-            if (damageableEntities[j] == projectileEntityId[i]) {
-                if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
-                    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
-                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+    if (_isRendering && _currentState == PLAY) {
+        auto healthComponents = _core->getComponents<ECS::Components::Health>();
+        std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
+        for (int i = 0; i < projectileEntityId.size(); i++) {
+            for (int j = 0; j < damageableEntities.size(); j++) {
+                if (damageableEntities[j] == projectileEntityId[i]) {
+                    if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
+                        std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
+                        _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+                    }
                 }
-            }
 
-        }
-        for (int j = 0; j < projectileEntities.size(); j++)
-            if (projectileEntities[j] == projectileEntityId[i]) {
-                _core->destroyEntity(projectileEntityId[i]);
             }
+            for (int j = 0; j < projectileEntities.size(); j++)
+                if (projectileEntities[j] == projectileEntityId[i]) {
+                    _core->destroyEntity(projectileEntityId[i]);
+                }
+        }
     }
     projectileEntityId.clear();
 
@@ -951,6 +1048,11 @@ void Rtype::Game::update() {
     }
     deadEntities.clear();
 
+    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
+        _core->getComponents<ECS::Components::AI>(),
+        _core->getComponents<ECS::Components::Position>(),
+        AIEntities);
+
     for (std::size_t i = 0; i < AIBydoShots.size(); i++)
         createEnemyBydoShots(AIBydoShots[i]);
     AIBydoShots.clear();
@@ -959,7 +1061,42 @@ void Rtype::Game::update() {
         _camera.Update(CAMERA_FREE);
 }
 
-//FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
+bool Rtype::Game::getJoiningGame()
+{
+    return _isJoiningGame;
+}
+
+void Rtype::Game::setIsJoiningGame(bool state)
+{
+    _isJoiningGame = state;
+}
+
+bool Rtype::Game::getIsAvailableGames()
+{
+    return _isAvailableGames;
+}
+
+void Rtype::Game::setIsAvailableGames(bool state)
+{
+    _isAvailableGames = state;
+}
+
+std::vector<std::tuple<int, int, int>> Rtype::Game::getAvailableGames()
+{
+    return _availableGames;
+}
+
+void Rtype::Game::addAvailableGames(int game_id, int nb_player, int nb_player_max)
+{
+    _availableGames.push_back({game_id, nb_player, nb_player_max});
+}
+
+void Rtype::Game::clearAvailableGames()
+{
+    _availableGames.clear();
+}
+
+//!FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
 
 void Rtype::Game::renderMenu() {
     BeginDrawing();
@@ -1038,6 +1175,7 @@ void Rtype::Game::render() {
                            renderEntities2D,
                            _ressourcePool);
 
+    DrawFPS(100, 100);
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Rotate>(),
                            _core->getComponents<ECS::Components::Scale>(),
@@ -1049,7 +1187,7 @@ void Rtype::Game::render() {
     EndDrawing();
 }
 
-//FUNCTIONS TO HANDLE MUSIC AND SOUND -----------------------------------------
+//!FUNCTIONS TO HANDLE MUSIC AND SOUND -----------------------------------------
 
 
 void Rtype::Game::createMusic(std::string path, std::string name) {

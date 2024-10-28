@@ -15,7 +15,7 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Level_complete: public ACommand{
+            class Level_complete: public ACommand {
                 public:
                     Level_complete() = default;
                     ~Level_complete();

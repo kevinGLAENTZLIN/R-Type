@@ -54,11 +54,15 @@ namespace Rtype
             void connectPlayer(std::shared_ptr<Rtype::client_info> player);
             void disconnectPlayer(int id);
 
+            int getNbProjectiles();
+            void accNbProjectiles();
+
         protected:
         private:
             int _id;
             int _level;
             int _nbMaxPlayer;
+            int _nbProjectiles; //! tmp
             unsigned int _tick;
             std::thread _tickThread;
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;

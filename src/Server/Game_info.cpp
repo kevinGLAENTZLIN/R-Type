@@ -13,7 +13,7 @@
 #include <vector>
 
 Rtype::Game_info::Game_info():
-	_id(-1), _level(0), _nbMaxPlayer(6), _tick(0), _players(), _toSetNetwork(true)
+	_id(-1), _level(0), _nbMaxPlayer(6), _nbProjectiles(10), _tick(0), _players(), _toSetNetwork(true)
 {
     _loadData.LoadDataFromFile("stage1.json");
     _enemySpawnData = _loadData.GetEnemySpawnData();
@@ -21,7 +21,7 @@ Rtype::Game_info::Game_info():
 }
 
 Rtype::Game_info::Game_info(int id):
-	_id(id), _level(0), _nbMaxPlayer(6), _tick(0), _players(), _toSetNetwork(true)
+	_id(id), _level(0), _nbMaxPlayer(6), _nbProjectiles(10), _tick(0), _players(), _toSetNetwork(true)
 {}
 
 Rtype::Game_info::~Game_info()
@@ -41,6 +41,7 @@ Rtype::Game_info::Game_info(Game_info &&other) noexcept:
     other._id = -1;
     other._level = 0;
     other._nbMaxPlayer = 6;
+    other._nbProjectiles = 10;
     other._tick = 0;
 }
 
@@ -58,6 +59,7 @@ Rtype::Game_info &Rtype::Game_info::operator=(Game_info &&other) noexcept
         _tickThread = std::move(other._tickThread);
         _players = std::move(other._players);
 		_toSetNetwork = other._toSetNetwork;
+        _nbProjectiles = other._nbProjectiles;
 
         other._id = -1;
         other._level = 0;
@@ -178,3 +180,14 @@ void Rtype::Game_info::disconnectPlayer(int id)
 		}
 	}
 }
+
+int Rtype::Game_info::getNbProjectiles()
+{
+    return _nbProjectiles;
+}
+
+void Rtype::Game_info::accNbProjectiles()
+{
+    _nbProjectiles += 1;
+}
+

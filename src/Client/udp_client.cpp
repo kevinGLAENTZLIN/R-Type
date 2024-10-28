@@ -129,7 +129,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
             return;
         }
         CONSOLE_INFO("Joining game at level: ", level)
-        _game->initGame();
+        _game->initGame(_id);
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::GameWonLost] = [this](Utils::Network::Response response) {
@@ -247,16 +247,13 @@ void Rtype::udpClient::setHandlePowerUpMap() {
 
 void Rtype::udpClient::setHandleProjectileMap() {
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileFired] = [this](Utils::Network::Response response) {
-        int ProjectileType = response.PopParam<int>();
-        int ProjectileID = response.PopParam<int>();
-        float XOrigin = response.PopParam<double>();
-        float YOrigin = response.PopParam<double>();
-        float XVector = response.PopParam<double>();
-        float YVector = response.PopParam<double>();
+        int entityID = response.PopParam<int>();
+        int projectileID = response.PopParam<int>();
+
+        _game->createProjectile(entityID, projectileID);
     };
 
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileHit] = [this](Utils::Network::Response response) {
-        int ProjectileID = response.PopParam<int>();
     };
 }
 
@@ -286,8 +283,11 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
 
-    CONSOLE_INFO("Handle Response: ", (int)cmd_category)
-    CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
+    if (((int)cmd_category != 1 && (int)clientResponse.GetInfoFunction() != 2) &&
+        ((int)cmd_category != 5 && (int)clientResponse.GetInfoFunction() != 0)) {
+        CONSOLE_INFO("Handle Response: ", (int)cmd_category)
+        CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
+    }
     switch (cmd_category) {
     case Utils::InfoTypeEnum::GameInfo:
         _handleGameInfoMap[static_cast<Utils::GameInfoEnum>(clientResponse.GetInfoFunction())](clientResponse);

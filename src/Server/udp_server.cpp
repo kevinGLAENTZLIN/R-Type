@@ -205,12 +205,13 @@ void Rtype::udpServer::setHandlePowerUpMap() {
 
 void Rtype::udpServer::setHandleProjectileMap() {
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileFired] = [this](Utils::Network::Response clientResponse) {
-        std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = convertACommandToCommand<Rtype::Command::Projectile::Fired>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Projectile), static_cast<uint8_t>(Utils::ProjectileEnum::ProjectileFired)));
+        std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Projectile::Fired, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);
         int gameID = _clients->at(get_sender_client_id())->getRoom();
 
-        cmd->set_server(_games->at(gameID)->getPlayers(), clientResponse.PopParam<int>(), clientResponse.PopParam<int>(), clientResponse.PopParam<double>(), clientResponse.PopParam<double>(), clientResponse.PopParam<double>(), clientResponse.PopParam<double>());
+        cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id(), _games->at(gameID)->getNbProjectiles()); //! tmp
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
+        _games->at(gameID)->accNbProjectiles();
     };
 
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileHit] = [this](Utils::Network::Response clientResponse) {
@@ -223,7 +224,8 @@ void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
 
-    if ((int)cmd_category != 1 && (int)clientResponse.GetInfoFunction() != 2) {
+    if (((int)cmd_category != 1 && (int)clientResponse.GetInfoFunction() != 2) &&
+        ((int)cmd_category != 5 && (int)clientResponse.GetInfoFunction() != 0)) {
         CONSOLE_INFO("Handle Response: ", (int)cmd_category)
         CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
     }

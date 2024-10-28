@@ -112,7 +112,7 @@ namespace Utils
                     return;
                 _parametersMap = {
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::NewClientConnected)}, {"", "i"}},
-                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", "i"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", "iii"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"i", "i"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::JoinGame)}, {"i", "bi"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GameWonLost)}, {"", "b"}},

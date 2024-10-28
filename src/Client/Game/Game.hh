@@ -73,8 +73,8 @@ namespace Rtype {
         bool getIsAvailableGames();
         void setIsAvailableGames(bool state);
 
-        std::vector<int> getAvailableGames();
-        void addAvailableGames(int game_id);
+        std::vector<std::tuple<int, int, int>> getAvailableGames();
+        void addAvailableGames(int game_id, int nb_player, int nb_player_max);
         void clearAvailableGames();
         void createPlayer(int id, float pos_x, float pos_y, int invincibility);
         void createOtherPlayer(int id, float pos_x, float pos_y);
@@ -82,6 +82,7 @@ namespace Rtype {
         void createBoss1();
         void createProjectile(int entityId, int projectileId);
         void failToConnect();
+        void joinGame();
 
     private:
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
@@ -96,7 +97,6 @@ namespace Rtype {
         void renderMenu();
         void switchState(GameState newState);
         void initMenu();
-        void joinGame();
         void initOptions();
         void joinRandomGame();
         void joinGameID();
@@ -140,6 +140,6 @@ namespace Rtype {
         bool _isAvailableGames;
         bool _isRendering;
         bool _modelCreated;
-        std::vector<int> _availableGames;
+        std::vector<std::tuple<int, int, int>> _availableGames;
     };
 };

@@ -50,6 +50,7 @@ namespace Rtype
             bool isGameAvailable(void);
             bool getToSetNetwork();
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> getPlayers(void);
+            int getNbMaxPlayers();
 
             void connectPlayer(std::shared_ptr<Rtype::client_info> player);
             void disconnectPlayer(int id);

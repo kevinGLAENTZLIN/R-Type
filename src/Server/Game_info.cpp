@@ -181,6 +181,11 @@ void Rtype::Game_info::disconnectPlayer(int id)
 	}
 }
 
+int Rtype::Game_info::getNbMaxPlayers()
+{
+    return _nbMaxPlayer;
+}
+
 int Rtype::Game_info::getNbProjectiles()
 {
     return _nbProjectiles;

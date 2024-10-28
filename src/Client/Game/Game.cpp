@@ -367,26 +367,14 @@ void Rtype::Game::initOptions(void)
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
-void Rtype::Game::joinGame(void)
+void Rtype::Game::joinGame()
 {
     destroyEntityMenu();
     destroyEntityLayer();
-
-    std::vector<std::tuple<int, int, int>> games = {
-        {101, 2, 4},
-        {102, 1, 4},
-        {103, 3, 4},
-        {103, 3, 4},
-        {103, 3, 4},
-        {102, 1, 4},
-        {103, 3, 4},
-        {103, 3, 4}
-    };
-
     float yOffset = 200.0f;
     short buttonCount = 0;
 
-    for (const auto &game : games) {
+    for (const auto &game : _availableGames) {
         if (buttonCount >= 5)
             break;
         int gameID = std::get<0>(game);
@@ -403,7 +391,11 @@ void Rtype::Game::joinGame(void)
         _core->addComponent(gameButton, ECS::Components::Text{buttonText, 20, RAYWHITE});
 
         _core->addComponent(gameButton, ECS::Components::Button{Rectangle{350, yOffset - 10, 300, 40}, true, [this, gameID]() {
-            std::cout << "Joining game " << gameID << std::endl;
+            std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_client(gameID);
+            _network->addCommandToInvoker(std::move(cmd));
+            std::cout << "Joining game with ID: " << gameID << std::endl;
         }});
 
         yOffset += 60.0f;
@@ -417,7 +409,7 @@ void Rtype::Game::joinGame(void)
         initPlayOption();
     }});
     for (auto available_game: _availableGames)
-        std::cout << "Game available: " << available_game << std::endl;
+        std::cout << "Game available: " << std::get<0>(available_game) << std::endl;
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
@@ -580,6 +572,7 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinRandomGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
         CONSOLE_INFO("Join game", "")
+        _isAvailableGames = false;
         _isJoiningGame = true;
         std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
@@ -594,11 +587,11 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
         CONSOLE_INFO("Get available game", "")
         _isJoiningGame = false;
+        _isAvailableGames = true;
         std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         cmd->set_client();
         _network->addCommandToInvoker(std::move(cmd));
-        joinGame();
     }});
 
     std::size_t joinGameId = _core->createEntity();
@@ -1088,14 +1081,14 @@ void Rtype::Game::setIsAvailableGames(bool state)
     _isAvailableGames = state;
 }
 
-std::vector<int> Rtype::Game::getAvailableGames()
+std::vector<std::tuple<int, int, int>> Rtype::Game::getAvailableGames()
 {
     return _availableGames;
 }
 
-void Rtype::Game::addAvailableGames(int game_id)
+void Rtype::Game::addAvailableGames(int game_id, int nb_player, int nb_player_max)
 {
-    _availableGames.push_back(game_id);
+    _availableGames.push_back({game_id, nb_player, nb_player_max});
 }
 
 void Rtype::Game::clearAvailableGames()

@@ -22,6 +22,7 @@ namespace Rtype
                     ~Join_game();
 
                     void set_client(int gameRoom);
+                    void set_server();
                     void set_server(std::shared_ptr<Rtype::Game_info> game, std::shared_ptr<Rtype::client_info> client_info);
 
                     void execute_client_side();
@@ -29,7 +30,7 @@ namespace Rtype
 
                 protected:
                 private:
-                    udp::endpoint _endpoint;
+                    bool _exist;
                     int _gameRoom;
                     std::shared_ptr<Rtype::Game_info> _gameInfo;
                     std::shared_ptr<Rtype::client_info> _clientInfo;

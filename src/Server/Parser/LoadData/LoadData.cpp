@@ -54,6 +54,20 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
     }
 }
 
+enemiesTypeEnum_t Rtype::LoadData::convertStringToEnumType(const std::string &text)
+{
+    if (text == "PATAPATA")
+        return PATAPATA;
+    if (text == "BINK")
+        return BINK;
+    return PATAPATA;
+}
+
+void Rtype::LoadData::clearEnemySpawnData()
+{
+    _enemySpawnData.clear();
+}
+
 std::vector<Rtype::EnemySpawnData> Rtype::LoadData::GetEnemySpawnData() const
 {
     return _enemySpawnData;

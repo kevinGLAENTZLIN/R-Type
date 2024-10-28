@@ -5,6 +5,7 @@ find_package(boost_asio CONFIG REQUIRED)
 set(NAME_LIB_CMD ${RTYPE}-cmd CACHE INTERNAL "")
 
 set(LIB_CMD_SRC
+    ./Factory/Factory.cpp
     ./Commands/Game_info/Create_game/Create_game.cpp
     ./Commands/Game_info/Game_result/Game_result.cpp
     ./Commands/Game_info/Level_complete/Level_complete.cpp
@@ -27,7 +28,6 @@ set(LIB_CMD_SRC
     ./Commands/Player/Power_up/Power_up.cpp
     ./Commands/Player/Spawn/Spawn.cpp
     ./Invoker/Command_invoker.cpp
-    ./Factory/Factory.cpp
     ../Utils/ParametersMap/ParametersMap.cpp
 )
 

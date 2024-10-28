@@ -20,22 +20,17 @@ namespace Rtype
                     Fired() = default;
                     ~Fired();
 
-                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int projectileType, int projectileID, int xOrigin, int yOrigin, int xVector, int yVector);
-                    void set_client(udp::endpoint endpoint, int projectileType, int projectileID, int xVector, int yVector);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int entityID, int projectileID);
+                    void set_client();
 
                     void execute_client_side();
                     void execute_server_side();
 
                 protected:
                 private:
-                    udp::endpoint _endpoint;
-                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
-                    int _projectileType;
+                    std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
+                    int _entityID;
                     int _projectileID;
-                    int _xOrigin;
-                    int _yOrigin;
-                    int _xVector;
-                    int _yVector;
             };
         }
     }

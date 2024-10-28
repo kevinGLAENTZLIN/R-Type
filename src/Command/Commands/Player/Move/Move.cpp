@@ -7,7 +7,7 @@
 
 #include "Move.hh"
 
-void Rtype::Command::Player::Move::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, int x, int y)
+void Rtype::Command::Player::Move::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID, double x, double y)
 {
     _players = players;
     _playerID = playerID;
@@ -15,9 +15,8 @@ void Rtype::Command::Player::Move::set_server(std::map<int, std::shared_ptr<Rtyp
     _y = y;
 }
 
-void Rtype::Command::Player::Move::set_client(udp::endpoint endpoint, int x, int y)
+void Rtype::Command::Player::Move::set_client(double x, double y)
 {
-    _endpoint = endpoint;
     _x = x;
     _y = y;
 }
@@ -33,11 +32,12 @@ void Rtype::Command::Player::Move::execute_client_side()
 
 void Rtype::Command::Player::Move::execute_server_side()
 {
-    _players[_playerID]->setX(_x);
-    _players[_playerID]->setX(_y);
-    for (auto player: _players) {
+    _players->at(_playerID)->moveX(_x);
+    _players->at(_playerID)->moveY(_y);
+    for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-        sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove, _playerID, _x, _y);
+        if (player.first != _playerID)
+            sendToEndpoint(_endpoint, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove, _playerID, _x, _y);
     }
-    _game->movePlayer(_playerID, _x * 1., _y * 1.);
+    // _game->movePlayer(_playerID, _x, _y); //! Issue : no player created on server side
 }

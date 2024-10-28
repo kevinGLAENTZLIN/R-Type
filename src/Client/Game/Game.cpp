@@ -7,6 +7,8 @@
 */
 
 #include "Game.hh"
+
+#include "../../Utils/Network/Network.hpp"
 #include <thread>
 #include<unistd.h>
 
@@ -15,25 +17,29 @@ std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegi
 int menuOption = 0;
 std::vector<std::string> options = {"Start Game", "Options", "Quit"};
 
-Rtype::Game::Game()
-    : _isRunning(true), _currentState(MENU)
+Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
+    : _network(network), _isRunning(true), _currentState(MENU),
+    _isJoiningGame(false), _isAvailableGames(false), _isRendering(render), _modelCreated(false)
 {
     _core = std::make_unique<ECS::Core::Core>();
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    SetTargetFPS(60);
-    _window.Init(1280, 720, "R-Type Game");
-    SetWindowMinSize(1280, 720);
-    _camera = raylib::Camera3D({0.0f, 10.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, 60.0f);
-    _ressourcePool.addModel("ship_yellow");
-    _ressourcePool.addModel("base_projectile");
-    _ressourcePool.addModel("enemy_one");
-    _ressourcePool.addTexture("bg_menu");
-    _ressourcePool.addTexture("background");
-    _ressourcePool.addTexture("background_layer0");
-    _ressourcePool.addTexture("background_layer1");
-    _ressourcePool.addTexture("background_layer2");
-
+    if (render) {
+        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+        SetTargetFPS(60);
+        _window.Init(1280, 720, "R-Type Game");
+        SetWindowMinSize(1280, 720);
+        _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
+        std::cout << "CONNARD" << std::endl;
+        _ressourcePool.addModel("ship_yellow");
+        std::cout << "CONNARED" << std::endl;
+        _ressourcePool.addModel("base_projectile");
+        _ressourcePool.addModel("enemy_one");
+        _ressourcePool.addTexture("bg_menu");
+        _ressourcePool.addTexture("background");
+        _ressourcePool.addTexture("background_layer0");
+        _ressourcePool.addTexture("background_layer1");
+        _ressourcePool.addTexture("background_layer2");
+    }
     _core->registerComponent<ECS::Components::Position>();
     _core->registerComponent<ECS::Components::Rotate>();
     _core->registerComponent<ECS::Components::Scale>();
@@ -226,7 +232,7 @@ std::size_t Rtype::Game::createCyclingEnemy(enemiesTypeEnum_t enemyType, float p
     return enemy;
 }
 
-void Rtype::Game::movePlayer(int id, float x, float y)
+void Rtype::Game::movePlayer(int id, double x, double y)
 {
     auto &velocity = _core->getComponent<ECS::Components::Velocity>(_serverToLocalPlayersId[id]);
 
@@ -252,6 +258,11 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
+    if (!_isRendering && !_modelCreated) {
+        std::cout << "Model Loaded" << std::endl;
+        _ressourcePool.addModel("ship_yellow");
+        _modelCreated = true;
+    }
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t otherPlayer = _core->createEntity();
 
@@ -260,8 +271,10 @@ void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
     _core->addComponent(otherPlayer, ECS::Components::Scale{1.0f});
     _core->addComponent(otherPlayer, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(otherPlayer, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(otherPlayer, ECS::Components::Health{1, -1});
     _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = otherPlayer;
+    std::cout << "otherPlayer id: " << otherPlayer << std::endl; 
 }
 
 void Rtype::Game::destroyEntityMenu(void)
@@ -358,26 +371,14 @@ void Rtype::Game::initOptions(void)
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
-void Rtype::Game::joinGame(void)
+void Rtype::Game::joinGame()
 {
     destroyEntityMenu();
     destroyEntityLayer();
-
-    std::vector<std::tuple<int, int, int>> games = {
-        {101, 2, 4},
-        {102, 1, 4},
-        {103, 3, 4},
-        {103, 3, 4},
-        {103, 3, 4},
-        {102, 1, 4},
-        {103, 3, 4},
-        {103, 3, 4}
-    };
-
     float yOffset = 200.0f;
     short buttonCount = 0;
 
-    for (const auto &game : games) {
+    for (const auto &game : _availableGames) {
         if (buttonCount >= 5)
             break;
         int gameID = std::get<0>(game);
@@ -394,7 +395,11 @@ void Rtype::Game::joinGame(void)
         _core->addComponent(gameButton, ECS::Components::Text{buttonText, 20, RAYWHITE});
 
         _core->addComponent(gameButton, ECS::Components::Button{Rectangle{350, yOffset - 10, 300, 40}, true, [this, gameID]() {
-            std::cout << "Joining game " << gameID << std::endl;
+            std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_client(gameID);
+            _network->addCommandToInvoker(std::move(cmd));
+            std::cout << "Joining game with ID: " << gameID << std::endl;
         }});
 
         yOffset += 60.0f;
@@ -407,7 +412,14 @@ void Rtype::Game::joinGame(void)
     _core->addComponent(back, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
         initPlayOption();
     }});
+    for (auto available_game: _availableGames)
+        std::cout << "Game available: " << std::get<0>(available_game) << std::endl;
     createBackgroundLayers(0.f, "bg_menu", 1);
+}
+
+void Rtype::Game::failToConnect()
+{
+    std::cout << "There is no room available with this ID." << std::endl;
 }
 
 void Rtype::Game::joinGameID(void)
@@ -434,8 +446,14 @@ void Rtype::Game::joinGameID(void)
         auto &textField = _core->getComponent<ECS::Components::TextField>(textFieldEntity);
         std::string friendGameID = textField.getText();
 
-        if (!friendGameID.empty()) {
+        if (!friendGameID.empty() && friendGameID.size() == 4 && std::all_of(friendGameID.begin(), friendGameID.end(), ::isdigit)) {
+            std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_client(std::stoi(friendGameID));
+            _network->addCommandToInvoker(std::move(cmd));
             std::cout << "Joining game with ID: " << friendGameID << std::endl;
+        } else if (friendGameID.empty() || friendGameID.size() != 4 || !std::all_of(friendGameID.begin(), friendGameID.end(), ::isdigit)) {
+            std::cout << "A game ID can't be empty and is only a number of 4 digits only." << friendGameID << std::endl;
         }
     }});
 
@@ -524,7 +542,11 @@ void Rtype::Game::initCreationGame(void)
     _core->addComponent(createButtonEntity, ECS::Components::Position{400, 500});
     _core->addComponent(createButtonEntity, ECS::Components::Text{"Create Game", 30, RAYWHITE});
     _core->addComponent(createButtonEntity, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
-        initGame();
+        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Create_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
+        CONSOLE_INFO("Create game: ", " Sended")
     }});
 
     std::size_t back = _core->createEntity();
@@ -553,6 +575,13 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinRandomGameEntity, ECS::Components::Position{400, 300});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Text{"Join Game", 30, RAYWHITE});
     _core->addComponent(joinRandomGameEntity, ECS::Components::Button{Rectangle{350, 290, 300, 60}, true, [this]() {
+        CONSOLE_INFO("Join game", "")
+        _isAvailableGames = false;
+        _isJoiningGame = true;
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
         joinRandomGame();
     }});
 
@@ -560,13 +589,20 @@ void Rtype::Game::initPlayOption(void)
     _core->addComponent(joinGameEntity, ECS::Components::Position{400, 400});
     _core->addComponent(joinGameEntity, ECS::Components::Text{"Search available game", 30, RAYWHITE});
     _core->addComponent(joinGameEntity, ECS::Components::Button{Rectangle{350, 390, 300, 60}, true, [this]() {
-        joinGame();
+        CONSOLE_INFO("Get available game", "")
+        _isJoiningGame = false;
+        _isAvailableGames = true;
+        std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_client();
+        _network->addCommandToInvoker(std::move(cmd));
     }});
 
     std::size_t joinGameId = _core->createEntity();
     _core->addComponent(joinGameId, ECS::Components::Position{400, 500});
     _core->addComponent(joinGameId, ECS::Components::Text{"Join friends game", 30, RAYWHITE});
     _core->addComponent(joinGameId, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
+        CONSOLE_INFO("Join Game by ID", "")
         joinGameID();
     }});
 
@@ -637,55 +673,79 @@ void Rtype::Game::createBoss2()
 {
     float bossCoreX = 7;
     float bossCoreY = -1;
-    std::vector<std::size_t> boss2Balls;
 
     createEnemy(BOSS2_Core, bossCoreX, bossCoreY, 10);
 
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball0, bossCoreX - 0.2, bossCoreY - 0.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball1, bossCoreX + 0.3, bossCoreY - 0.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball2, bossCoreX + 0.8, bossCoreY -0.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball3, bossCoreX + 0.8, bossCoreY + 0.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball4, bossCoreX + 0.8, bossCoreY + 0.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball5, bossCoreX + 0.3, bossCoreY + 0.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball6, bossCoreX - 0.2, bossCoreY + 0.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball7, bossCoreX - 0.2, bossCoreY + 0.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball8, bossCoreX + 0.3, bossCoreY + 0.3, 5));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball0, bossCoreX - 0.2, bossCoreY - 0.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball1, bossCoreX + 0.3, bossCoreY - 0.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball2, bossCoreX + 0.8, bossCoreY -0.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball3, bossCoreX + 0.8, bossCoreY + 0.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball4, bossCoreX + 0.8, bossCoreY + 0.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball5, bossCoreX + 0.3, bossCoreY + 0.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball6, bossCoreX - 0.2, bossCoreY + 0.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball7, bossCoreX - 0.2, bossCoreY + 0.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball8, bossCoreX + 0.3, bossCoreY + 0.3, 1));
 
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball9, bossCoreX - 0.7, bossCoreY - 0.7, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball10, bossCoreX -0.2, bossCoreY - 0.7, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball11, bossCoreX + 0.3, bossCoreY - 0.7, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball12, bossCoreX + 0.8, bossCoreY - 0.7, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball13, bossCoreX + 1.3, bossCoreY - 0.7, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball14, bossCoreX + 1.3, bossCoreY -0.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball15, bossCoreX + 1.3, bossCoreY + 0.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball16, bossCoreX + 1.3, bossCoreY + 0.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball17, bossCoreX + 0.8, bossCoreY + 1.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball18, bossCoreX + 0.3, bossCoreY + 1.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball19, bossCoreX - 0.2, bossCoreY + 1.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball20, bossCoreX - 0.7, bossCoreY + 1.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball21, bossCoreX - 0.7, bossCoreY + 0.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball22, bossCoreX - 0.7, bossCoreY + 0.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball23, bossCoreX - 0.7, bossCoreY - 0.2, 5));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball9, bossCoreX - 0.7, bossCoreY - 0.7, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball10, bossCoreX -0.2, bossCoreY - 0.7, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball11, bossCoreX + 0.3, bossCoreY - 0.7, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball12, bossCoreX + 0.8, bossCoreY - 0.7, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball13, bossCoreX + 1.3, bossCoreY - 0.7, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball14, bossCoreX + 1.3, bossCoreY -0.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball15, bossCoreX + 1.3, bossCoreY + 0.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball16, bossCoreX + 1.3, bossCoreY + 0.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball17, bossCoreX + 0.8, bossCoreY + 1.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball18, bossCoreX + 0.3, bossCoreY + 1.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball19, bossCoreX - 0.2, bossCoreY + 1.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball20, bossCoreX - 0.7, bossCoreY + 1.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball21, bossCoreX - 0.7, bossCoreY + 0.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball22, bossCoreX - 0.7, bossCoreY + 0.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball23, bossCoreX - 0.7, bossCoreY - 0.2, 1));
 
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball24, bossCoreX - 1.2, bossCoreY - 1.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball25, bossCoreX - 0.7, bossCoreY - 1.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball26, bossCoreX - 0.2, bossCoreY - 1.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball27, bossCoreX + 0.3, bossCoreY - 1.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball28, bossCoreX + 1.8, bossCoreY - 0.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball29, bossCoreX + 1.8, bossCoreY + 0.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball30, bossCoreX + 0.8, bossCoreY + 1.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball31, bossCoreX + 0.3, bossCoreY + 1.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball32, bossCoreX - 0.2, bossCoreY + 1.8, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball33, bossCoreX - 1.2, bossCoreY - 0.2, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball34, bossCoreX - 1.2, bossCoreY - 0.7, 5));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball24, bossCoreX - 1.2, bossCoreY - 1.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball25, bossCoreX - 0.7, bossCoreY - 1.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball26, bossCoreX - 0.2, bossCoreY - 1.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball27, bossCoreX + 0.3, bossCoreY - 1.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball28, bossCoreX + 1.8, bossCoreY - 0.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball29, bossCoreX + 1.8, bossCoreY + 0.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball30, bossCoreX + 0.8, bossCoreY + 1.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball31, bossCoreX + 0.3, bossCoreY + 1.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball32, bossCoreX - 0.2, bossCoreY + 1.8, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball33, bossCoreX - 1.2, bossCoreY - 0.2, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball34, bossCoreX - 1.2, bossCoreY - 0.7, 1));
     
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball35, bossCoreX - 1.2, bossCoreY - 1.7, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball36, bossCoreX - 0.7, bossCoreY - 1.7, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball37, bossCoreX + 0.3, bossCoreY + 2.3, 5));
-    _boss2Balls.push_back(createEnemy(BOSS2_Ball38, bossCoreX - 1.7, bossCoreY - 1.2, 5));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball35, bossCoreX - 1.2, bossCoreY - 1.7, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball36, bossCoreX - 0.7, bossCoreY - 1.7, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball37, bossCoreX + 0.3, bossCoreY + 2.3, 1));
+    _boss2Balls.push_back(createEnemy(BOSS2_Ball38, bossCoreX - 1.7, bossCoreY - 1.2, 1));
+    for (std::size_t i = 0; i < _boss2Balls.size(); i++) {
+        _core->getComponents<ECS::Components::AI>()[_boss2Balls[i]]->setCooldown(250 * (_boss2Balls.size() - i));
+    }
 }
 
-void Rtype::Game::initGame(void)
+std::vector<int> Rtype::Game::getAIBydoShots()
+{
+    std::vector<int> serverBydoShots;
+
+    for (std::size_t i; i < _AIBydoShots.size(); i++)
+        for (const auto& Ids : _serverToLocalProjectilesId)
+            if (Ids.second == _AIBydoShots[i])
+                serverBydoShots.push_back(Ids.first);
+    return serverBydoShots;
+}
+
+std::vector<int> Rtype::Game::getAIHomingShots()
+{
+    std::vector<int> serverHomingShots;
+
+    for (std::size_t i; i < _AIHomingShots.size(); i++)
+        for (const auto& Ids : _serverToLocalProjectilesId)
+            if (Ids.second == _AIHomingShots[i])
+                serverHomingShots.push_back(Ids.first);
+    return serverHomingShots;
+}
+
+void Rtype::Game::initGame(int id)
 {
     stopMusic("menu");
     destroyEntityMenu();
@@ -695,12 +755,16 @@ void Rtype::Game::initGame(void)
     createBackgroundLayers(2.f , "background_layer0", 3);
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
+    createPlayer(id, -10.0f, 0.0f, 50);
     switchState(GameState::PLAY);
-    createPlayer(0, -10.0f, 0.0f, 50);
+    // createPlayer(0, -10.0f, 0.0f, 50);
+    // createOtherPlayer(1, -10.0f, 0.0f);
 
-    createBoss2();
+    // createBoss1();
+    // createBoss2();
 
-    createEnemy(BINK, -5.0f, 3.0f, 1);
+    // createEnemy(BINK, -5.0f, 3.0f, 1);
+    // createEnemy(BLASTER, 11.0f, 4.67f, 1);
 
     // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
     // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);
@@ -725,56 +789,109 @@ void Rtype::Game::initGame(void)
 
     //ay = ((by - cy) / 2) * sin((π / (bx - cx)) * (ax - ((bx + cx) / 2))) + ((by + cy) / 2)
 
-    // createEnemy(PATAPATA, 10.5f, -3.0f);
-    // createEnemy(PATAPATA, 11.5f, -2.9f);
-    // createEnemy(PATAPATA, 12.5f, -2.8f);
-    // createEnemy(PATAPATA, 13.5f, -3.0f);
-    // createEnemy(PATAPATA, 14.5f, -3.2f);
+    // createEnemy(PATAPATA, 15.5f, -3.0f, 1);
+    // createEnemy(PATAPATA, 16.5f, -2.9f, 1);
+    // createEnemy(PATAPATA, 17.5f, -2.8f, 1);
+    // createEnemy(PATAPATA, 18.5f, -3.0f, 1);
+    // createEnemy(PATAPATA, 19.5f, -3.2f, 1);
 
-    // createEnemy(PATAPATA, 10.5f, 3.0f);
-    // createEnemy(PATAPATA, 11.5f, 2.9f);
-    // createEnemy(PATAPATA, 12.5f, 2.8f);
-    // createEnemy(PATAPATA, 13.5f, 3.2f);
-    // createEnemy(PATAPATA, 14.5f, 2.0f);
+    // createEnemy(PATAPATA, 15.5f, 3.0f, 1);
+    // createEnemy(PATAPATA, 16.5f, 2.9f, 1);
+    // createEnemy(PATAPATA, 17.5f, 2.8f, 1);
+    // createEnemy(PATAPATA, 18.5f, 3.2f, 1);
+    // createEnemy(PATAPATA, 19.5f, 2.0f, 1);
 
-    // createEnemy(BUG, 10.5f, 0.25f);
-    // createEnemy(BUG, 11.25f, 0.25f);
-    // createEnemy(BUG, 12.0f, 0.25f);
-    // createEnemy(BUG, 12.75f, 0.25f);
-    // createEnemy(BUG, 13.5f, 0.25f);
-    // createEnemy(BUG, 14.25f, 0.25f);
+    // createEnemy(BUG, 15.5f, 0.25f, 1);
+    // createEnemy(BUG, 16.25f, 0.25f, 1);
+    // createEnemy(BUG, 17.0f, 0.25f, 1);
+    // createEnemy(BUG, 17.75f, 0.25f, 1);
+    // createEnemy(BUG, 18.5f, 0.25f, 1);
+    // createEnemy(BUG, 19.25f, 0.25f, 1);
 
 
-    // createEnemy(BUG, 10.5f, 3.25f);
-    // createEnemy(BUG, 11.25f, 3.25f);
-    // createEnemy(BUG, 12.0f, 3.25f);
-    // createEnemy(BUG, 12.75f, 3.25f);
-    // createEnemy(BUG, 13.5f, 3.25f);
-    // createEnemy(BUG, 14.25f, 3.25f);
+    // createEnemy(BUG, 15.5f, 3.25f, 1);
+    // createEnemy(BUG, 16.25f, 3.25f, 1);
+    // createEnemy(BUG, 17.0f, 3.25f, 1);
+    // createEnemy(BUG, 17.75f, 3.25f, 1);
+    // createEnemy(BUG, 18.5f, 3.25f, 1);
+    // createEnemy(BUG, 19.25f, 3.25f, 1);
 
     // createEnemy(MINIKIT, 17.0f, -4.0f);
 }
 
-void Rtype::Game::run() {
-    std::thread musicThread(&Rtype::Game::loadMusic, this);
+void Rtype::Game::run()
+{
+    // std::thread musicThread(&Rtype::Game::loadMusic, this);
 
-    musicThread.join();
+    // musicThread.join();
     initMenu();
     while (!_window.ShouldClose() && _isRunning) {
         switch (_currentState) {
             case MENU:
-                updateMusic("menu");
+                // updateMusic("menu");
                 updateMenu();
                 renderMenu();
                 break;
             case PLAY:
-                updateMusic("stage1");
+                // updateMusic("stage1");
                 update();
                 render();
                 break;
         }
     }
     CloseAudioDevice();
+}
+
+void Rtype::Game::runServer()
+{
+    _currentState = PLAY;
+
+    while (_isRunning)
+        switch (_currentState) {
+            case PLAY:
+                update();
+        }
+}
+
+void Rtype::Game::sendProjectile()
+{
+    std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Projectile::Fired, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);
+
+    cmd->set_client();
+    cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    _network->addCommandToInvoker(std::move(cmd));
+}
+
+void Rtype::Game::sendInput(std::vector<std::size_t> vec)
+{
+    std::unique_ptr<Rtype::Command::Player::Move> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Move, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove);
+    double x = 0.;
+    double y = 0.;
+
+    if (vec.empty())
+        return;
+    for (auto input: vec) {
+        switch (input) {
+        case 1:
+            x += 0.1;
+            break;
+        case 2:
+            y -= 0.1;
+            break;
+        case 3:
+            x -= 0.1;
+            break;
+        case 4:
+            y += 0.1;
+            break;
+        case 5:
+            sendProjectile();
+            break;
+        }
+    }
+    cmd->set_client(x, y);
+    cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    _network->addCommandToInvoker(std::move(cmd));
 }
 
 std::vector<std::size_t> Rtype::Game::getAllInputs() {
@@ -788,6 +905,8 @@ std::vector<std::size_t> Rtype::Game::getAllInputs() {
         vec.push_back(3);
     if (IsKeyDown(KEY_DOWN))
         vec.push_back(4);
+    if (IsKeyPressed(KEY_SPACE))
+        vec.push_back(5);
     return vec;
 }
 
@@ -796,23 +915,18 @@ void Rtype::Game::switchState(GameState newState)
     _currentState = newState;
 }
 
-void Rtype::Game::createEnemyBydoShots(int id)
+void Rtype::Game::createEnemyProjectile(int entityId, int projectileId, enemiesTypeEnum_t projectileType)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
-    auto &ai = _core->getComponent<ECS::Components::AI>(_serverToLocalEnemiesId[id]);
+    std::size_t localEntityId = _serverToLocalEnemiesId[entityId];
+    auto &ai = _core->getComponent<ECS::Components::AI>(localEntityId);
 
-    if (!positions[_serverToLocalEnemiesId[id]].has_value()) {
-        std::cerr << "Enemy " << id << " does not have a valid position!" << std::endl;
-        return;
-    }
-
-    const ECS::Components::Position &enemyPos = positions[_serverToLocalEnemiesId[id]].value();
-    const ECS::Components::Hitbox &enemyHitbox = hitboxes[_serverToLocalEnemiesId[id]].value();
+    const ECS::Components::Position &enemyPos = positions[localEntityId].value();
+    const ECS::Components::Hitbox &enemyHitbox = hitboxes[localEntityId].value();
 
     std::size_t projectile = _core->createEntity();
 
-    std::cout << "AIProjectileId : " << projectile << std::endl;
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
 
     float projectileStartX = enemyPos.getX() - (enemyHitbox.getWidth() / 2) - TmpHitbox.first;
@@ -821,13 +935,13 @@ void Rtype::Game::createEnemyBydoShots(int id)
     for (const auto& player : _serverToLocalPlayersId)
         playersPos.push_back(positions[player.second]->getPosPair());
     std::size_t targetPlayer = ecsUtils::getClosestPlayer(
-        positions[id]->getPosPair(), playersPos);
+        positions[localEntityId]->getPosPair(), playersPos);
     for (const auto& player : _serverToLocalPlayersId)
         if (positions[player.second]->getPosPair() == playersPos[targetPlayer])
             targetPlayer = player.second;
 
-    float tmpVeloX = positions[targetPlayer]->getX() - positions[id]->getX();
-    float tmpVeloY = positions[targetPlayer]->getY() - positions[id]->getY();
+    float tmpVeloX = positions[targetPlayer]->getX() - positions[entityId]->getX();
+    float tmpVeloY = positions[targetPlayer]->getY() - positions[entityId]->getY();
     float tmpMagnitude = std::sqrt(tmpVeloX * tmpVeloX + tmpVeloY * tmpVeloY);
 
     _core->addComponent(projectile, ECS::Components::Position{
@@ -839,25 +953,23 @@ void Rtype::Game::createEnemyBydoShots(int id)
     _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(projectile, ECS::Components::Velocity{tmpVeloX / tmpMagnitude * 0.075f, tmpVeloY / tmpMagnitude * 0.075f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
-    _core->addComponent(projectile, ECS::Components::AI{BYDOSHOT});
+    _core->addComponent(projectile, ECS::Components::AI{projectileType});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+    _serverToLocalProjectilesId[projectileId] = projectile;
 }
 
-void Rtype::Game::createPlayerProjectile(std::size_t entityID)
+void Rtype::Game::createPlayerProjectile(int entityId, int projectileId)
 {
     auto &positions = _core->getComponents<ECS::Components::Position>();
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
 
-    if (!positions[entityID].has_value()) {
-        std::cerr << "Entity " << entityID << " does not have a valid position!" << std::endl;
+    if (!positions[_serverToLocalPlayersId[entityId]].has_value()) {
         return;
     }
-    const ECS::Components::Position &entityPos = positions[entityID].value();
-    const ECS::Components::Hitbox &entityHitbox = hitboxes[entityID].value();
+    const ECS::Components::Position &entityPos = positions[_serverToLocalPlayersId[entityId]].value();
+    const ECS::Components::Hitbox &entityHitbox = hitboxes[_serverToLocalPlayersId[entityId]].value();
 
     std::size_t projectile = _core->createEntity();
-
-    std::cout << "PlayerProjectileId : " << projectile << std::endl;
 
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
     _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
@@ -868,6 +980,20 @@ void Rtype::Game::createPlayerProjectile(std::size_t entityID)
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
     playSound("blasterLego");
+    _serverToLocalProjectilesId[projectileId] = projectile;
+}
+
+void Rtype::Game::createProjectile(int entityId, int projectileId)
+{
+    if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
+        
+        if (_core->getComponents<ECS::Components::AI>()[_serverToLocalEnemiesId[entityId]]->getEnemyType() == BLASTER)
+            createEnemyProjectile(entityId, projectileId, HOMINGSHOT);
+        else
+            createEnemyProjectile(entityId, projectileId, BYDOSHOT);
+    }
+    else if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end())
+        createPlayerProjectile(entityId, projectileId);
 }
 
 void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel)
@@ -884,7 +1010,7 @@ void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int
     }
 }
 
-//FUNCTIONS TO UPDATE GAME AND MENU -------------------------------------------
+//!FUNCTIONS TO UPDATE GAME AND MENU -------------------------------------------
 
 void Rtype::Game::updateMenu() {
     auto clicSystem = _core->getSystem<ECS::Systems::ButtonClickSystem>();
@@ -924,9 +1050,11 @@ void Rtype::Game::update() {
                              _core->getComponents<ECS::Components::AI>(),
                              AIEntities, _serverToLocalPlayersId);
 
-    std::size_t entityID = inputUpdatesSystem->updateInputs(getAllInputs(),
-                                                            _core->getComponents<ECS::Components::Input>(),
-                                                            inputEntities);
+    std::vector<std::size_t> inputs = getAllInputs();
+    sendInput(inputs);
+    inputUpdatesSystem->updateInputs(inputs,
+                        _core->getComponents<ECS::Components::Input>(),
+                        inputEntities);
 
     inputUpdatesSystem->updateInputedVelocity(_core->getComponents<ECS::Components::Input>(),
                                               _core->getComponents<ECS::Components::Velocity>(),
@@ -938,49 +1066,44 @@ void Rtype::Game::update() {
 
     velocitySystem->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Velocity>(),
+                           _serverToLocalPlayersId,
                            velocityEntities);
 
-    collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
-                           _core->getComponents<ECS::Components::Hitbox>(),
-                           _core->getComponents<ECS::Components::Health>(),
-                           _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
-                           playerCollisionEntities);
+    if (_isRendering && _currentState == PLAY) {
+        collisionSystem->playerIsHit(_core->getComponents<ECS::Components::Position>(),
+                       _core->getComponents<ECS::Components::Hitbox>(),
+                       _core->getComponents<ECS::Components::Health>(),
+                       _core->getEntitiesWithComponent<ECS::Components::Input>()[0],
+                       playerCollisionEntities);
+    }
 
-    if (entityID <= 10000)
-        createPlayerProjectile(entityID);
-    entityID = 10001;
+    // if (entityID <= 10000)
+    //     createPlayerProjectile(entityID);
+    // entityID = 10001;
 
-    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
-        _core->getComponents<ECS::Components::AI>(),
-        _core->getComponents<ECS::Components::Position>(),
-        AIEntities);
-
-    for (std::size_t i = 0; i < AIBydoShots.size(); i++)
-        createEnemyBydoShots(AIBydoShots[i]);
-    AIBydoShots.clear();
-    
     std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
         _core->getComponents<ECS::Components::Position>(),
         _core->getComponents<ECS::Components::Hitbox>(),
         _core->getComponents<ECS::Components::AI>(),
         projectileEntities, collisionEntities);
 
-    auto healthComponents = _core->getComponents<ECS::Components::Health>();
-    std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
-    for (int i = 0; i < projectileEntityId.size(); i++) {
-        for (int j = 0; j < damageableEntities.size(); j++) {
-            if (damageableEntities[j] == projectileEntityId[i]) {
-                if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
-                    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
-                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+    if (_isRendering && _currentState == PLAY) {
+        auto healthComponents = _core->getComponents<ECS::Components::Health>();
+        std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
+        for (int i = 0; i < projectileEntityId.size(); i++) {
+            for (int j = 0; j < damageableEntities.size(); j++) {
+                if (damageableEntities[j] == projectileEntityId[i]) {
+                    if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
+                        std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
+                        _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+                    }
                 }
             }
-
+            for (int j = 0; j < projectileEntities.size(); j++)
+                if (projectileEntities[j] == projectileEntityId[i]) {
+                    _core->destroyEntity(projectileEntityId[i]);
+                }
         }
-        for (int j = 0; j < projectileEntities.size(); j++)
-            if (projectileEntities[j] == projectileEntityId[i]) {
-                _core->destroyEntity(projectileEntityId[i]);
-            }
     }
     projectileEntityId.clear();
 
@@ -1006,17 +1129,74 @@ void Rtype::Game::update() {
         }
         if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS2_Core) {
             for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
-                _core->destroyEntity(_boss2Balls[balls]);
+                if (_boss2Balls[balls] < 10000)
+                    _core->destroyEntity(_boss2Balls[balls]);
         }
+        for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
+            if (_boss2Balls[balls] == deadEntities[i])
+                _boss2Balls[balls] = 10001;
         _core->destroyEntity(deadEntities[i]);
     }
     deadEntities.clear();
+    
+    _AIBydoShots.clear();
+    std::vector<std::size_t> _AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
+        _core->getComponents<ECS::Components::AI>(),
+        _core->getComponents<ECS::Components::Position>(),
+        AIEntities);
+
+    // for (std::size_t i = 0; i < AIBydoShots.size(); i++)
+    //     createEnemyProjectile(AIBydoShots[i], BYDOSHOT);
+
+    _AIHomingShots.clear();
+    std::vector<std::size_t> _AIHomingShots = AIFiringProjectileSystem->aiFiringHomingShots(
+        _core->getComponents<ECS::Components::AI>(),
+        _core->getComponents<ECS::Components::Position>(),
+        AIEntities);
+
+    // for (std::size_t i = 0; i < AIHomingShots.size(); i++)
+    //     createEnemyProjectile(AIHomingShots[i], HOMINGSHOT);
 
     if (false)
         _camera.Update(CAMERA_FREE);
 }
 
-//FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
+bool Rtype::Game::getJoiningGame()
+{
+    return _isJoiningGame;
+}
+
+void Rtype::Game::setIsJoiningGame(bool state)
+{
+    _isJoiningGame = state;
+}
+
+bool Rtype::Game::getIsAvailableGames()
+{
+    return _isAvailableGames;
+}
+
+void Rtype::Game::setIsAvailableGames(bool state)
+{
+    _isAvailableGames = state;
+}
+
+std::vector<std::tuple<int, int, int>> Rtype::Game::getAvailableGames()
+{
+    return _availableGames;
+}
+
+void Rtype::Game::addAvailableGames(int game_id, int nb_player, int nb_player_max)
+{
+    _availableGames.push_back({game_id, nb_player, nb_player_max});
+}
+
+void Rtype::Game::clearAvailableGames()
+{
+    _availableGames.clear();
+}
+
+//!FUNCTIONS TO RENDER GAME AND MENU -------------------------------------------
 
 void Rtype::Game::renderMenu() {
     BeginDrawing();
@@ -1095,6 +1275,7 @@ void Rtype::Game::render() {
                            renderEntities2D,
                            _ressourcePool);
 
+    DrawFPS(100, 100);
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Rotate>(),
                            _core->getComponents<ECS::Components::Scale>(),
@@ -1106,7 +1287,7 @@ void Rtype::Game::render() {
     EndDrawing();
 }
 
-//FUNCTIONS TO HANDLE MUSIC AND SOUND -----------------------------------------
+//!FUNCTIONS TO HANDLE MUSIC AND SOUND -----------------------------------------
 
 
 void Rtype::Game::createMusic(std::string path, std::string name) {

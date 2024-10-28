@@ -20,8 +20,9 @@ typedef enum enemiesTypeEnum_e {
     PATAPATA,
     BUG,
     BINK,
-    SCANT,
+    BLASTER,
     BYDOSHOT,
+    HOMINGSHOT,
     BOSS1_Core,
     BOSS1_Tail0,
     BOSS1_Tail1,
@@ -96,10 +97,12 @@ public:
             return BUG;
         if (type == "BINK")
             return BINK;
-        if (type == "SCANT")
-            return SCANT;
+        if (type == "BLASTER")
+            return BLASTER;
         if (type == "BYDOSHOT")
             return BYDOSHOT;
+        if (type == "HOMINGSHOT")
+            return HOMINGSHOT;
         if (type == "BOSS1_Core")
             return BOSS1_Core;
         if (type == "BOSS2_Core")

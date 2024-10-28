@@ -10,6 +10,7 @@ void ECS::Systems::UpdateVelocityAI::update (
     const std::map<int, std::size_t> & serverToLocalPlayersId) const
 {
     std::size_t boss2CoreId = 0;
+
     for (std::size_t i = 0; i < entities.size(); i++) {
         std::size_t aiId = entities[i];
         enemiesTypeEnum_t aiType = AIs[aiId]->getEnemyType();
@@ -39,13 +40,14 @@ void ECS::Systems::UpdateVelocityAI::update (
                 amplitude * std::sin(frequency * positions[aiId]->getX()) + offset);
         }
         if (aiType == BINK) {
-            velocities[aiId]->setY(0.5);
-            if (positions[aiId]->getY() > 4.0)
+            velocities[aiId]->setY(0.05);
+            if (positions[aiId]->getY() > 4.5)
                 velocities[aiId]->setY(0);
             if (AIs[aiId]->isFiring()) {
-                velocities[aiId]->setX(0);
+                velocities[aiId]->setX(-0.01);
                 continue;
             }
+
             std::vector<std::pair<float, float>> playersPos;
             for (const auto& player : serverToLocalPlayersId)
                 playersPos.push_back(positions[player.second]->getPosPair());
@@ -60,6 +62,9 @@ void ECS::Systems::UpdateVelocityAI::update (
             else
                 velocities[aiId]->setX(0.033);
         }
+        if (aiType == BLASTER) {
+            velocities[aiId]->setX(-0.01);
+        }
         if (aiType >= BOSS1_Tail0 && aiType <= BOSS1_Tail19) {
             float p1x = AIs[aiId]->getP1().first;
             float p1y = AIs[aiId]->getP1().second;
@@ -69,7 +74,7 @@ void ECS::Systems::UpdateVelocityAI::update (
             float deltaBetweenThePoints = distanceBetweenXPoints / 200;
             float curX = positions[aiId]->getX();
             float nextY = 0;
-            
+
             if (curX >= p2x || (velocities[aiId]->getX() < 0 && curX > p1x))
                 deltaBetweenThePoints *= -1;
             velocities[aiId]->setX(deltaBetweenThePoints);
@@ -93,9 +98,39 @@ void ECS::Systems::UpdateVelocityAI::update (
                 boss2CoreId = aiId;
                 continue;
             }
-            if (!AIs[aiId]->isFiring()) {
+            if (!AIs[aiId]->isFiring() && AIs[aiId]->getCooldown() > 0) {
                 velocities[aiId]->setX(velocities[boss2CoreId]->getX());
                 velocities[aiId]->setY(velocities[boss2CoreId]->getY());
+                AIs[aiId]->setCooldown(AIs[aiId]->getCooldown() - 1);
+            }
+
+            if (!AIs[aiId]->isFiring() && AIs[aiId]->getCooldown() == 0) {
+                AIs[aiId]->setFiring(true);
+                AIs[aiId]->setCooldown(200);
+            }
+
+            if (AIs[aiId]->isFiring() && AIs[aiId]->getCooldown() == 200) {
+                std::vector<std::pair<float, float>> playersPos;
+                for (const auto& player : serverToLocalPlayersId)
+                    playersPos.push_back(positions[player.second]->getPosPair());
+                std::size_t targetPlayer = ecsUtils::getClosestPlayer(
+            positions[aiId]->getPosPair(), playersPos);
+                for (const auto& player : serverToLocalPlayersId)
+                    if (positions[player.second]->getPosPair() == playersPos[targetPlayer])
+                        targetPlayer = player.second;
+                float tempVelX = positions[targetPlayer]->getX() - positions[aiId]->getX();
+                float tempVelY = positions[targetPlayer]->getY() - positions[aiId]->getY();
+                velocities[aiId]->setX(tempVelX / 50);
+                velocities[aiId]->setY(tempVelY / 50);
+                AIs[aiId]->setCooldown(AIs[aiId]->getCooldown() - 1);
+            }
+
+            if (AIs[aiId]->isFiring() && AIs[aiId]->getCooldown() > 0)
+                AIs[aiId]->setCooldown(AIs[aiId]->getCooldown() - 1);
+            
+            if (AIs[aiId]->isFiring() && AIs[aiId]->getCooldown() == 0) {
+                AIs[aiId]->setFiring(false);
+                AIs[aiId]->setCooldown(2500);
             }
         }
     }

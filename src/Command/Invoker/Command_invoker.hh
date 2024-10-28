@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include <iostream> 
+#include <iostream>
 #include <queue>
 #include <string>
 #include "../ACommand.hpp"
@@ -22,12 +22,12 @@ namespace Rtype
 
                 void executeCommand();
 
-                void addCommand(std::unique_ptr<ACommand> cmd);
+                void addCommand(std::unique_ptr<Rtype::Command::ACommand> cmd);
 
             protected:
             private:
                 std::string _invokerType;
-                std::queue<std::unique_ptr<ACommand>> _commandQueue;
+                std::queue<std::unique_ptr<Rtype::Command::ACommand>> _commandQueue;
         };
     }
 }

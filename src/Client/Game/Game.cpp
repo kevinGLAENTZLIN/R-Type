@@ -764,10 +764,10 @@ void Rtype::Game::initGame(int id)
     // createBoss2();
 
     // createEnemy(BINK, -5.0f, 3.0f, 1);
-    createEnemy(BLASTER, 11.0f, 4.67f, 1);
-    createEnemy(BLASTER, 12.0f, 4.67f, 1);
-    createEnemy(BLASTER, 13.0f, 4.67f, 1);
-    createEnemy(BLASTER, 14.0f, 4.67f, 1);
+    // createEnemy(BLASTER, 11.0f, 4.67f, 1);
+    // createEnemy(BLASTER, 12.0f, 4.67f, 1);
+    // createEnemy(BLASTER, 13.0f, 4.67f, 1);
+    // createEnemy(BLASTER, 14.0f, 4.67f, 1);
 
     // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
     // createBoss1Tail(BOSS1_Tail1, 6.1f, 2.7f);

@@ -49,6 +49,8 @@
 
 #define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
+#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
+
 namespace Rtype {
     enum GameState {
         MENU,
@@ -140,13 +142,13 @@ namespace Rtype {
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
         std::vector<std::size_t> _boss2Balls;
+
         std::shared_ptr<Rtype::Network> _network;
         bool _isJoiningGame;
         bool _isAvailableGames;
         bool _isRendering;
         bool _modelCreated;
         std::vector<std::tuple<int, int, int>> _availableGames;
-
         std::vector<std::size_t> _AIBydoShots;
         std::vector<std::size_t> _AIHomingShots;
     };

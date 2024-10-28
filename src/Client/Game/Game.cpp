@@ -421,6 +421,11 @@ void Rtype::Game::joinGame(void)
     createBackgroundLayers(0.f, "bg_menu", 1);
 }
 
+void Rtype::Game::failToConnect()
+{
+    std::cout << "There is no room available with this ID." << std::endl;
+}
+
 void Rtype::Game::joinGameID(void)
 {
     destroyEntityMenu();
@@ -445,8 +450,14 @@ void Rtype::Game::joinGameID(void)
         auto &textField = _core->getComponent<ECS::Components::TextField>(textFieldEntity);
         std::string friendGameID = textField.getText();
 
-        if (!friendGameID.empty()) {
+        if (!friendGameID.empty() && friendGameID.size() == 4 && std::all_of(friendGameID.begin(), friendGameID.end(), ::isdigit)) {
+            std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_client(std::stoi(friendGameID));
+            _network->addCommandToInvoker(std::move(cmd));
             std::cout << "Joining game with ID: " << friendGameID << std::endl;
+        } else if (friendGameID.empty() || friendGameID.size() != 4 || !std::all_of(friendGameID.begin(), friendGameID.end(), ::isdigit)) {
+            std::cout << "A game ID can't be empty and is only a number of 4 digits only." << friendGameID << std::endl;
         }
     }});
 
@@ -1171,6 +1182,7 @@ void Rtype::Game::render() {
                            renderEntities2D,
                            _ressourcePool);
 
+    DrawFPS(100, 100);
     renderSystem3D->update(_core->getComponents<ECS::Components::Position>(),
                            _core->getComponents<ECS::Components::Rotate>(),
                            _core->getComponents<ECS::Components::Scale>(),

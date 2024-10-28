@@ -125,7 +125,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
         int level = response.PopParam<int>();
 
         if (!accepted) {
-            std::cerr << "Joining game failed." << std::endl;
+            _game->failToConnect();
             return;
         }
         CONSOLE_INFO("Joining game at level: ", level)

@@ -81,6 +81,7 @@ namespace Rtype {
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void createBoss1();
         void createProjectile(int entityId, int projectileId);
+        void failToConnect();
 
     private:
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);

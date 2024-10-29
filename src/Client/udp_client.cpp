@@ -219,8 +219,12 @@ void Rtype::udpClient::setHandlePlayerMap() {
 void Rtype::udpClient::setHandleEnemyMap() {
     _handleEnemyMap[Utils::EnemyEnum::EnemySpawn] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();
-        float x = response.PopParam<double>();
-        float y = response.PopParam<double>();
+        int enemyType = response.PopParam<int>();
+        double x = response.PopParam<double>();
+        double y = response.PopParam<double>();
+        int health = response.PopParam<int>();
+
+        _game->createEnemy(enemyId, static_cast<enemiesTypeEnum_t>(enemyType), x, y, health);
     };
 
     _handleEnemyMap[Utils::EnemyEnum::EnemyDie] = [this](Utils::Network::Response response) {

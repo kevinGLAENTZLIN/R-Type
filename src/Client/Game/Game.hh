@@ -79,6 +79,7 @@ namespace Rtype {
         void createPlayer(int id, float pos_x, float pos_y, int invincibility);
         void createOtherPlayer(int id, float pos_x, float pos_y);
         void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
+        void createEnemy(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void createBoss1();
         void createProjectile(int entityId, int projectileId);
         void failToConnect();

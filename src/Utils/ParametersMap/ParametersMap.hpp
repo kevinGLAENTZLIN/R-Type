@@ -127,12 +127,12 @@ namespace Utils
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerHitAWall)}, {"", "i"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerScore)}, {"", "i"}},
 
-                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", "iiff"}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", "iiffi"}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyDie)}, {"", "i"}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyMove)}, {"", ""}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyAttack)}, {"", "i"}},
 
-                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iff"}},
+                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iffi"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossDie)}, {"", "i"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossAttack)}, {"", "ii"}},
 

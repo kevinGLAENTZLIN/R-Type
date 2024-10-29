@@ -200,6 +200,21 @@ Rtype::Game::~Game()
     _ressourcePool.UnloadAll();
 }
 
+void Rtype::Game::createEnemy(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
+{
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
+    std::size_t enemy = _core->createEntity();
+    _core->addComponent(enemy, ECS::Components::Position{pos_x, pos_y});
+    _core->addComponent(enemy, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Scale{1.0f});
+    _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
+    _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
+    _core->addComponent(enemy, ECS::Components::AI{enemyType});
+    _core->addComponent(enemy, ECS::Components::Health{life});
+    _serverToLocalEnemiesId[entityId] = enemy;
+}
+
 void Rtype::Game::createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
@@ -678,7 +693,7 @@ void Rtype::Game::initGame(int id)
     createPlayer(id, -10.0f, 0.0f, 50);
     switchState(GameState::PLAY);
 
-    createBoss1();
+    // createBoss1();
 
     createEnemy(BINK, -5.0f, 3.0f, 1);
     // createBoss1Tail(BOSS1_Tail0, 6.0f, 3.0f);
@@ -1053,9 +1068,9 @@ void Rtype::Game::update() {
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
 
-    for (std::size_t i = 0; i < AIBydoShots.size(); i++)
-        createEnemyBydoShots(AIBydoShots[i]);
-    AIBydoShots.clear();
+    // for (std::size_t i = 0; i < AIBydoShots.size(); i++)
+    //     createEnemyBydoShots(AIBydoShots[i]);
+    // AIBydoShots.clear();
 
     if (false)
         _camera.Update(CAMERA_FREE);

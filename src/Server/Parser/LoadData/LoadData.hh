@@ -9,7 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <json/json.h>
-#include <vector>
+#include <stack>
+#include <algorithm>
 
 #include "../EnemySpawnData/EnemySpawnData.hh"
 #include "../../../Utils/enemiesTypeEnum.hpp"
@@ -22,12 +23,12 @@ namespace Rtype {
             ~LoadData() = default;
 
             void LoadDataFromFile(const std::string &path);
-            std::vector<Rtype::EnemySpawnData> GetEnemySpawnData() const;
+            std::stack<Rtype::EnemySpawnData> GetEnemySpawnData() const;
             void clearEnemySpawnData();
 
         private:
             enemiesTypeEnum_t convertStringToEnumType(const std::string &text);
-            std::vector<Rtype::EnemySpawnData> _enemySpawnData;
+            std::stack<Rtype::EnemySpawnData> _enemySpawnData;
 
     };
 }

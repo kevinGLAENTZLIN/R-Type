@@ -739,26 +739,18 @@ void Rtype::Game::createBoss2()
     }
 }
 
-std::vector<int> Rtype::Game::getAIBydoShots()
+
+std::vector<int> Rtype::Game::getAIProjectile()
 {
-    std::vector<int> serverBydoShots;
+    std::vector<int> serverProjectile;
 
-    for (std::size_t i; i < _AIBydoShots.size(); i++)
+    serverProjectile.insert(serverProjectile.end(), _AIBydoShots.begin(), _AIBydoShots.end());
+    serverProjectile.insert(serverProjectile.end(), _AIHomingShots.begin(), _AIHomingShots.end());
+    for (std::size_t i; i < serverProjectile.size(); i++)
         for (const auto& Ids : _serverToLocalProjectilesId)
-            if (Ids.second == _AIBydoShots[i])
-                serverBydoShots.push_back(Ids.first);
-    return serverBydoShots;
-}
-
-std::vector<int> Rtype::Game::getAIHomingShots()
-{
-    std::vector<int> serverHomingShots;
-
-    for (std::size_t i; i < _AIHomingShots.size(); i++)
-        for (const auto& Ids : _serverToLocalProjectilesId)
-            if (Ids.second == _AIHomingShots[i])
-                serverHomingShots.push_back(Ids.first);
-    return serverHomingShots;
+            if (Ids.second == serverProjectile[i])
+                serverProjectile[i] = Ids.first;
+    return serverProjectile;
 }
 
 void Rtype::Game::initGame(int id)

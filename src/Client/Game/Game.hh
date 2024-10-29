@@ -88,8 +88,7 @@ namespace Rtype {
         void failToConnect();
         void joinGame();
 
-        std::vector<int> getAIBydoShots();
-        std::vector<int> getAIHomingShots();
+        std::vector<int> getAIProjectile();
 
     private:
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);

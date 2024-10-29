@@ -225,7 +225,6 @@ void Rtype::udpClient::setHandleEnemyMap() {
         double y = response.PopParam<double>();
         int health = response.PopParam<int>();
 
-        std::cout << "enemyType: " << enemyType << std::endl;
         _game->createEnemy(enemyId, static_cast<enemiesTypeEnum_t>(enemyType), x, y, health);
     };
 

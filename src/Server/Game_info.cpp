@@ -96,6 +96,16 @@ void Rtype::Game_info::runGame()
 
 void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 {
+    std::vector<int> toShot = _game->getAIProjectile();
+    for (auto enemyId: toShot) {
+        CONSOLE_INFO(enemyId, " has to shooooott")
+        std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Projectile::Fired, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);
+
+        cmd->set_server(getPlayers(), enemyId, getNbProjectiles()); //! tmp
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        _network->addCommandToInvoker(std::move(cmd));
+        accNbProjectiles();
+    }
     if (!_enemySpawnData.empty()) {
         Rtype::EnemySpawnData enemyData = _enemySpawnData.top();
 
@@ -105,6 +115,7 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
             cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
             cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
             _network->addCommandToInvoker(std::move(cmd));
+            _game->createEnemy( getNbProjectiles(), enemyData.getType(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
             accNbProjectiles();
             _enemySpawnData.pop();
         }

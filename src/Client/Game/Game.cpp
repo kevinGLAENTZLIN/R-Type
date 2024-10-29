@@ -29,9 +29,7 @@ Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
         _window.Init(1280, 720, "R-Type Game");
         SetWindowMinSize(1280, 720);
         _camera = raylib::Camera3D({ 0.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -1.0f }, 60.0f);
-        std::cout << "CONNARD" << std::endl;
         _ressourcePool.addModel("ship_yellow");
-        std::cout << "CONNARED" << std::endl;
         _ressourcePool.addModel("base_projectile");
         _ressourcePool.addModel("enemy_one");
         _ressourcePool.addTexture("bg_menu");
@@ -203,14 +201,17 @@ Rtype::Game::~Game()
 
 std::size_t Rtype::Game::createEnemy(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
 {
-    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
     std::size_t enemy = _core->createEntity();
+
+    if (_isRendering) {
+        std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
+        _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+        _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
+    }
     _core->addComponent(enemy, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(enemy, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Scale{1.0f});
     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
-    _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType});
     _core->addComponent(enemy, ECS::Components::Health{life});
     _serverToLocalEnemiesId[entityId] = enemy;
@@ -744,12 +745,20 @@ std::vector<int> Rtype::Game::getAIProjectile()
 {
     std::vector<int> serverProjectile;
 
+    for (auto tmp: _AIHomingShots)
+        std::cout << "homing: " << tmp << std::endl;
+    for (auto tmp: _AIBydoShots)
+        std::cout << "bydo: " << tmp << std::endl;
     serverProjectile.insert(serverProjectile.end(), _AIBydoShots.begin(), _AIBydoShots.end());
     serverProjectile.insert(serverProjectile.end(), _AIHomingShots.begin(), _AIHomingShots.end());
     for (std::size_t i; i < serverProjectile.size(); i++)
         for (const auto& Ids : _serverToLocalProjectilesId)
             if (Ids.second == serverProjectile[i])
                 serverProjectile[i] = Ids.first;
+    for (auto tmp: serverProjectile)
+        std::cout << "tmp: " << tmp << std::endl;
+    _AIBydoShots.clear();
+    _AIHomingShots.clear();
     return serverProjectile;
 }
 
@@ -1116,34 +1125,36 @@ void Rtype::Game::update() {
         _core->getComponents<ECS::Components::Position>(),
         damageableEntities);
 
-    for (std::size_t i = 0; i < deadEntities.size(); i++) {
-        if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
-            sleep(3000);//GAMEOVER
-        if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
-            for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
-                auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
-                int tailId = 0;
-                for (std::size_t j = 0; j < AIs.size(); j++)
-                    if (_core->getComponent<ECS::Components::AI>(AIs[j]).getEnemyType() == i) {
-                        tailId = AIs[j];
-                        break;
-                    }
-                _core->destroyEntity(tailId);
+    if (_isRendering) {
+            for (std::size_t i = 0; i < deadEntities.size(); i++) {
+            if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
+                sleep(3000);//GAMEOVER
+            if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
+                for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
+                    auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
+                    int tailId = 0;
+                    for (std::size_t j = 0; j < AIs.size(); j++)
+                        if (_core->getComponent<ECS::Components::AI>(AIs[j]).getEnemyType() == i) {
+                            tailId = AIs[j];
+                            break;
+                        }
+                    _core->destroyEntity(tailId);
+                }
             }
-        }
-        if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS2_Core) {
+            if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS2_Core) {
+                for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
+                    if (_boss2Balls[balls] < 10000)
+                        _core->destroyEntity(_boss2Balls[balls]);
+            }
             for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
-                if (_boss2Balls[balls] < 10000)
-                    _core->destroyEntity(_boss2Balls[balls]);
+                if (_boss2Balls[balls] == deadEntities[i])
+                    _boss2Balls[balls] = 10001;
+            _core->destroyEntity(deadEntities[i]);
         }
-        for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
-            if (_boss2Balls[balls] == deadEntities[i])
-                _boss2Balls[balls] = 10001;
-        _core->destroyEntity(deadEntities[i]);
+        deadEntities.clear();
     }
-    deadEntities.clear();
     
-    _AIBydoShots.clear();
+    // _AIBydoShots.clear();
     std::vector<std::size_t> _AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),
@@ -1152,7 +1163,7 @@ void Rtype::Game::update() {
     // for (std::size_t i = 0; i < AIBydoShots.size(); i++)
     //     createEnemyProjectile(AIBydoShots[i], BYDOSHOT);
 
-    _AIHomingShots.clear();
+    // _AIHomingShots.clear();
     std::vector<std::size_t> _AIHomingShots = AIFiringProjectileSystem->aiFiringHomingShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),

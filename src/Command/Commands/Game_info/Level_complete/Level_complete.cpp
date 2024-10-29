@@ -29,5 +29,8 @@ void Rtype::Command::GameInfo::Level_complete::execute_server_side()
 {
     _gameInfo->goNextLevel();
     CONSOLE_INFO(_gameInfo->getRoomId(), " went to the next Level !")
-    sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete, _gameInfo.get());
+    for (auto player: *_gameInfo->getPlayers()) {
+        _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
+        sendToEndpoint(_endpoint, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete, _gameInfo->getLevel());
+    }
 }

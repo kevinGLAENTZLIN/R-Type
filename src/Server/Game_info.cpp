@@ -110,7 +110,11 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
         }
     }
     if (_enemySpawnData.empty()) {
-        //! Send next level by network
+        std::unique_ptr<Rtype::Command::GameInfo::Level_complete> lvl_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Level_complete, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete);
+        
+        lvl_cmd->set_server(std::make_shared<Rtype::Game_info>(this));
+        lvl_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        _network->addCommandToInvoker(std::move(lvl_cmd));
         goNextLevel();
     }
 }

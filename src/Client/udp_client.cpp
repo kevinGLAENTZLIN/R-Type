@@ -155,6 +155,7 @@ void Rtype::udpClient::setHandleGameInfoMap()
         int level = response.PopParam<int>();
 
         std::cerr << "Level " << level << " completed." << std::endl;
+        //? Changer le fond ?
     };
 };
 

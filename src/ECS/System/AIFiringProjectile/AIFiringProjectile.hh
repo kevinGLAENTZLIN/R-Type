@@ -15,7 +15,7 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 std::vector<std::size_t> & entities);
-            std::vector<std::size_t> aiFiringMissile(
+            std::vector<std::size_t> aiFiringHomingShots(
                 ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 std::vector<std::size_t> & entities);

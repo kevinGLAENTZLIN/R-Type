@@ -28,7 +28,8 @@ std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
             continue;
         }
 
-        isAIShot = AIs[projectile].has_value();
+        isAIShot = AIs.size() > 0 && AIs[projectile].has_value();
+
         for (std::size_t i = 0; i < entities.size(); ++i) {
             for (std::size_t temp = 0; temp < projectileEntities.size(); temp++)
                 if (entities[i] == projectileEntities[temp]) {
@@ -42,7 +43,7 @@ std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
             std::size_t entity = entities[i];
             auto &entityPos = positions[entity].value();
             auto &entityHitbox = hitboxes[entity].value();
-            bool isAIEntity = AIs[entity].has_value();
+            bool isAIEntity = AIs.size() > 0 && AIs[entity].has_value();
 
             if ((isAIShot && isAIEntity) || (!isAIShot && !isAIEntity)) {
                 continue;

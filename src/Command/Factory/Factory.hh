@@ -6,6 +6,17 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
+
+#include "raylib-cpp.hpp"
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
 #include "../ICommand.hh"
 #include "../ACommand.hpp"
 #include "../../Utils/ParametersMap/ParametersMap.hpp"
@@ -51,7 +62,7 @@ namespace Rtype
                 Factory();
                 ~Factory() = default;
 
-                std::unique_ptr<ACommand> createCommand(uint8_t cmd_category, uint8_t cmd_index);
+                std::unique_ptr<Rtype::Command::ACommand> createCommand(uint8_t cmd_category, uint8_t cmd_index);
 
             protected:
             private:

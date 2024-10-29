@@ -5,8 +5,6 @@ set(RTYPE "r-type")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Werror -g")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -15,13 +13,25 @@ endif()
 if (WIN32)
     set(CMAKE_GENERATOR "Visual Studio 17 2022")
     set(CMAKE_GENERATOR_PLATFORM "x64")
+    add_definitions(-D_WIN32_WINNT=0x0601)
+
+    if(MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS")
+    else()
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror -g")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+    endif()
+else()
+    set(CMAKE_GENERATOR "Unix Makefiles")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror -g")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 endif()
 
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
 
 find_package(boost_asio CONFIG REQUIRED)
 find_package(doctest REQUIRED)
-find_package(jsoncpp REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED)
 find_package(raylib CONFIG REQUIRED)
 
 if (NOT DEFINED RAYLIB_CPP_VERSION)
@@ -55,4 +65,3 @@ endif()
 
 # Afficher le type de build
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-

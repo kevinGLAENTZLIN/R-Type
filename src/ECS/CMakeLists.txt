@@ -27,6 +27,7 @@ set(LIB_SOURCES
     ./Component/Button/Button.cpp
     ./Component/Light/Light.cpp
     ./Component/AI/AI.cpp
+    ./Component/Textfield/Textfield.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
     ./System/UpdateVelocityAI/UpdateVelocityAI.cpp
@@ -38,7 +39,10 @@ set(LIB_SOURCES
     ./System/RenderText/RenderText.cpp
     ./System/ButtonClick/ButtonClick.cpp
     ./System/RenderButton/RenderButton.cpp
-    ./System/Light/Light.cpp
+    ./System/GetDeadEntities/GetDeadEntities.cpp
+    ./System/AIFiringProjectile/AIFiringProjectile.cpp
+    ./System/TextfieldInput/TextfieldInput.cpp
+    ./System/RenderTextfield/RenderTextfield.cpp
     ./RessourcePool/RessourcePool.cpp
 
 )

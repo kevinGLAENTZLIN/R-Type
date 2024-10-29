@@ -12,6 +12,17 @@
 
 #pragma once
 
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
+
+#include "raylib-cpp.hpp"
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -20,10 +31,9 @@
 #include <unordered_map>
 #include "Client_info.hpp"
 #include "Game_info.hh"
-#include "../Utils/ParametersMap/ParametersMap.hpp"
+
 #include "../Utils/Response/Response.hpp"
-#include "../Command/Factory/Factory.hh"
-#include "../Command/Invoker/Command_invoker.hh"
+#include "../Utils/Network/Network.hpp"
 
 using boost::asio::ip::udp;
 using boost::asio::ip::address;
@@ -42,7 +52,7 @@ namespace Rtype {
              * @param port The port on which the server will listen.
              */
             udpServer(boost::asio::io_service& io_service, short port);
-            
+
             /**
              * @brief Destructor for the udpServer class.
              */
@@ -55,22 +65,10 @@ namespace Rtype {
 
         private:
             /**
-             * @brief Checks for an ACK from the client.
-             * @return true if ACK is received, false otherwise.
-             */
-            bool check_ACK();
-
-            /**
              * @brief Retrieves the ID of the sender.
              * @return Sender's ID.
              */
             int get_sender_id();
-
-            /**
-             * @brief Finds an available client ID.
-             * @return Available client ID.
-             */
-            int get_available_client_id(); // ! Refactor: to remove -> handle by Command
 
             /**
              * @brief Retrieves the client ID by its address.
@@ -100,8 +98,6 @@ namespace Rtype {
              */
             void disconnect_client(int client_id);
 
-            void connect_client_to_game(int client_id, int game_room);
-
             template <typename T>
             std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
                 static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
@@ -127,14 +123,11 @@ namespace Rtype {
             std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
             std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
 
-            std::shared_ptr<udp::socket> _socket;
+            std::shared_ptr<Rtype::Network> _network;
             udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
-            std::map<int, std::shared_ptr<Rtype::client_info>> _clients;
-            std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> _games;
-            Rtype::Command::Command_invoker _commandInvoker;
-            Rtype::Command::Factory _commandFactory;
-            
+            std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _clients;
+            std::shared_ptr<std::map<int, std::shared_ptr<Rtype::Game_info>>> _games;
     };
 }

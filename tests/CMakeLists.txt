@@ -18,6 +18,4 @@ target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 target_compile_options(${TEST_NAME} PRIVATE
     -Wall
-    -Wextra
-    -Werror
 )

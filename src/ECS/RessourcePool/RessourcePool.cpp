@@ -41,24 +41,6 @@ raylib::Texture& ECS::RessourcePool::getTexture(const std::string &texturePath)
     return _textures.at(texturePath);
 }
 
-raylib::Shader& ECS::RessourcePool::getShader(const std::string &shaderPath)
-{
-    return _shaders.at(shaderPath);
-}
-
-void ECS::RessourcePool::addShader(const std::string &shaderPath)
-{
-    std::string pathRessourcesVs = "./resources/shaders/" + shaderPath + ".vs";
-    std::string pathRessourcesFs = "./resources/shaders/" + shaderPath + ".fs";
-    raylib::Shader defaultShader(pathRessourcesVs, pathRessourcesFs);
-
-    defaultShader.locs[SHADER_LOC_VECTOR_VIEW] = defaultShader.GetLocation("viewPos");
-    int ambientLoc = defaultShader.GetLocation("ambient");
-    std::array<float, 4> ambientValues = {1.0f, 1.0f, 1.0f, 1.0f};
-    defaultShader.SetValue(ambientLoc, ambientValues.data(), SHADER_UNIFORM_VEC4);
-    _shaders.emplace(shaderPath, std::move(defaultShader));
-}
-
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)
 {
     std::string pathRessources = "./resources/" + TexturePath + "/" + TexturePath + ".png";
@@ -75,10 +57,39 @@ void ECS::RessourcePool::addModel(const std::string &modelPath)
 
     if (std::filesystem::exists(pngTexturePath)) {
         raylib::Texture texture(pngTexturePath.c_str());
-        defaultModel.materials[0].shader = _shaders.at("lighting");
         defaultModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
         _texturesModels.emplace(pngTexturePath, std::move(texture));
     }
 
     _models.emplace(modelPath, std::move(defaultModel));
+}
+
+void ECS::RessourcePool::queueModelLoad(const std::string &modelPath)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    _pendingLoads.push(modelPath);
+}
+
+void ECS::RessourcePool::requestLoadTexture(const std::string &texturePath)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    _pendingTextureLoads.push(texturePath);
+}
+
+void ECS::RessourcePool::processLoadQueue()
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    while (!_pendingLoads.empty()) {
+        std::string modelPath = _pendingLoads.front();
+        _pendingLoads.pop();
+        addModel(modelPath);
+    }
+    while (!_pendingTextureLoads.empty()) {
+            std::string texturePath = _pendingTextureLoads.front();
+            _pendingTextureLoads.pop();
+            addTexture(texturePath);
+        }
 }

@@ -18,32 +18,31 @@ bool ECS::Utils::checkCollision(
 }
 
 ECS::Utils::FileType ECS::Utils::getRaylibFileType(const std::string& path) {
-        std::string extension = std::filesystem::path(path).extension().string();
-        std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-
-        if (extension == ".png" || extension == ".bmp" || extension == ".tga" || extension == ".jpg" || extension == ".gif") {
-            return ECS::Utils::FileType::Texture;
-        }
-        else if (extension == ".obj" || extension == ".gltf" || extension == ".glb" || extension == ".iqm") {
-            return ECS::Utils::FileType::Model;
-        }
-        else if (extension == ".wav" || extension == ".ogg" || extension == ".mp3") {
-            return ECS::Utils::FileType::Audio;
-        }
-        else if (extension == ".ttf" || extension == ".otf") {
-            return ECS::Utils::FileType::Font;
-        }
-        else if (extension == ".vs" || extension == ".fs") {
-            return ECS::Utils::FileType::Shader;
-        }
-        else if (extension == ".txt" || extension == ".json") {
-            return ECS::Utils::FileType::Data;
-        }
-        else {
-            return ECS::Utils::FileType::Unknown;
-        }
+    std::string extension = std::filesystem::path(path).extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+    
+    if (extension == ".png" || extension == ".bmp" || extension == ".tga" || extension == ".jpg" || extension == ".gif") {
+        return ECS::Utils::FileType::Texture;
     }
-
+    else if (extension == ".obj" || extension == ".gltf" || extension == ".glb" || extension == ".iqm") {
+        return ECS::Utils::FileType::Model;
+    }
+    else if (extension == ".wav" || extension == ".ogg" || extension == ".mp3") {
+        return ECS::Utils::FileType::Audio;
+    }
+    else if (extension == ".ttf" || extension == ".otf") {
+        return ECS::Utils::FileType::Font;
+    }
+    else if (extension == ".vs" || extension == ".fs") {
+        return ECS::Utils::FileType::Shader;
+    }
+    else if (extension == ".txt" || extension == ".json") {
+        return ECS::Utils::FileType::Data;
+    }
+    else {
+        return ECS::Utils::FileType::Unknown;
+    }
+}
 
 std::pair<float, float> ECS::Utils::getModelSize(const raylib::Model &model)
 {

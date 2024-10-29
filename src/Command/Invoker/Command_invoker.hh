@@ -6,7 +6,19 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
+
+#include "raylib-cpp.hpp"
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
 #include <iostream> 
+#include <iostream>
 #include <queue>
 #include <string>
 #include "../ACommand.hpp"
@@ -22,12 +34,12 @@ namespace Rtype
 
                 void executeCommand();
 
-                void addCommand(std::unique_ptr<ACommand> cmd);
+                void addCommand(std::unique_ptr<Rtype::Command::ACommand> cmd);
 
             protected:
             private:
                 std::string _invokerType;
-                std::queue<std::unique_ptr<ACommand>> _commandQueue;
+                std::queue<std::unique_ptr<Rtype::Command::ACommand>> _commandQueue;
         };
     }
 }

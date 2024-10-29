@@ -14,6 +14,9 @@
 #include <algorithm>
 #include <filesystem>
 #include "raylib-cpp.hpp"
+#include <array>
+#include <queue>
+#include <mutex>
 
 namespace ECS {
     class RessourcePool {
@@ -23,16 +26,19 @@ namespace ECS {
 
         raylib::Model &getModel(const std::string &modelPath);
         raylib::Texture &getTexture(const std::string &texturePath);
-        raylib::Shader &getShader(const std::string &shaderPath);
 
+        void queueModelLoad(const std::string& modelPath);
+        void requestLoadTexture(const std::string &texturePath);
+        void processLoadQueue();
         void addModel(const std::string &modelPath);
         void addTexture(const std::string &TexturePath);
-        void addShader(const std::string &shaderPath);
         void UnloadAll();
     private:
         std::map<const std::string, raylib::Model> _models;
         std::map<const std::string, raylib::Texture> _texturesModels;
         std::map<const std::string, raylib::Texture> _textures;
-        std::map<const std::string, raylib::Shader> _shaders;
+        std::queue<std::string> _pendingLoads;
+        std::queue<std::string> _pendingTextureLoads;
+        std::mutex _mutex;
     };
 }

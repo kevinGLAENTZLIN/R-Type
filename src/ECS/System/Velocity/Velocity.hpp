@@ -6,11 +6,13 @@
 */
 #pragma once
 
+#include <cstddef>
 #include <vector>
 #include "../System/System.hpp"
 #include "../../Component/ComponentManager/SparseArray.hpp"
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/Velocity/Velocity.hh"
+#include <map>
 
 namespace ECS {
     namespace Systems {
@@ -48,6 +50,7 @@ namespace ECS {
             */
             void update(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
                         ECS::ComponentManager::SparseArray<ECS::Components::Velocity> &velocities,
+                        std::map<int, std::size_t> &players,
                         std::vector<std::size_t> &entities);
         };
     }

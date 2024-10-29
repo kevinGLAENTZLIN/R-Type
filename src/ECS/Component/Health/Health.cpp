@@ -17,8 +17,8 @@
  * @tparam Integer to create health component.
  * @return void.
  */
-ECS::Components::Health::Health(int health):
-    _health(health)
+ECS::Components::Health::Health(int health, int invincibility):
+    _health(health), _invincibility(invincibility)
 {}
 
 /**
@@ -42,3 +42,24 @@ void ECS::Components::Health::setHealth(int health)
 {
     _health = health;
 }
+
+void ECS::Components::Health::modifyHealthBy(int delta)
+{
+    _health += delta;
+}
+
+int ECS::Components::Health::getInvincibility() const
+{
+    return _invincibility;
+}
+
+void ECS::Components::Health::setInvincibility(int invincibility)
+{
+    _invincibility = invincibility;
+}
+
+void ECS::Components::Health::modifyInvincibilityBy(int delta)
+{
+    _invincibility += delta;
+}
+

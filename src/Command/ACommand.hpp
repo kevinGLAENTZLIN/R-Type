@@ -7,6 +7,18 @@
 
 #pragma once
 
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
+
+#include "raylib-cpp.hpp"
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
+
 #include <iostream>
 #include <cstdarg>
 #include <map>
@@ -16,11 +28,11 @@
 #include <iomanip>
 #include <chrono>
 #include <boost/asio.hpp>
+
 #include "./ICommand.hh"
 #include "../Utils/ParametersMap/ParametersMap.hpp"
 #include "../Utils/Protocol/Protocol.hpp"
 #include "../Server/Client_info.hpp"
-#include "../Client/Game/Game.hh"
 
 using boost::asio::ip::udp;
 
@@ -66,13 +78,18 @@ namespace Rtype
                     _origins = origins;
                 }
 
+                void setGame(std::shared_ptr<Rtype::Game> game)
+                {
+                    _game = game;
+                }
+
             protected:
                 /**
                  * @brief Sends a command to the last sender client.
-                 * 
+                 *
                  * This function uses variadic arguments to handle parameters of the command to send.
                  * Also it pushes the command with its parameters to the client's history.
-                 * 
+                 *
                  * @param function_type The type of command to be sent.
                  * @param function_index The index of the command to be sent.
                  * @param ... Parameters for the command to send in the right order.
@@ -99,10 +116,41 @@ namespace Rtype
                 }
 
                 /**
+                 * @brief Sends a command to the last sender client.
+                 *
+                 * This function uses variadic arguments to handle parameters of the command to send.
+                 * Also it pushes the command with its parameters to the client's history.
+                 *
+                 * @param function_type The type of command to be sent.
+                 * @param function_index The index of the command to be sent.
+                 * @param ... Parameters for the command to send in the right order.
+                 */
+                template <Utils::FunctionIndex T>
+                void sendToEndpoint(udp::endpoint endpoint, Utils::InfoTypeEnum function_type, T function_index, ...)
+                {
+                    va_list params;
+                    va_list params_copy;
+                    Utils::Network::bytes msg;
+                    std::string params_type = getParamsType(function_type, function_index);
+
+                    va_start(params, function_index);
+                    va_copy(params_copy, params);
+                    // if (!_history.empty())
+                    //     std::cerr << "Warning, the history has not been dev" << std::endl;
+                    //     // pushCmdToHistory(function_type, function_index, params);
+                    // else
+                    //     std::cerr << "Warning, the history has not been set" << std::endl;
+                    msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
+                    va_end(params);
+                    _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
+                    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                }
+
+                /**
                  * @brief Gets the parameter types for a given function.
-                 * 
+                 *
                  * This method returns the parameter types for a given function type and index.
-                 * 
+                 *
                  * @param function_type The type of the function.
                  * @param function_index The index of the function.
                  * @return The parameter types as a string.
@@ -124,10 +172,10 @@ namespace Rtype
 
                 /**
                  * @brief Adds a command to the client's command history.
-                 * 
+                 *
                  * This method handle a variadic list of parameters, converts them to strings,
                  * and stores them in the client's history.
-                 * 
+                 *
                  * @param function_type The type of the command.
                  * @param function_index The index of the command.
                  * @param params The variadic parameters for the command.

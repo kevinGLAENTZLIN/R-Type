@@ -21,14 +21,15 @@ namespace Rtype
                     ~Level_complete();
 
                     void set_client();
-                    void set_server(std::shared_ptr<Rtype::Game_info> game);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int level);
 
                     void execute_client_side();
                     void execute_server_side();
 
                 protected:
                 private:
-                    std::shared_ptr<Rtype::Game_info> _gameInfo;
+                    int _level;
+                    std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
             };
         }
     }

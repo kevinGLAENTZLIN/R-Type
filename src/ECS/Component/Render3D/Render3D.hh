@@ -2,13 +2,13 @@
 #include <iostream>
 #include <string>
 #if defined(_WIN32)           
-	#define NOGDI             // All GDI defines and routines
-	#define NOUSER            // All USER defines and routines
+	#define NOGDI
+	#define NOUSER
 #endif
 
 #include "raylib-cpp.hpp"
 
-#if defined(_WIN32)           // raylib uses these names as function parameters
+#if defined(_WIN32)
 	#undef near
 	#undef far
 #endif

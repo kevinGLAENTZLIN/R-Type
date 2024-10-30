@@ -97,6 +97,8 @@ void Rtype::Game_info::runGame()
 void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 {
     std::vector<int> toShot = _game->getAIProjectile();
+    for (int i = 0; i < toShot.size(); i++)
+        std::cout << "toShot[" << i << "]: " << toShot[i] << std::endl;
     for (auto enemyId: toShot) {
         CONSOLE_INFO(enemyId, " has to shooooott")
         std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Projectile::Fired, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);

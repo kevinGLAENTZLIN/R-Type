@@ -129,7 +129,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16
+        "time second": 16
     },
     "Bug0_1": {
         "type": "BUG",
@@ -141,7 +141,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16
+        "time second": 16
     },
     "Bug0_2": {
         "type": "BUG",
@@ -153,7 +153,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16
+        "time second": 16
     },
     "Bug0_3": {
         "type": "BUG",
@@ -165,7 +165,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16
+        "time second": 16
     },
     "Bug0_4": {
         "type": "BUG",
@@ -177,7 +177,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16
+        "time second": 16
     },
     "Bug0_5": {
         "type": "BUG",
@@ -189,7 +189,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 16
+        "time second": 16
     },
     "Bink0": {
         "type": "BINK",
@@ -213,7 +213,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 19
+        "time second": 19
     },
     "Bug1_1": {
         "type": "BUG",
@@ -225,7 +225,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 19
+        "time second": 19
     },
     "Bug1_2": {
         "type": "BUG",
@@ -237,7 +237,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 19
+        "time second": 19
     },
     "Bug1_3": {
         "type": "BUG",
@@ -249,7 +249,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 19
+        "time second": 19
     },
     "Bug1_4": {
         "type": "BUG",
@@ -261,7 +261,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 19
+        "time second": 19
     },
     "Bug1_5": {
         "type": "BUG",
@@ -273,7 +273,7 @@
         "health": 1,
         "model": "enemy_one",
         "time minute":0,
-        "timesecond": 19
+        "time second": 19
     },
     "Patapata2_0": {
         "type": "PATAPATA",

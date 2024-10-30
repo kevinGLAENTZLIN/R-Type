@@ -740,25 +740,18 @@ void Rtype::Game::createBoss2()
     }
 }
 
-
 std::vector<int> Rtype::Game::getAIProjectile()
 {
     std::vector<int> serverProjectile;
 
-    for (auto tmp: _AIHomingShots)
-        std::cout << "homing: " << tmp << std::endl;
-    for (auto tmp: _AIBydoShots)
-        std::cout << "bydo: " << tmp << std::endl;
     serverProjectile.insert(serverProjectile.end(), _AIBydoShots.begin(), _AIBydoShots.end());
     serverProjectile.insert(serverProjectile.end(), _AIHomingShots.begin(), _AIHomingShots.end());
-    for (std::size_t i; i < serverProjectile.size(); i++)
-        for (const auto& Ids : _serverToLocalProjectilesId)
-            if (Ids.second == serverProjectile[i])
-                serverProjectile[i] = Ids.first;
-    for (auto tmp: serverProjectile)
-        std::cout << "tmp: " << tmp << std::endl;
     _AIBydoShots.clear();
     _AIHomingShots.clear();
+    for (std::size_t i; i < serverProjectile.size(); i++)
+        for (const auto& Ids : _serverToLocalEnemiesId)
+            if (Ids.second == serverProjectile[i])
+                serverProjectile[i] = Ids.first;
     return serverProjectile;
 }
 
@@ -863,6 +856,7 @@ void Rtype::Game::runServer()
         switch (_currentState) {
             case PLAY:
                 update();
+                std::this_thread::sleep_for(std::chrono::milliseconds(15));        
         }
 }
 
@@ -1155,19 +1149,21 @@ void Rtype::Game::update() {
     }
     
     // _AIBydoShots.clear();
-    std::vector<std::size_t> _AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
+    std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
-
+    _AIBydoShots.insert(_AIBydoShots.end(), AIBydoShots.begin(), AIBydoShots.end());
+    
     // for (std::size_t i = 0; i < AIBydoShots.size(); i++)
     //     createEnemyProjectile(AIBydoShots[i], BYDOSHOT);
 
     // _AIHomingShots.clear();
-    std::vector<std::size_t> _AIHomingShots = AIFiringProjectileSystem->aiFiringHomingShots(
+    std::vector<std::size_t> AIHomingShots = AIFiringProjectileSystem->aiFiringHomingShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
+    _AIHomingShots.insert(_AIHomingShots.end(), AIHomingShots.begin(), AIHomingShots.end());
 
     // for (std::size_t i = 0; i < _AIHomingShots.size(); i++)
     //     createEnemyProjectile(_AIHomingShots[i], 250, HOMINGSHOT);

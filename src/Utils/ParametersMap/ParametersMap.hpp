@@ -78,7 +78,7 @@ namespace Utils
 
     /**
      * @brief A concept that constrains a type T to be one of the specified enumeration types.
-     * 
+     *
      * This concept ensures that the template parameter T can only be one of the following types:
      * - GameInfoEnum
      * - PlayerEnum
@@ -86,7 +86,7 @@ namespace Utils
      * - BossEnum
      * - PowerUpEnum
      * - ProjectileEnum
-     * 
+     *
      * Any type that does not match one of these enumerations will not satisfy this concept.
      */
     template <typename T>
@@ -96,24 +96,24 @@ namespace Utils
 
 
     using PrimitiveType = std::variant<bool, char, int, double>;
-    
+
     // Class managing a mapping of parameters for all functions of the protocol.
     class ParametersMap {
         public:
             /**
              * @brief Initialize the parameters map with all functions and their parameters.
-             * 
-             * Sets up the mapping of function types and indexes to their corresponding 
+             *
+             * Sets up the mapping of function types and indexes to their corresponding
              * parameter types expected by the server and client.
              */
-            static void init_map() 
+            static void init_map()
             {
                 if (!_parametersMap.empty())
                     return;
                 _parametersMap = {
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::NewClientConnected)}, {"", "i"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", "iii"}},
-                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"i", "i"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"", "i"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::JoinGame)}, {"i", "bi"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GameWonLost)}, {"", "b"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::SafetyCheck)}, {"", ""}},
@@ -240,13 +240,13 @@ namespace Utils
         private:
             /**
              * @brief Map of function caategories and indexes to parameter types.
-             * 
-             * The map key is a pair consisting of the function category & index, 
-             * while the value is a pair of strings representing the parameter types 
+             *
+             * The map key is a pair consisting of the function category & index,
+             * while the value is a pair of strings representing the parameter types
              * expected by the server & client, respectively.
              * Parameter types are denoted by characters (e.g., b: Bool, c: Char, i: Int, f: Float).
              * The first string represents the server's expected parameters, while the second string represents the client's.
              */
-            static std::map<std::pair<InfoTypeEnum, uint8_t>, std::pair<std::string, std::string>> _parametersMap; 
+            static std::map<std::pair<InfoTypeEnum, uint8_t>, std::pair<std::string, std::string>> _parametersMap;
     };
 }

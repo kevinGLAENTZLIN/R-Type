@@ -14,7 +14,6 @@
 #include "../../Component/AI/AI.hh"
 #include <map>
 #include <cmath>
-#define M_PI 3.14f
 namespace ECS {
     namespace Systems {
 

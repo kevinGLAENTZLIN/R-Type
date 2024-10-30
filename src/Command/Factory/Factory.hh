@@ -6,6 +6,7 @@
 */
 
 #pragma once
+<<<<<<< HEAD
 #if defined(_WIN32)           
 	#define NOGDI             // All GDI defines and routines
 	#define NOUSER            // All USER defines and routines
@@ -19,6 +20,9 @@
 #endif
 #include "../ICommand.hh"
 #include "../ACommand.hpp"
+=======
+
+>>>>>>> d669fe12eeee9ddacaae29b8270b4933c164e2b4
 #include "../../Utils/ParametersMap/ParametersMap.hpp"
 #include <functional>
 #include <iostream>

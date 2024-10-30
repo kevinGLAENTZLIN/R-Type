@@ -11,6 +11,7 @@
 	#define NOUSER            // All USER defines and routines
 #endif
 
+<<<<<<< HEAD
 #include "raylib-cpp.hpp"
 
 #if defined(_WIN32)           // raylib uses these names as function parameters
@@ -18,6 +19,8 @@
 	#undef far
 #endif
 
+=======
+>>>>>>> d669fe12eeee9ddacaae29b8270b4933c164e2b4
 #include "../Client/Game/Game.hh"
 #include <boost/asio.hpp>
 

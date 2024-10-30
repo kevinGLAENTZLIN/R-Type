@@ -6,6 +6,7 @@
 */
 
 #pragma once
+<<<<<<< HEAD
 #if defined(_WIN32)           
 	#define NOGDI             // All GDI defines and routines
 	#define NOUSER            // All USER defines and routines
@@ -17,6 +18,8 @@
 	#undef near
 	#undef far
 #endif
+=======
+>>>>>>> d669fe12eeee9ddacaae29b8270b4933c164e2b4
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>

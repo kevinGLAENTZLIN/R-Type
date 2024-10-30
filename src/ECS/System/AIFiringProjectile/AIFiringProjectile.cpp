@@ -33,5 +33,5 @@ std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringMissile(
     ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
     std::vector<std::size_t> & entities)
 {
-    return std::vector<std::size_t>({0});
+    
 }

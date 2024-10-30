@@ -10,6 +10,7 @@
 
 #include "../../Utils/Network/Network.hpp"
 #include <thread>
+#include<unistd.h>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -1032,8 +1033,12 @@ void Rtype::Game::update() {
 
     for (std::size_t i = 0; i < deadEntities.size(); i++) {
         if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
+<<<<<<< HEAD
             //sleep(3000);//GAMEOVER
             std::cout << "SEGV LOL" << std::endl;
+=======
+            sleep(3000);//GAMEOVER
+>>>>>>> d669fe12eeee9ddacaae29b8270b4933c164e2b4
         else if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
             for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
                 auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();

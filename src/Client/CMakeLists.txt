@@ -21,6 +21,13 @@ include_directories(
     ../Utils
 )
 
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ../Server/Parser/LoadData
+    ../Server/Parser/EnemySpawnData
+    ../Utils
+)
+
 if (WIN32)
     add_executable(${NAME_CLIENT} ${CLIENT_SOURCES})
 

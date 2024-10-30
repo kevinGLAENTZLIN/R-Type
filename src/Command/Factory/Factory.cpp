@@ -15,6 +15,7 @@ Rtype::Command::Factory::Factory()
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::GamesAvailable)}] = []() {return std::make_unique<GameInfo::Games_available>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame)}] = []() {return std::make_unique<GameInfo::Join_game>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::LevelComplete)}] = []() {return std::make_unique<GameInfo::Level_complete>();};
+    _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::ClientDisconnect)}] = []() {return std::make_unique<GameInfo::Client_disconnect>();};
 
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerAttack)}] = []() {return std::make_unique<Player::Attack>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerDie)}] = []() {return std::make_unique<Player::Die>();};
@@ -27,6 +28,7 @@ Rtype::Command::Factory::Factory()
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Enemy), static_cast<uint8_t>(Utils::EnemyEnum::EnemyAttack)}] = []() {return std::make_unique<Enemy::Attack>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Enemy), static_cast<uint8_t>(Utils::EnemyEnum::EnemyDie)}] = []() {return std::make_unique<Enemy::Die>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Enemy), static_cast<uint8_t>(Utils::EnemyEnum::EnemySpawn)}] = []() {return std::make_unique<Enemy::Spawn>();};
+    _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Enemy), static_cast<uint8_t>(Utils::EnemyEnum::EnemyDestroy)}] = []() {return std::make_unique<Enemy::Destroy>();};
 
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Boss), static_cast<uint8_t>(Utils::BossEnum::BossAttack)}] = []() {return std::make_unique<Boss::Attack>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Boss), static_cast<uint8_t>(Utils::BossEnum::BossDie)}] = []() {return std::make_unique<Boss::Die>();};

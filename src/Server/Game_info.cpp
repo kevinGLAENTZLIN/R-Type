@@ -97,10 +97,17 @@ void Rtype::Game_info::runGame()
 void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 {
     std::vector<int> toShot = _game->getAIProjectile();
-    for (int i = 0; i < toShot.size(); i++)
-        std::cout << "toShot[" << i << "]: " << toShot[i] << std::endl;
+    std::vector<int> deadBros = _game->getDeadEntities();
+
+    for (auto entity: deadBros) {
+        std::unique_ptr<Rtype::Command::Enemy::Destroy> destroy_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Destroy, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDestroy);
+
+        destroy_cmd->set_server(getPlayers(), entity);
+        destroy_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        _network->addCommandToInvoker(std::move(destroy_cmd));
+        _game->destroyEntity(entity);
+    }
     for (auto enemyId: toShot) {
-        CONSOLE_INFO(enemyId, " has to shooooott")
         std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Projectile::Fired, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);
 
         cmd->set_server(getPlayers(), enemyId, getNbProjectiles()); //! tmp
@@ -112,11 +119,11 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
         Rtype::EnemySpawnData enemyData = _enemySpawnData.top();
 
         if (currentGameTimeInSeconds >= enemyData.getSpawnTimeInSeconds()) {
-            std::unique_ptr<Rtype::Command::Enemy::Spawn> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Spawn, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemySpawn);
+            std::unique_ptr<Rtype::Command::Enemy::Spawn> spawn_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Spawn, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemySpawn);
 
-            cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
-            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-            _network->addCommandToInvoker(std::move(cmd));
+            spawn_cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
+            spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            _network->addCommandToInvoker(std::move(spawn_cmd));
             _game->createEnemy( getNbProjectiles(), enemyData.getType(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
             accNbProjectiles();
             _enemySpawnData.pop();

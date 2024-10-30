@@ -12,6 +12,7 @@ set(LIB_CMD_SRC
     ./Commands/Game_info/Join_game/Join_game.cpp
     ./Commands/Game_info/Games_available/Games_available.cpp
     ./Commands/Game_info/Client_connection/Client_connection.cpp
+    ./Commands/Game_info/Client_disconnect/Client_disconnect.cpp
     ./Commands/Boss/Attack/Attack.cpp
     ./Commands/Boss/Die/Die.cpp
     ./Commands/Boss/Spawn/Spawn.cpp
@@ -20,6 +21,7 @@ set(LIB_CMD_SRC
     ./Commands/Enemy/Attack/Attack.cpp
     ./Commands/Enemy/Die/Die.cpp
     ./Commands/Enemy/Spawn/Spawn.cpp
+    ./Commands/Enemy/Destroy/Destroy.cpp
     ./Commands/Player/Move/Move.cpp
     ./Commands/Player/Attack/Attack.cpp
     ./Commands/Player/Die/Die.cpp

@@ -19,6 +19,7 @@
 #include "../Commands/Game_info/Game_result/Game_result.hh"
 #include "../Commands/Game_info/Join_game/Join_game.hh"
 #include "../Commands/Game_info/Level_complete/Level_complete.hh"
+#include "../Commands/Game_info/Client_disconnect/Client_disconnect.hh"
 
 #include "../Commands/Player/Attack/Attack.hh"
 #include "../Commands/Player/Die/Die.hh"
@@ -31,6 +32,7 @@
 #include "../Commands/Enemy/Attack/Attack.hh"
 #include "../Commands/Enemy/Die/Die.hh"
 #include "../Commands/Enemy/Spawn/Spawn.hh"
+#include "../Commands/Enemy/Destroy/Destroy.hh"
 
 #include "../Commands/Boss/Attack/Attack.hh"
 #include "../Commands/Boss/Die/Die.hh"

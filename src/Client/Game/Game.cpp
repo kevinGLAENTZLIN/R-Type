@@ -745,12 +745,18 @@ void Rtype::Game::destroyEntity(int entityId)
 {
     std::size_t toDestroy;
 
-    if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end())
+    if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end()) {
         toDestroy = _serverToLocalPlayersId.at(entityId);
-    if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end())
+        _serverToLocalPlayersId.erase(entityId);
+    }
+    if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
         toDestroy = _serverToLocalEnemiesId.at(entityId);
-    if (_serverToLocalProjectilesId.find(entityId) != _serverToLocalProjectilesId.end())
+        _serverToLocalEnemiesId.erase(entityId);
+    }
+    if (_serverToLocalProjectilesId.find(entityId) != _serverToLocalProjectilesId.end()) {
         toDestroy = _serverToLocalProjectilesId.at(entityId);
+        _serverToLocalProjectilesId.erase(entityId);
+    }
     _core->destroyEntity(toDestroy);
 }
 
@@ -791,10 +797,10 @@ std::vector<int> Rtype::Game::getDeadEntities()
         for (const auto& Ids : _serverToLocalProjectilesId)
             if (Ids.second == serverDeadEntities[i])
                 serverDeadEntities[i] = Ids.first;
-    // for (int i = 0; i < serverDeadEntities.size(); i++) {
-    //     std::cout << "serverId[" << i << "]:" << serverDeadEntities[i];
-    //     std::cout << "==> localId[" << i << "]:" << _serverToLocalEnemiesId[serverDeadEntities[i]] << std::endl;
-    // }
+    }
+    for (int i = 0; i < serverDeadEntities.size(); i++) {
+        std::cout << "serverId[" << i << "]:" << serverDeadEntities[i] << std::endl;
+        // std::cout << "==> localId[" << i << "]:" << _serverToLocalEnemiesId[serverDeadEntities[i]] << std::endl;
     }
     return serverDeadEntities;
 }
@@ -1137,16 +1143,14 @@ void Rtype::Game::update() {
         _core->getComponents<ECS::Components::AI>(),
         projectileEntities, collisionEntities);
 
-    if (_isRendering && _currentState == PLAY) {
+    if (_isRendering) {
         auto healthComponents = _core->getComponents<ECS::Components::Health>();
-        std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
         for (int i = 0; i < projectileEntityId.size(); i++) {
             for (int j = 0; j < damageableEntities.size(); j++) {
-                if (damageableEntities[j] == projectileEntityId[i]) {
-                    if (damageableEntities[j] != player || healthComponents[player]->getInvincibility() == 0) {
-                        std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
-                        _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
-                    }
+                if (damageableEntities[j] == projectileEntityId[i] && healthComponents[damageableEntities[j]]->getInvincibility() == 0) {
+                    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
+                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
+                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setInvincibility(50);
                 }
             }
             for (int j = 0; j < projectileEntities.size(); j++)
@@ -1154,8 +1158,8 @@ void Rtype::Game::update() {
                     _core->destroyEntity(projectileEntityId[i]);
                 }
         }
+        projectileEntityId.clear();
     }
-    projectileEntityId.clear();
 
     if (!_isRendering) {
         std::vector<std::size_t> deadEntities = getDeadEntitiesSystem->getDeadEntities(
@@ -1163,6 +1167,9 @@ void Rtype::Game::update() {
             _core->getComponents<ECS::Components::Position>(),
             damageableEntities);
         _deadEntities.insert(_deadEntities.end(), deadEntities.begin(), deadEntities.end());
+        for (int i = 0; i < deadEntities.size(); i++)
+            _core->destroyEntity(deadEntities[i]);
+        deadEntities.clear();
     }
     
     // for (std::size_t i = 0; i < deadEntities.size(); i++) {

@@ -68,8 +68,7 @@ namespace Utils
             for (size_t i = 0; i < args_number; i++) {
                 size = 0;
 
-                while ((!((descriptor & (1 << bit_position)) > 0 ) ^ (i % 2 == 0)))
-                {
+                while ((!((descriptor & (1 << bit_position)) > 0 ) ^ ((~i) & 1))) {
                     size++;
                     bit_position++;
                 }

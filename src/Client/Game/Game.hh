@@ -22,6 +22,7 @@
 #include "../../ECS/Component/Background/Background.hpp"
 #include "../../ECS/Component/AI/AI.hh"
 #include "../../ECS/Component/Button/Button.hh"
+#include "../../ECS/Component/Light/Light.hh"
 #include "../../ECS/Component/Music/Music.hh"
 #include "../../ECS/Component/Sound/Sound.hh"
 #include "../../ECS/Component/Textfield/Textfield.hh"
@@ -46,8 +47,6 @@
 
 #include "../../Utils/enemiesTypeEnum.hpp"
 #include "../../ECS/RessourcePool/RessourcePool.hh"
-
-#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
 #define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 

@@ -1,8 +1,17 @@
 #pragma once
 #include <iostream>
 #include <string>
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
+
 #include "raylib-cpp.hpp"
 
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
 namespace ECS {
     namespace Components {
 

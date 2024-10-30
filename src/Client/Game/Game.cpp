@@ -741,25 +741,6 @@ void Rtype::Game::createBoss2()
     }
 }
 
-void Rtype::Game::destroyEntity(int entityId)
-{
-    std::size_t toDestroy;
-
-    if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end()) {
-        toDestroy = _serverToLocalPlayersId.at(entityId);
-        _serverToLocalPlayersId.erase(entityId);
-    }
-    if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
-        toDestroy = _serverToLocalEnemiesId.at(entityId);
-        _serverToLocalEnemiesId.erase(entityId);
-    }
-    if (_serverToLocalProjectilesId.find(entityId) != _serverToLocalProjectilesId.end()) {
-        toDestroy = _serverToLocalProjectilesId.at(entityId);
-        _serverToLocalProjectilesId.erase(entityId);
-    }
-    _core->destroyEntity(toDestroy);
-}
-
 std::vector<int> Rtype::Game::getAIProjectile()
 {
     std::vector<int> serverProjectile;
@@ -781,27 +762,37 @@ std::vector<int> Rtype::Game::getAIProjectile()
     return serverProjectile;
 }
 
+std::vector<int> Rtype::Game::getDamagedEntities()
+{
+    std::vector<int> serverDamagedEntities;
+
+    serverDamagedEntities.insert(serverDamagedEntities.end(), _damagedEntities.begin(), _damagedEntities.end());
+    for (std::size_t i; i < serverDamagedEntities.size(); i++)
+        for (const auto& Ids : _serverToLocalPlayersId)
+            if (Ids.second == serverDamagedEntities[i])
+                serverDamagedEntities[i] = Ids.first;
+    _damagedEntities.clear();
+    return serverDamagedEntities;
+}
+
 std::vector<int> Rtype::Game::getDeadEntities()
 {
     std::vector<int> serverDeadEntities;
 
     serverDeadEntities.insert(serverDeadEntities.end(), _deadEntities.begin(), _deadEntities.end());
-    _deadEntities.clear();
     for (std::size_t i; i < serverDeadEntities.size(); i++) {
         for (const auto& Ids : _serverToLocalPlayersId)
             if (Ids.second == serverDeadEntities[i])
                 serverDeadEntities[i] = Ids.first;
         for (const auto& Ids : _serverToLocalEnemiesId)
-            if (Ids.second == serverDeadEntities[i])
+            if (Ids.second == serverDeadEntities[i]) {
                 serverDeadEntities[i] = Ids.first;
+            }
         for (const auto& Ids : _serverToLocalProjectilesId)
             if (Ids.second == serverDeadEntities[i])
                 serverDeadEntities[i] = Ids.first;
     }
-    for (int i = 0; i < serverDeadEntities.size(); i++) {
-        std::cout << "serverId[" << i << "]:" << serverDeadEntities[i] << std::endl;
-        // std::cout << "==> localId[" << i << "]:" << _serverToLocalEnemiesId[serverDeadEntities[i]] << std::endl;
-    }
+    _deadEntities.clear();
     return serverDeadEntities;
 }
 
@@ -1052,6 +1043,34 @@ void Rtype::Game::createProjectile(int entityId, int projectileId)
         createPlayerProjectile(entityId, projectileId);
 }
 
+void Rtype::Game::damageEntity(int entityId)
+{
+    std::size_t toDamage = _serverToLocalEnemiesId.at(entityId);
+    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(toDamage).getHealth();
+
+    _core->getComponent<ECS::Components::Health>(toDamage).setHealth(currentHealth - 1);
+    _core->getComponent<ECS::Components::Health>(toDamage).setInvincibility(50);
+}
+
+void Rtype::Game::destroyEntity(int entityId)
+{
+    std::size_t toDestroy;
+
+    if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end()) {
+        toDestroy = _serverToLocalPlayersId.at(entityId);
+        _serverToLocalPlayersId.erase(entityId);
+    }
+    if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
+        toDestroy = _serverToLocalEnemiesId.at(entityId);
+        _serverToLocalEnemiesId.erase(entityId);
+    }
+    if (_serverToLocalProjectilesId.find(entityId) != _serverToLocalProjectilesId.end()) {
+        toDestroy = _serverToLocalProjectilesId.at(entityId);
+        _serverToLocalProjectilesId.erase(entityId);
+    }
+    _core->destroyEntity(toDestroy);
+}
+
 void Rtype::Game::createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel)
 {
     float width = _ressourcePool.getTexture(modelPath).GetWidth();
@@ -1148,9 +1167,7 @@ void Rtype::Game::update() {
         for (int i = 0; i < projectileEntityId.size(); i++) {
             for (int j = 0; j < damageableEntities.size(); j++) {
                 if (damageableEntities[j] == projectileEntityId[i] && healthComponents[damageableEntities[j]]->getInvincibility() == 0) {
-                    std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(damageableEntities[j]).getHealth();
-                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setHealth(currentHealth - 1);
-                    _core->getComponent<ECS::Components::Health>(damageableEntities[j]).setInvincibility(50);
+                    _damagedEntities.push_back(damageableEntities[j]);
                 }
             }
             for (int j = 0; j < projectileEntities.size(); j++)
@@ -1158,8 +1175,8 @@ void Rtype::Game::update() {
                     _core->destroyEntity(projectileEntityId[i]);
                 }
         }
-        projectileEntityId.clear();
     }
+    projectileEntityId.clear();
 
     if (!_isRendering) {
         std::vector<std::size_t> deadEntities = getDeadEntitiesSystem->getDeadEntities(
@@ -1171,36 +1188,36 @@ void Rtype::Game::update() {
             _core->destroyEntity(deadEntities[i]);
         deadEntities.clear();
     }
-    
-    // for (std::size_t i = 0; i < deadEntities.size(); i++) {
-    //     if (_isRendering) {
-    //         if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
-    //             sleep(3000);//GAMEOVER
-    //     }
-    //     if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
-    //         for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
-    //             auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
-    //             int tailId = 0;
-    //             for (std::size_t j = 0; j < AIs.size(); j++)
-    //                 if (_core->getComponent<ECS::Components::AI>(AIs[j]).getEnemyType() == i) {
-    //                     tailId = AIs[j];
-    //                     break;
-    //                 }
-    //             _core->destroyEntity(tailId);
-    //         }
-    //     }
-    //     if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS2_Core) {
-    //         for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
-    //             if (_boss2Balls[balls] < 10000)
-    //                 _core->destroyEntity(_boss2Balls[balls]);
-    //     }
-    //     for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
-    //         if (_boss2Balls[balls] == deadEntities[i])
-    //             _boss2Balls[balls] = 10001;
-    //     _core->destroyEntity(deadEntities[i]);
-    //     deadEntities.clear();
-    // }
-    
+/*    
+    for (std::size_t i = 0; i < deadEntities.size(); i++) {
+        if (_isRendering) {
+            if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
+                sleep(3000);//GAMEOVER
+        }
+        if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
+            for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
+                auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
+                int tailId = 0;
+                for (std::size_t j = 0; j < AIs.size(); j++)
+                    if (_core->getComponent<ECS::Components::AI>(AIs[j]).getEnemyType() == i) {
+                        tailId = AIs[j];
+                        break;
+                    }
+                _core->destroyEntity(tailId);
+            }
+        }
+        if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS2_Core) {
+            for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
+                if (_boss2Balls[balls] < 10000)
+                    _core->destroyEntity(_boss2Balls[balls]);
+        }
+        for (std::size_t balls = 0; balls < _boss2Balls.size(); balls++)
+            if (_boss2Balls[balls] == deadEntities[i])
+                _boss2Balls[balls] = 10001;
+        _core->destroyEntity(deadEntities[i]);
+        deadEntities.clear();
+    }
+*/
     // _AIBydoShots.clear();
     std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
         _core->getComponents<ECS::Components::AI>(),

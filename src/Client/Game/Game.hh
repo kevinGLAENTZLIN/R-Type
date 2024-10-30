@@ -83,13 +83,15 @@ namespace Rtype {
         std::size_t createEnemy(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void createBoss1();
         void createBoss2();
-        void destroyEntity(int entityId);
         void movePlayer(int id, float x, float y);
-        void createProjectile(int entityId, int projectileId);
         void failToConnect();
         void joinGame();
+        void createProjectile(int entityId, int projectileId);
+        void damageEntity(int entityId);
+        void destroyEntity(int entityId);
 
         std::vector<int> getAIProjectile();
+        std::vector<int> getDamagedEntities();
         std::vector<int> getDeadEntities();
 
     private:
@@ -154,5 +156,6 @@ namespace Rtype {
         std::vector<std::size_t> _AIBydoShots;
         std::vector<std::size_t> _AIHomingShots;
         std::vector<std::size_t> _deadEntities;
+        std::vector<std::size_t> _damagedEntities;
     };
 };

@@ -52,6 +52,13 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
                 ECS::ComponentManager::SparseArray<ECS::Components::Health> & healths,
                 std::size_t player, std::vector<std::size_t> & entities);
+
+            void AIHitPod(
+                ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
+                ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
+                ECS::ComponentManager::SparseArray<ECS::Components::Health> & healths,
+                std::vector<std::size_t> &pods, std::vector<std::size_t> &AIs);
+
         };
     }
 }

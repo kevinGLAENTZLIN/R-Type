@@ -14,6 +14,11 @@
 #include "../../Component/AI/AI.hh"
 #include <map>
 #include <cmath>
+
+#if defined(_WIN32)           
+    #define M_PI 3.14159265358979323846
+#endif
+
 namespace ECS {
     namespace Systems {
 

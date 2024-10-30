@@ -20,6 +20,7 @@
 	#undef near
 	#undef far
 #endif
+
 namespace ECS {
     namespace Components {
 

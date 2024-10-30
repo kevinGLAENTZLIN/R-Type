@@ -20,8 +20,9 @@ typedef enum enemiesTypeEnum_e {
     PATAPATA,
     BUG,
     BINK,
-    SCANT,
+    BLASTER,
     BYDOSHOT,
+    HOMINGSHOT,
     BOSS1_Core,
     BOSS1_Tail0,
     BOSS1_Tail1,
@@ -43,6 +44,46 @@ typedef enum enemiesTypeEnum_e {
     BOSS1_Tail17,
     BOSS1_Tail18,
     BOSS1_Tail19,
+    BOSS2_Core,
+    BOSS2_Ball0,
+    BOSS2_Ball1,
+    BOSS2_Ball2,
+    BOSS2_Ball3,
+    BOSS2_Ball4,
+    BOSS2_Ball5,
+    BOSS2_Ball6,
+    BOSS2_Ball7,
+    BOSS2_Ball8,
+    BOSS2_Ball9,
+    BOSS2_Ball10,
+    BOSS2_Ball11,
+    BOSS2_Ball12,
+    BOSS2_Ball13,
+    BOSS2_Ball14,
+    BOSS2_Ball15,
+    BOSS2_Ball16,
+    BOSS2_Ball17,
+    BOSS2_Ball18,
+    BOSS2_Ball19,
+    BOSS2_Ball20,
+    BOSS2_Ball21,
+    BOSS2_Ball22,
+    BOSS2_Ball23,
+    BOSS2_Ball24,
+    BOSS2_Ball25,
+    BOSS2_Ball26,
+    BOSS2_Ball27,
+    BOSS2_Ball28,
+    BOSS2_Ball29,
+    BOSS2_Ball30,
+    BOSS2_Ball31,
+    BOSS2_Ball32,
+    BOSS2_Ball33,
+    BOSS2_Ball34,
+    BOSS2_Ball35,
+    BOSS2_Ball36,
+    BOSS2_Ball37,
+    BOSS2_Ball38
 } enemiesTypeEnum_t;
 
 class ecsUtils {
@@ -56,52 +97,16 @@ public:
             return BUG;
         if (type == "BINK")
             return BINK;
-        if (type == "SCANT")
-            return SCANT;
+        if (type == "BLASTER")
+            return BLASTER;
         if (type == "BYDOSHOT")
             return BYDOSHOT;
+        if (type == "HOMINGSHOT")
+            return HOMINGSHOT;
         if (type == "BOSS1_Core")
             return BOSS1_Core;
-        if (type == "BOSS1_Tail0")
-            return BOSS1_Tail0;
-        if (type == "BOSS1_Tail1")
-            return BOSS1_Tail1;
-        if (type == "BOSS1_Tail2")
-            return BOSS1_Tail2;
-        if (type == "BOSS1_Tail3")
-            return BOSS1_Tail3;
-        if (type == "BOSS1_Tail4")
-            return BOSS1_Tail4;
-        if (type == "BOSS1_Tail5")
-            return BOSS1_Tail5;
-        if (type == "BOSS1_Tail6")
-            return BOSS1_Tail6;
-        if (type == "BOSS1_Tail7")
-            return BOSS1_Tail7;
-        if (type == "BOSS1_Tail8")
-            return BOSS1_Tail8;
-        if (type == "BOSS1_Tail9")
-            return BOSS1_Tail9;
-        if (type == "BOSS1_Tail10")
-            return BOSS1_Tail10;
-        if (type == "BOSS1_Tail11")
-            return BOSS1_Tail11;
-        if (type == "BOSS1_Tail12")
-            return BOSS1_Tail12;
-        if (type == "BOSS1_Tail13")
-            return BOSS1_Tail13;
-        if (type == "BOSS1_Tail14")
-            return BOSS1_Tail14;
-        if (type == "BOSS1_Tail15")
-            return BOSS1_Tail15;
-        if (type == "BOSS1_Tail16")
-            return BOSS1_Tail16;
-        if (type == "BOSS1_Tail17")
-            return BOSS1_Tail17;
-        if (type == "BOSS1_Tail18")
-            return BOSS1_Tail18;
-        if (type == "BOSS1_Tail19")
-            return BOSS1_Tail19;
+        if (type == "BOSS2_Core")
+            return BOSS2_Core;
         return UNKNOWN;
     };
 

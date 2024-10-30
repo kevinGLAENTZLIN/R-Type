@@ -18,7 +18,7 @@ void ECS::Systems::SystemRender3D::update(
 {
     raylib::Vector3 rotation = {0.0f, 0.0f, 0.0f};
     raylib::Vector3 scale = {1.0f, 1.0f, 1.0f};
-    bool drawHitBox = true;
+    bool drawHitBox = false;
 
     camera.BeginMode();
     for (auto &entity : entities) {

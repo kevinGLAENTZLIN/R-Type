@@ -14,7 +14,6 @@ if (WIN32)
     set(CMAKE_GENERATOR "Visual Studio 17 2022")
     set(CMAKE_GENERATOR_PLATFORM "x64")
     add_definitions(-D_WIN32_WINNT=0x0601)
-
     if(MSVC)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS")
     else()

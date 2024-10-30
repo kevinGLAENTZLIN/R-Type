@@ -20,37 +20,62 @@ namespace Utils
          * @param offset The offset to start reading from.
          * @param msg The bytes vector to read from.
          * @param type The type to read.
+         * @param size The size of the type to read.
          * @return The value read as a std::any.
          */
-        std::any Protocol::newParam(std::size_t &offset, bytes msg, char type_)
+        std::any Protocol::newParam(std::size_t &offset, bytes msg, char type_, std::size_t size)
         {
-            char char_placeholder;
-            int32_t int_placeholder;
-            double float_placeholder;
-            bool bool_placeholder;
+            char char_placeholder = '\0';
+            int16_t int_placeholder = 0;
+            double float_placeholder = 0.0;
+            bool bool_placeholder = false;
+            std::any value;
 
-
+            std::cout << "Type: [" << type_ << "] of size: [" << size << "]"<< std::endl;
             switch (type_)
             {
             case 'c':
-                std::memcpy(&char_placeholder, msg.data() + offset, sizeof(char));
-                offset += sizeof(char);
-                return std::any(char_placeholder);
+                std::memcpy(&char_placeholder, msg.data() + offset, size);
+                value =  std::any(char_placeholder);
+                break;
             case 'i':
-                std::memcpy(&int_placeholder, msg.data() + offset, sizeof(int32_t));
-                offset += sizeof(int32_t);
-                return std::any(int_placeholder);
+                std::memcpy(&int_placeholder, msg.data() + offset, size);
+                value =  std::any(static_cast<int32_t>(int_placeholder));
+                break;
             case 'f':
-                std::memcpy(&float_placeholder, msg.data() + offset, sizeof(double));
-                offset += sizeof(double);
-                return std::any(float_placeholder);
+                std::memcpy(&int_placeholder, msg.data() + offset, size);
+                float_placeholder = static_cast<double>(int_placeholder) / 1000.0;
+                value =  std::any(float_placeholder);
+                break;
             case 'b':
-                std::memcpy(&bool_placeholder, msg.data() + offset, sizeof(bool));
-                offset += sizeof(bool);
-                return std::any(bool_placeholder);
+                std::memcpy(&bool_placeholder, msg.data() + offset, size);
+                value =  std::any(bool_placeholder);
+                break;
             default:
                 throw std::runtime_error("Unknown type");
             }
+
+            offset += size;
+            return value;
+        }
+
+        std::vector<std::size_t> Protocol::decryptDescriptor(uint16_t descriptor, size_t args_number)
+        {
+            std::vector<std::size_t> sizes;
+            size_t bit_position = 0;
+            size_t size = 0;
+
+            for (size_t i = 0; i < args_number; i++) {
+                size = 0;
+
+                while ((!((descriptor & (1 << bit_position)) > 0 ) ^ ((~i) & 1))) {
+                    size++;
+                    bit_position++;
+                }
+                sizes.push_back(size);
+            }
+
+            return sizes;
         }
 
         /**
@@ -67,6 +92,9 @@ namespace Utils
             std::vector<std::any> params;
             std::size_t offset = 0;
             std::string params_types;
+            uint16_t args_bytes = 0;
+            std::vector<std::size_t> args_sizes;
+            
 
             Utils::ParametersMap::init_map();
 
@@ -76,13 +104,17 @@ namespace Utils
             offset += INFO_TYPE_SIZE;
             std::memcpy(&functionDefiner, msg.data() + offset, FUNCTION_TYPE_SIZE);
             offset += FUNCTION_TYPE_SIZE;
+            std::memcpy(&args_bytes, msg.data() + offset, DESCRIPTOR_SIZE);
+            offset += DESCRIPTOR_SIZE;
+
             if (isClient)
                 params_types = Utils::ParametersMap::getParameterTypePerFunctionClient(info, functionDefiner);
             else
                 params_types = Utils::ParametersMap::getParameterTypePerFunctionServer(info, functionDefiner);
-            
-            for (char type_ : params_types)
-                params.push_back(newParam(offset, msg, type_));
+            args_sizes = decryptDescriptor(args_bytes, params_types.size());
+
+            for (size_t i = 0; i < params_types.size(); i++)
+                params.push_back(newParam(offset, msg, params_types[i], args_sizes[i]));
 
             return Response(ack, info, functionDefiner, params);
         }

@@ -37,6 +37,37 @@ namespace Utils
             static const std::size_t PARAMS_SIZE_SIZE = sizeof(uint8_t);
             static const std::size_t INFO_TYPE_SIZE = sizeof(uint8_t);
             static const std::size_t FUNCTION_TYPE_SIZE = sizeof(uint8_t);
+            static const std::size_t DESCRIPTOR_SIZE = sizeof(uint16_t);
+
+            template <typename T>
+            static void updateDescriptor(uint16_t &descriptor, std::size_t &bit_position, T value)
+            {
+                std::size_t num_bits = 1;
+
+                if constexpr (std::is_same<T, int>::value) {
+                    if ((value & 0xFF00) != 0)
+                        num_bits = 2;
+                }
+                else if constexpr (std::is_same<T, double>::value)
+                    num_bits = 2;
+
+                for (size_t i = 0; i < num_bits; i++)
+                    if (bit_position == 0 || ((1 << (bit_position - 1)) & descriptor) == 0)
+                        descriptor |= (1 << (bit_position + i));
+                    else
+                        descriptor &= ~(1 << (bit_position + i));
+                
+                bit_position += num_bits;
+                for (size_t i = bit_position; i < sizeof(uint16_t) * 8; i++)
+                {
+                    if (((1 << (bit_position - 1)) & descriptor) == 0)
+                        descriptor |= (1 << (i));
+                    else
+                        descriptor &= ~(1 << (i));
+                }
+
+
+            }
 
             /**
              * @brief Appends a fixed-size type into a bytes vector.
@@ -45,11 +76,32 @@ namespace Utils
              * @param msg The bytes vector to append the value to.
              * @param value The value to append.
              */
-            template<typename T>
-            static void appendFixedSizeTypeIntoBytes(bytes &msg, T value) {
-                bytes converted_value(sizeof(T));
+            template <typename T>
+            static void appendFixedSizeTypeIntoBytes(bytes &msg, T value)
+            {
+                bytes converted_value;
+                int16_t scaled_value;
 
-                std::memcpy(converted_value.data(), &value, sizeof(T));
+                if constexpr (std::is_same<T, int>::value) {
+                    scaled_value = static_cast<int16_t>(value);
+                    if ((value & 0xFF00) == 0) {
+                        converted_value.resize(1);
+                        converted_value[0] = static_cast<uint8_t>(value);
+                    } else {
+                        converted_value.resize(2);
+                        std::memcpy(converted_value.data(), &value, 2);
+                    }
+                }
+                else if constexpr (std::is_same<T, double>::value) {
+                        scaled_value = static_cast<int16_t>(value * 1000.0);
+                        converted_value.resize(sizeof(scaled_value));
+                        std::memcpy(converted_value.data(), &scaled_value, sizeof(scaled_value));
+                }
+                else {
+                    converted_value.resize(sizeof(T));
+                    std::memcpy(converted_value.data(), &value, sizeof(T));
+                }
+
                 msg.insert(msg.end(), converted_value.begin(), converted_value.end());
             }
 
@@ -61,8 +113,16 @@ namespace Utils
              * @param type_ The type of the value to extract.
              * @return The extracted value in a std::any.
              */
-            static std::any newParam(std::size_t &offset, bytes msg, char type_);
+            static std::any newParam(std::size_t &offset, bytes msg, char type_, std::size_t size);
 
+            /**
+             * @brief Decrypts the descriptor to get the sizes of each argument.
+             *
+             * @param descriptor The descriptor to decrypt.
+             * @param args_number The number of arguments.
+             * @return A vector containing the sizes of the arguments.
+             */
+            static std::vector<std::size_t> decryptDescriptor(uint16_t descriptor, size_t args_number);
 
         public:
             Protocol() = delete;
@@ -76,6 +136,9 @@ namespace Utils
              */
             static std::vector<Utils::PrimitiveType>  va_listToVector(va_list params, std::string params_type) {
                 std::vector<Utils::PrimitiveType> args;
+                int int_arg;
+                double double_arg;
+
                 for (const char c: params_type) {
                     switch (c) {
                         case 'b':
@@ -85,12 +148,19 @@ namespace Utils
                             args.push_back(va_arg(params, int));
                             break;
                         case 'i':
-                            args.push_back(va_arg(params, int));
+                            int_arg = va_arg(params, int);
+                            if (int_arg >= -32768 && int_arg <= 32767)
+                                throw std::runtime_error("int argument is too big");
+                            args.push_back(int_arg);
                             break;
                         case 'f':
-                            args.push_back(va_arg(params, double));
+                            double_arg = va_arg(params, double);
+                            if (double_arg > 32.0 || double_arg < -32.0)
+                                throw std::runtime_error("double argument is too big or too small");
+                            args.push_back(double_arg);
                             break;
                         default:
+                            throw std::runtime_error("Unknown type");
                             break;
                     }
                 }
@@ -111,13 +181,19 @@ namespace Utils
             static bytes CreateMsg(uint32_t ack, Utils::InfoTypeEnum info, T functionDefiner, std::vector<Utils::PrimitiveType> args)
             {
                 bytes msg;
+                std::size_t args_byte_bit_offset = 0x0;
+                std::size_t args_byte_position = 0x0;
 
                 appendFixedSizeTypeIntoBytes(msg, ack);
                 appendFixedSizeTypeIntoBytes(msg, info);
                 appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner));
+                args_byte_position = msg.size();
+                appendFixedSizeTypeIntoBytes(msg, static_cast<uint16_t>(0x00));
+
                 for (const auto &arg: args) {
-                    std::visit([&msg](auto &&value) {
+                    std::visit([&msg, &args_byte_bit_offset, args_byte_position](auto &&value) {
                         using P = std::decay_t<decltype(value)>;
+                        updateDescriptor<P>(*reinterpret_cast<uint16_t*>(&msg[args_byte_position]), args_byte_bit_offset, value);
                         appendFixedSizeTypeIntoBytes<P>(msg, value);
                     }, arg);
                 }

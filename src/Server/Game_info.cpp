@@ -147,6 +147,8 @@ void Rtype::Game_info::computeTick(void)
         _tick += 1;
         currentGameTimeInSeconds = _tick / 20;
         computeGame(currentGameTimeInSeconds);
+        if (_tick == MAX_UINT32 - 1)
+            _tick = 0;
     }
 }
 

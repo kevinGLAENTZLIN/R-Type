@@ -125,7 +125,7 @@ void Rtype::udpServer::setHandleGameInfoMap() {
         _network->addCommandToInvoker(std::move(join_cmd));
         if (join_game) {
             CONSOLE_INFO("Player is joining game: ", id_room)
-            spawn_cmd->set_server(_clients, get_sender_client_id(), -10., 0.);
+            spawn_cmd->set_server(_clients, get_sender_client_id(), id_room, -10., 0.);
             spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend(), _games->at(id_room)->getGame());
             _network->addCommandToInvoker(std::move(spawn_cmd));
             CONSOLE_INFO("Player is spawning in game: ", id_room)
@@ -139,10 +139,11 @@ void Rtype::udpServer::setHandleGameInfoMap() {
 void Rtype::udpServer::setHandlePlayerMap() {
     _handlePlayerMap[Utils::PlayerEnum::PlayerSpawnOnGame] = [this](Utils::Network::Response clientResponse) {
         std::unique_ptr<Rtype::Command::Player::Spawn> cmd = convertACommandToCommand<Rtype::Command::Player::Spawn>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerSpawnOnGame)));
-        int gameID = _clients->at(get_sender_client_id())->getRoom();
+        int senderID = get_sender_client_id();
+        int gameID = _clients->at(senderID)->getRoom();
 
-        cmd->set_server(_games->at(gameID)->getPlayers(),get_sender_client_id(), _clients->at(get_sender_client_id())->getX(), _clients->at(get_sender_client_id())->getY());
-        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
+        cmd->set_server(_games->at(gameID)->getPlayers(), senderID, gameID, _clients->at(senderID)->getX(), _clients->at(senderID)->getY());
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(senderID)->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
     };
 

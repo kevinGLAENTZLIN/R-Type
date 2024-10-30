@@ -17,6 +17,8 @@
 #include "Client_info.hpp"
 #include "Parser/LoadData/LoadData.hh"
 
+#define MAX_UINT32  (4294967295U)
+
 namespace Rtype
 {
     class Game;

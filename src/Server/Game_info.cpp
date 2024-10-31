@@ -13,12 +13,12 @@
 #include <vector>
 
 Rtype::Game_info::Game_info():
-	_id(-1), _level(0), _nbMaxPlayer(6), _nbProjectiles(10), _tick(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
+	_id(-1), _level(0), _difficulty(1), _nbMaxPlayer(6), _nbProjectiles(10), _tick(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
 {
 }
 
-Rtype::Game_info::Game_info(int id):
-	_id(id), _level(0), _nbMaxPlayer(6), _nbProjectiles(10), _tick(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
+Rtype::Game_info::Game_info(int id, int difficulty, int nbMaxPlayer):
+	_id(id), _level(0), _difficulty(difficulty), _nbMaxPlayer(nbMaxPlayer), _nbProjectiles(10), _tick(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
 {
     _loadData.LoadDataFromFile("stage1.json");
     _enemySpawnData = _loadData.GetEnemySpawnData();
@@ -36,7 +36,7 @@ Rtype::Game_info::~Game_info()
 }
 
 Rtype::Game_info::Game_info(Game_info &&other) noexcept:
-	_id(other._id), _level(other._level), _nbMaxPlayer(other._nbMaxPlayer), _tick(other._tick),
+	_id(other._id), _level(other._level), _difficulty(other._difficulty), _nbMaxPlayer(other._nbMaxPlayer), _tick(other._tick),
     _tickThread(std::move(other._tickThread)), _players(std::move(other._players)), _toSetNetwork(other._toSetNetwork)
 {
     other._id = -1;
@@ -45,6 +45,7 @@ Rtype::Game_info::Game_info(Game_info &&other) noexcept:
     other._nbProjectiles = 10;
     other._tick = 0;
     other._nextEnemyIndex = 0;
+    other._difficulty = 0;
 }
 
 Rtype::Game_info &Rtype::Game_info::operator=(Game_info &&other) noexcept
@@ -63,6 +64,7 @@ Rtype::Game_info &Rtype::Game_info::operator=(Game_info &&other) noexcept
 		_toSetNetwork = other._toSetNetwork;
         _nbProjectiles = other._nbProjectiles;
         _nextEnemyIndex = other._nextEnemyIndex;
+        _difficulty = other._difficulty;
 
         other._id = -1;
         other._level = 0;
@@ -118,7 +120,9 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
     if (!_enemySpawnData.empty()) {
         Rtype::EnemySpawnData enemyData = _enemySpawnData.top();
 
-        if (currentGameTimeInSeconds >= enemyData.getSpawnTimeInSeconds()) {
+        if (enemyData.getDifficulty() != _difficulty)
+            _enemySpawnData.pop();
+        else if (currentGameTimeInSeconds >= enemyData.getSpawnTimeInSeconds()) {
             std::unique_ptr<Rtype::Command::Enemy::Spawn> spawn_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Spawn, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemySpawn);
 
             spawn_cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());

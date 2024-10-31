@@ -12,6 +12,16 @@
 
 #pragma once
 
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
+
 #include <boost/asio.hpp>
 #include <iostream>
 #include <memory>

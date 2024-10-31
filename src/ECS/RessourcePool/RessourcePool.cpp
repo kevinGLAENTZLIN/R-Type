@@ -31,14 +31,14 @@ void ECS::RessourcePool::UnloadAll()
     }
 }
 
-raylib::Model& ECS::RessourcePool::getModel(std::string modelPath)
+raylib::Model& ECS::RessourcePool::getModel(const std::string &modelPath)
 {
-    return _models[modelPath];
+    return _models.at(modelPath);
 }
 
-raylib::Texture& ECS::RessourcePool::getTexture(std::string texturePath)
+raylib::Texture& ECS::RessourcePool::getTexture(const std::string &texturePath)
 {
-    return _textures[texturePath];
+    return _textures.at(texturePath);
 }
 
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)

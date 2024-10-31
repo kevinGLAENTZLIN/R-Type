@@ -6,7 +6,18 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
 
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
+
+#include "../ICommand.hh"
+#include "../ACommand.hpp"
 #include "../../Utils/ParametersMap/ParametersMap.hpp"
 #include <functional>
 #include <iostream>

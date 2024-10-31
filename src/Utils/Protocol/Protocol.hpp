@@ -66,7 +66,7 @@ namespace Utils
                         descriptor |= (1 << (bit_position + i));
                     else
                         descriptor &= ~(1 << (bit_position + i));
-                
+
                 bit_position += num_bits;
                 for (size_t i = bit_position; i < sizeof(uint16_t) * 8; i++)
                 {
@@ -175,7 +175,7 @@ namespace Utils
                             break;
                         case 'i':
                             int_arg = va_arg(params, int);
-                            if (int_arg >= -32768 && int_arg <= 32767)
+                            if (int_arg < -32768 || int_arg > 32767)
                                 throw std::runtime_error("int argument is too big");
                             args.push_back(int_arg);
                             break;

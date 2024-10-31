@@ -19,11 +19,13 @@
 #include "../Commands/Game_info/Game_result/Game_result.hh"
 #include "../Commands/Game_info/Join_game/Join_game.hh"
 #include "../Commands/Game_info/Level_complete/Level_complete.hh"
+#include "../Commands/Game_info/Missing_packages/Missing_packages.hh"
 
 #include "../Commands/Player/Attack/Attack.hh"
 #include "../Commands/Player/Die/Die.hh"
 #include "../Commands/Player/Hit_wall/Hit_wall.hh"
 #include "../Commands/Player/Move/Move.hh"
+#include "../Commands/Player/Position/Position.hh"
 #include "../Commands/Player/Power_up/Power_up.hh"
 #include "../Commands/Player/Score/Score.hh"
 #include "../Commands/Player/Spawn/Spawn.hh"

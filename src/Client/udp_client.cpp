@@ -13,23 +13,36 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
 {
     _network = std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client");
     _game = std::make_unique<Rtype::Game>(_network, true);
-    // _timeThread = std::thread([this]() {
-    //     std::vector<uint32_t> missing_ack;
-    //     std::size_t missing_ack_size = 0;
-    //     std::unique_ptr<Rtype::Command::GameInfo::> ;
+    _timeThread = std::thread([this]() {
+        std::vector<uint32_t> missing_ack;
+        std::size_t missing_ack_size = 0;
+        std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> cmd;
+        std::size_t tail_size;
 
-    //     while (true) {
-    //         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //         missing_ack = getMissingPackages();
-    //         missing_ack_size = missing_ack.size();
-    //         for (size_t i = 0; i < (missing_ack_size >> 2); i++) {
-                
-    //         }
-    //         if ((~missing_ack_size) & 3) {
-                
-    //         }
-    //     }
-    // });
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            missing_ack = getMissingPackages();
+            missing_ack_size = missing_ack.size();
+            tail_size = (~missing_ack_size) & 3;
+
+            for (size_t i = 0; i < (missing_ack_size >> 2); i++) {
+                cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
+                cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                cmd->set_client(missing_ack[i * 4], missing_ack[i * 4 + 1], missing_ack[i * 4 + 2], missing_ack[i * 4 + 3]);
+                _network->addCommandToInvoker(std::move(cmd));
+            }
+            if (tail_size) {
+                cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
+                cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                cmd->set_client(
+                    missing_ack[missing_ack_size - 1],
+                    (tail_size & 2) ? missing_ack[missing_ack_size - 2] : 0,
+                    (tail_size == 3) ? missing_ack[missing_ack_size - 3] : 0,
+                    0
+                );
+            }
+        }
+    });
     setHandleMaps();
     connectClient();
     read_server();
@@ -208,6 +221,13 @@ void Rtype::udpClient::setHandlePlayerMap() {
         _game->movePlayer(player_id, x, y);
     };
 
+    _handlePlayerMap[Utils::PlayerEnum::Position] = [this](Utils::Network::Response response) {
+        double x = response.PopParam<double>();
+        double y = response.PopParam<double>();
+
+        _game->setPlayerPos(_id, x, y);
+    };
+
     _handlePlayerMap[Utils::PlayerEnum::PlayerAttack] = [this](Utils::Network::Response response) {
         std::unique_ptr<Rtype::Command::Player::Attack> cmd = _network->convertACommandToCommand<Rtype::Command::Player::Attack>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::Player), static_cast<uint8_t>(Utils::PlayerEnum::PlayerAttack)));
 
@@ -356,7 +376,7 @@ void Rtype::udpClient::connectClient()
 std::vector<uint32_t> Rtype::udpClient::getMissingPackages()
 {
     std::vector<uint32_t> missingPackages;
-    for (int i = 1; i <= _biggestAck; i++) {
+    for (int i = 1; i < _biggestAck; i++) {
         if (_recivedPackages.find(i) == _recivedPackages.end())
             missingPackages.push_back(i);
     }

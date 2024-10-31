@@ -7,12 +7,15 @@
 
 #include "Missing_packages.hh"
 
-void Rtype::Command::GameInfo::Missing_packages::set_server()
+void Rtype::Command::GameInfo::Missing_packages::set_server(Utils::Network::bytes msg)
 {
+    _msg = msg;
 }
 
 void Rtype::Command::GameInfo::Missing_packages::execute_server_side()
 {
+    _senderSocket->async_send_to(boost::asio::buffer(_msg), _endpoint,
+    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
 }
 
 void Rtype::Command::GameInfo::Missing_packages::set_client(uint32_t ack0, uint32_t ack1, uint32_t ack2, uint32_t ack3)

@@ -142,13 +142,17 @@ void Rtype::udpServer::setHandleGameInfoMap() {
     _handleGameInfoMap[Utils::GameInfoEnum::MissingPackages] = [this](Utils::Network::Response clientResponse) {
         int ack = 0;
         Utils::Network::bytes msg;
+        std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> cmd;
 
         for (std::size_t i = 0; i < 4; i++) {
             ack = clientResponse.PopParam<int>();
             if (ack == 0)
                 break;
             msg = _clients->at(get_sender_client_id())->getCmdFromHistory(ack);
-            // Ask Gabin how to do a raw Send
+            cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_server(msg);
+            _network->addCommandToInvoker(std::move(cmd));
         }
     };
 }

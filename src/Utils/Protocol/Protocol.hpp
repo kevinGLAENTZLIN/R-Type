@@ -44,7 +44,17 @@ namespace Utils
             {
                 std::size_t num_bits = 1;
 
-                if constexpr (std::is_same<T, int>::value) {
+                if constexpr (std::is_same<T, uint32_t>::value) {
+                    if (value & 0xFF000000)
+                        num_bits = 4;
+                    else if (value & 0x00FF0000)
+                        num_bits = 3;
+                    else if (value & 0x0000FF00)
+                        num_bits = 2;
+                    else
+                        num_bits = 1;
+                }
+                else if constexpr (std::is_same<T, int>::value) {
                     if ((value & 0xFF00) != 0)
                         num_bits = 2;
                 }
@@ -77,13 +87,29 @@ namespace Utils
              * @param value The value to append.
              */
             template <typename T>
-            static void appendFixedSizeTypeIntoBytes(bytes &msg, T value)
+            static void appendFixedSizeTypeIntoBytes(bytes &msg, T value, bool isAck)
             {
                 bytes converted_value;
                 int16_t scaled_value;
 
-                if constexpr (std::is_same<T, int>::value) {
-                    scaled_value = static_cast<int16_t>(value);
+                if constexpr (std::is_same<T, uint32_t>::value) {
+                    std::cout << "Value: " << value << std::endl;
+                    if (isAck) {
+                        converted_value.resize(ACK_SIZE);
+                        std::memcpy(converted_value.data(), &value, ACK_SIZE);
+                    } else {
+                        if (value & 0xFF000000) {
+                            converted_value.resize(4);
+                        } else if (value & 0x00FF0000) {
+                            converted_value.resize(3);
+                        } else if (value & 0x0000FF00) {
+                            converted_value.resize(2);
+                        } else {
+                            converted_value.resize(1);
+                        }
+                    }
+                    std::memcpy(converted_value.data(), &value, converted_value.size());
+                } else if constexpr (std::is_same<T, int>::value) {
                     if ((value & 0xFF00) == 0) {
                         converted_value.resize(1);
                         converted_value[0] = static_cast<uint8_t>(value);
@@ -159,6 +185,9 @@ namespace Utils
                                 throw std::runtime_error("double argument is too big or too small");
                             args.push_back(double_arg);
                             break;
+                        case 'l':
+                            int_arg = va_arg(params, int);
+                            args.push_back(int_arg);
                         default:
                             throw std::runtime_error("Unknown type");
                             break;
@@ -184,17 +213,17 @@ namespace Utils
                 std::size_t args_byte_bit_offset = 0x0;
                 std::size_t args_byte_position = 0x0;
 
-                appendFixedSizeTypeIntoBytes(msg, ack);
-                appendFixedSizeTypeIntoBytes(msg, info);
-                appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner));
+                appendFixedSizeTypeIntoBytes(msg, ack, true);
+                appendFixedSizeTypeIntoBytes(msg, info, false);
+                appendFixedSizeTypeIntoBytes(msg, static_cast<uint8_t>(functionDefiner), false);
                 args_byte_position = msg.size();
-                appendFixedSizeTypeIntoBytes(msg, static_cast<uint16_t>(0x00));
+                appendFixedSizeTypeIntoBytes(msg, static_cast<uint16_t>(0x00), false);
 
                 for (const auto &arg: args) {
                     std::visit([&msg, &args_byte_bit_offset, args_byte_position](auto &&value) {
                         using P = std::decay_t<decltype(value)>;
                         updateDescriptor<P>(*reinterpret_cast<uint16_t*>(&msg[args_byte_position]), args_byte_bit_offset, value);
-                        appendFixedSizeTypeIntoBytes<P>(msg, value);
+                        appendFixedSizeTypeIntoBytes<P>(msg, value, value);
                     }, arg);
                 }
                 return msg;

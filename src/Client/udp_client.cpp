@@ -9,10 +9,27 @@
 #include "../Utils/Protocol/Protocol.hpp"
 
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort):
-    _id(-1), _ioContext()
+    _id(-1), _ioContext() , _biggestAck(0)
 {
     _network = std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client");
     _game = std::make_unique<Rtype::Game>(_network, true);
+    // _timeThread = std::thread([this]() {
+    //     std::vector<uint32_t> missing_ack;
+    //     std::size_t missing_ack_size = 0;
+    //     std::unique_ptr<Rtype::Command::GameInfo::> ;
+
+    //     while (true) {
+    //         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //         missing_ack = getMissingPackages();
+    //         missing_ack_size = missing_ack.size();
+    //         for (size_t i = 0; i < (missing_ack_size >> 2); i++) {
+                
+    //         }
+    //         if ((~missing_ack_size) & 3) {
+                
+    //         }
+    //     }
+    // });
     setHandleMaps();
     connectClient();
     read_server();
@@ -27,6 +44,9 @@ Rtype::udpClient::~udpClient()
     _ioContext.stop();
     if (_networkThread.joinable()) {
         _networkThread.join();
+    }
+    if (_timeThread.joinable()) {
+        _timeThread.join();
     }
 
     std::cout << "Client disconnected successfully." << std::endl;
@@ -155,6 +175,11 @@ void Rtype::udpClient::setHandleGameInfoMap()
         int level = response.PopParam<int>();
 
         std::cerr << "Level " << level << " completed." << std::endl;
+    };
+    
+    _handleGameInfoMap[Utils::GameInfoEnum::MissingPackages] = [this](Utils::Network::Response response) {
+        (void)response;
+        std::cerr << "Missing packages should not be recived by the client" << std::endl;
     };
 };
 
@@ -285,6 +310,11 @@ void Rtype::udpClient::setHandleBossMap() {
 void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 {
     Utils::InfoTypeEnum cmd_category = clientResponse.GetInfoType();
+    uint32_t ack = clientResponse.getACK();
+
+    _recivedPackages.insert(ack);
+    if (ack > _biggestAck)
+        _biggestAck = ack;
 
     if (((int)cmd_category != 1 && (int)clientResponse.GetInfoFunction() != 2) &&
         ((int)cmd_category != 5 && (int)clientResponse.GetInfoFunction() != 0)) {
@@ -321,4 +351,14 @@ void Rtype::udpClient::connectClient()
     std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd_connection = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Client_connection, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected);
     cmd_connection->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
     _network->addCommandToInvoker(std::move(cmd_connection));
+}
+
+std::vector<uint32_t> Rtype::udpClient::getMissingPackages()
+{
+    std::vector<uint32_t> missingPackages;
+    for (int i = 1; i <= _biggestAck; i++) {
+        if (_recivedPackages.find(i) == _recivedPackages.end())
+            missingPackages.push_back(i);
+    }
+    return missingPackages;
 }

@@ -18,6 +18,7 @@
 #include <thread>
 #include <vector>
 #include <array>
+#include <unordered_set>
 
 #include "../Utils/Network/Network.hpp"
 
@@ -52,6 +53,7 @@ namespace Rtype {
          */
         void run();  // This will now spawn two threads: one for game, one for network.
 
+        std::vector<uint32_t> getMissingPackages(); // used in the time thread
     private:
         void read_server();
 
@@ -85,9 +87,12 @@ namespace Rtype {
 
         int _id;
         boost::asio::io_context _ioContext;
+        std::unordered_set<uint32_t> _recivedPackages;
+        uint32_t _biggestAck;
         std::shared_ptr<Rtype::Network> _network;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
+        std::thread _timeThread;
         std::unique_ptr<Rtype::Game> _game;
     };
 }

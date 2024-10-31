@@ -237,6 +237,9 @@ void Rtype::udpClient::setHandleEnemyMap() {
     };
     _handleEnemyMap[Utils::EnemyEnum::EnemyDie] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();
+
+        _game->damageEntity(enemyId);
+        CONSOLE_INFO(enemyId, " passed away...");
     };
 
     _handleEnemyMap[Utils::EnemyEnum::EnemyMove] = [this](Utils::Network::Response response) {
@@ -247,7 +250,14 @@ void Rtype::udpClient::setHandleEnemyMap() {
     _handleEnemyMap[Utils::EnemyEnum::EnemyDestroy] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();
 
+        CONSOLE_INFO(enemyId, " is destroyed")
         _game->destroyEntity(enemyId);
+    };
+    _handleEnemyMap[Utils::EnemyEnum::EnemyDamage] = [this](Utils::Network::Response response) {
+        int enemyId = response.PopParam<int>();
+
+        CONSOLE_INFO(enemyId, " take damages")
+        _game->damageEntity(enemyId);
     };
 };
 
@@ -304,8 +314,8 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
 
     if (((int)cmd_category != 1 && (int)clientResponse.GetInfoFunction() != 2) &&
         ((int)cmd_category != 5 && (int)clientResponse.GetInfoFunction() != 0)) {
-        CONSOLE_INFO("Handle Response: ", (int)cmd_category)
-        CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
+        CONSOLE_INFO("Handle Response category: ", (int)cmd_category)
+        CONSOLE_INFO("Handle Response index: ", (int)clientResponse.GetInfoFunction())
     }
     switch (cmd_category) {
     case Utils::InfoTypeEnum::GameInfo:

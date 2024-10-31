@@ -80,6 +80,7 @@ void Rtype::udpServer::setHandleMaps() {
     setHandlePlayerMap();
     setHandlePowerUpMap();
     setHandleProjectileMap();
+    setHandleEnemyMap();
 }
 
 void Rtype::udpServer::setHandleGameInfoMap() {
@@ -219,6 +220,31 @@ void Rtype::udpServer::setHandlePowerUpMap() {
     std::cerr << "PowerUpNotImplemented" << std::endl;
 }
 
+void Rtype::udpServer::setHandleEnemyMap() {
+
+    _handleEnemyMap[Utils::EnemyEnum::EnemyDamage] = [this](Utils::Network::Response clientResponse) {
+        std::unique_ptr<Rtype::Command::Enemy::Damage> damage_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Damage, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDamage);
+        std::unique_ptr<Rtype::Command::Enemy::Die> destroy_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Die, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDie);
+        int entityId = clientResponse.PopParam<int>();
+        int gameID = _clients->at(get_sender_client_id())->getRoom();
+        std::shared_ptr<Rtype::Game> game = _games->at(gameID)->getGame();
+        std::vector<int> deadBros;
+
+        damage_cmd->set_server(_games->at(gameID)->getPlayers(), entityId);
+        damage_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        _network->addCommandToInvoker(std::move(damage_cmd));
+        game->damageEntity(entityId);
+        deadBros = game->getDeadEntities();
+        for (auto entityId: deadBros) {
+            destroy_cmd->set_server(_games->at(gameID)->getPlayers(), entityId);
+            destroy_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            _network->addCommandToInvoker(std::move(destroy_cmd));
+            game->destroyEntity(entityId);
+        }
+    };
+}
+
+
 void Rtype::udpServer::setHandleProjectileMap() {
     _handleProjectileMap[Utils::ProjectileEnum::ProjectileFired] = [this](Utils::Network::Response clientResponse) {
         std::unique_ptr<Rtype::Command::Projectile::Fired> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Projectile::Fired, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);
@@ -242,8 +268,8 @@ void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
 
     if (((int)cmd_category != 1 && (int)clientResponse.GetInfoFunction() != 2) &&
         ((int)cmd_category != 5 && (int)clientResponse.GetInfoFunction() != 0)) {
-        CONSOLE_INFO("Handle Response: ", (int)cmd_category)
-        CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
+        CONSOLE_INFO("Handle Response category: ", (int)cmd_category)
+        CONSOLE_INFO("Handle Response index: ", (int)clientResponse.GetInfoFunction())
     }
     switch (cmd_category)
     {
@@ -260,7 +286,7 @@ void Rtype::udpServer::handleResponse(Utils::Network::Response clientResponse)
         _handleProjectileMap[static_cast<Utils::ProjectileEnum>(clientResponse.GetInfoFunction())](clientResponse);
         break;
     case Utils::InfoTypeEnum::Enemy:
-        std::cerr << "EnemyNotImplemented" << std::endl;
+        _handleEnemyMap[static_cast<Utils::EnemyEnum>(clientResponse.GetInfoFunction())](clientResponse);
         break;
     case Utils::InfoTypeEnum::Boss:
         std::cerr << "BossNotImplemented" << std::endl;

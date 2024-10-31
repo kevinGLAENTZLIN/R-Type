@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** Die
+** Damage
 */
 
 #pragma once
@@ -15,13 +15,13 @@ namespace Rtype
     {
         namespace Enemy
         {
-            class Die: public ACommand{
+            class Damage: public ACommand{
                 public:
-                    Die() = default;
-                    ~Die();
+                    Damage() = default;
+                    ~Damage();
 
                     void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int mobID);
-                    void set_client();
+                    void set_client(int mobID);
 
                     void execute_client_side();
                     void execute_server_side();

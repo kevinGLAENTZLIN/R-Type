@@ -97,7 +97,6 @@ void Rtype::Game_info::runGame()
 void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
 {
     std::vector<int> FIIIIIRRRREEEEBros = _game->getAIProjectile();
-    std::vector<int> OOFedBros = _game->getDamagedEntities();
     std::vector<int> deadBros = _game->getDeadEntities();
 
     for (auto enemyId: FIIIIIRRRREEEEBros) {
@@ -108,14 +107,10 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
         _network->addCommandToInvoker(std::move(cmd));
         accNbProjectiles();
     }
-    for (auto entityId: OOFedBros) {
-        
-        _game->damageEntity(entityId);
-    }
     for (auto entityId: deadBros) {
         std::unique_ptr<Rtype::Command::Enemy::Destroy> destroy_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Destroy, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDestroy);
 
-        destroy_cmd->set_server(getPlayers(), entityId);
+        destroy_cmd->set_server(getPlayers(), entityId, getRoomId());
         destroy_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         _network->addCommandToInvoker(std::move(destroy_cmd));
         _game->destroyEntity(entityId);

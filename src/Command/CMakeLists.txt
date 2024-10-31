@@ -22,6 +22,7 @@ set(LIB_CMD_SRC
     ./Commands/Enemy/Die/Die.cpp
     ./Commands/Enemy/Spawn/Spawn.cpp
     ./Commands/Enemy/Destroy/Destroy.cpp
+    ./Commands/Enemy/Damage/Damage.cpp
     ./Commands/Player/Move/Move.cpp
     ./Commands/Player/Attack/Attack.cpp
     ./Commands/Player/Die/Die.cpp

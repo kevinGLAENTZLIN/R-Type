@@ -33,6 +33,7 @@
 #include "../Commands/Enemy/Die/Die.hh"
 #include "../Commands/Enemy/Spawn/Spawn.hh"
 #include "../Commands/Enemy/Destroy/Destroy.hh"
+#include "../Commands/Enemy/Damage/Damage.hh"
 
 #include "../Commands/Boss/Attack/Attack.hh"
 #include "../Commands/Boss/Die/Die.hh"

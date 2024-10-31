@@ -20,7 +20,7 @@ namespace Rtype
                     Destroy() = default;
                     ~Destroy();
 
-                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int mobID);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int mobID, int roomId);
                     void set_client();
 
                     void execute_client_side();
@@ -30,6 +30,7 @@ namespace Rtype
                 private:
                     std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
                     int _mobID;
+                    int _roomID;
             };
         }
     }

@@ -25,6 +25,7 @@
 #include "../../ECS/Component/Music/Music.hh"
 #include "../../ECS/Component/Sound/Sound.hh"
 #include "../../ECS/Component/Textfield/Textfield.hh"
+#include "../../ECS/Component/Pod/Pod.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -87,6 +88,7 @@ namespace Rtype {
         void failToConnect();
         void joinGame();
         void createProjectile(int entityId, int projectileId);
+        void createPod(float posX, float posY);
         void damageEntity(int entityId);
         void destroyEntity(int entityId);
 

@@ -13,6 +13,7 @@
 #include "../../Component/Position/Position.hpp"
 #include "../../Component/Hitbox/Hitbox.hh"
 #include "../../Component/Health/Health.hh"
+#include "../../Component/Pod/Pod.hh"
 
 namespace ECS {
     namespace Systems {
@@ -53,12 +54,20 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Health> & healths,
                 std::size_t player, std::vector<std::size_t> & entities);
 
-            void AIHitPod(
+            std::vector<std::size_t> AIHitPod(
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
                 ECS::ComponentManager::SparseArray<ECS::Components::Health> & healths,
-                std::vector<std::size_t> &pods, std::vector<std::size_t> &AIs);
+                ECS::ComponentManager::SparseArray<ECS::Components::Pod> & pods,
+                const std::vector<std::size_t> &podsEntity,
+                const std::vector<std::size_t> &AIs);
 
+            std::vector<std::size_t> PlayerPickedUpPod(
+                ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
+                ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
+                ECS::ComponentManager::SparseArray<ECS::Components::Pod> & pods,
+                std::vector<std::size_t> & podsEntity,
+                std::vector<std::size_t> & playersEntity);
         };
     }
 }

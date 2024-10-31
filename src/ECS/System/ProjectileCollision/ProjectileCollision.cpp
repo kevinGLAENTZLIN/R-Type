@@ -45,7 +45,7 @@ std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
                     selfCollision = false;
                 }
             }
-            if (selfCollision) {
+            if (selfCollision == true) {
                 continue;
             }
             std::size_t entity = entities[i];

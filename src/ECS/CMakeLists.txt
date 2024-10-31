@@ -56,6 +56,7 @@ set(LIB_SOURCES
     ./Component/Button/Button.cpp
     ./Component/AI/AI.cpp
     ./Component/Textfield/Textfield.cpp
+    ./Component/Pod/Pod.cpp
     ./System/Velocity/Velocity.cpp
     ./System/Collision/Collision.cpp
     ./System/UpdateVelocityAI/UpdateVelocityAI.cpp
@@ -106,6 +107,7 @@ target_include_directories(${NAME_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Volume
     ${CMAKE_CURRENT_SOURCE_DIR}Component/Projectile
     ${CMAKE_CURRENT_SOURCE_DIR}Component/AI
+    ${CMAKE_CURRENT_SOURCE_DIR}Component/Pod
     ${CMAKE_CURRENT_SOURCE_DIR}System
     ${CMAKE_CURRENT_SOURCE_DIR}System/ButtonClick
     ${CMAKE_CURRENT_SOURCE_DIR}System/SystemManager

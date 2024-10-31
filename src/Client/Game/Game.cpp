@@ -753,7 +753,6 @@ std::vector<int> Rtype::Game::getAIProjectile()
         for (const auto& Ids : _serverToLocalEnemiesId)
             if (Ids.second == serverProjectile[i]) {
                 serverProjectile[i] = Ids.first;
-                std::cout << "entity Id to make fire: " << Ids.first << std::endl;
             }
     // for (int i = 0; i < serverProjectile.size(); i++) {
     //     std::cout << "serverId[" << i << "]:" << serverProjectile[i];
@@ -969,28 +968,42 @@ void Rtype::Game::createEnemyProjectile(int entityId, int projectileId, enemiesT
     auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
     std::size_t localEntityId = _serverToLocalEnemiesId[entityId];
     auto &ai = _core->getComponent<ECS::Components::AI>(localEntityId);
+    std::cerr << "1" << std::endl;
 
     const ECS::Components::Position &enemyPos = positions[localEntityId].value();
     const ECS::Components::Hitbox &enemyHitbox = hitboxes[localEntityId].value();
+    std::cerr << "2" << std::endl;
 
     std::size_t projectile = _core->createEntity();
 
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
 
     float projectileStartX = enemyPos.getX() - (enemyHitbox.getWidth() / 2) - TmpHitbox.first;
+    std::cerr << "3" << std::endl;
 
     std::vector<std::pair<float, float>> playersPos;
     for (const auto& player : _serverToLocalPlayersId)
         playersPos.push_back(positions[player.second]->getPosPair());
     std::size_t targetPlayer = ecsUtils::getClosestPlayer(
         positions[localEntityId]->getPosPair(), playersPos);
+    std::cerr << "4" << std::endl;
     for (const auto& player : _serverToLocalPlayersId)
         if (positions[player.second]->getPosPair() == playersPos[targetPlayer])
             targetPlayer = player.second;
+    std::cerr << "5" << std::endl;
 
+    std::cerr << "Player: " << targetPlayer << std::endl;
+    std::cerr << "Entity: " << entityId << std::endl;
+    std::cerr << "X: " << positions[targetPlayer]->getX()  << std::endl;
+    std::cerr << "Y: " << positions[targetPlayer]->getY()  << std::endl;
+    // ! Ca pete par ici
     float tmpVeloX = positions[targetPlayer]->getX() - positions[entityId]->getX();
+    std::cerr << "5.3" << std::endl;
     float tmpVeloY = positions[targetPlayer]->getY() - positions[entityId]->getY();
+    std::cerr << "5.6" << std::endl;
     float tmpMagnitude = std::sqrt(tmpVeloX * tmpVeloX + tmpVeloY * tmpVeloY);
+    // !
+    std::cerr << "6" << std::endl;
 
     _core->addComponent(projectile, ECS::Components::Position{
         projectileStartX,
@@ -1004,6 +1017,7 @@ void Rtype::Game::createEnemyProjectile(int entityId, int projectileId, enemiesT
     _core->addComponent(projectile, ECS::Components::AI{projectileType});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
     _serverToLocalProjectilesId[projectileId] = projectile;
+    std::cerr << "7" << std::endl;
 }
 
 void Rtype::Game::createPlayerProjectile(int entityId, int projectileId)
@@ -1068,6 +1082,7 @@ void Rtype::Game::destroyEntity(int entityId)
         toDestroy = _serverToLocalProjectilesId.at(entityId);
         _serverToLocalProjectilesId.erase(entityId);
     }
+    std::cout << "toDestroy :" << toDestroy << std::endl;
     _core->destroyEntity(toDestroy);
 }
 
@@ -1167,7 +1182,16 @@ void Rtype::Game::update() {
         for (int i = 0; i < projectileEntityId.size(); i++) {
             for (int j = 0; j < damageableEntities.size(); j++) {
                 if (damageableEntities[j] == projectileEntityId[i] && healthComponents[damageableEntities[j]]->getInvincibility() == 0) {
-                    _damagedEntities.push_back(damageableEntities[j]);
+                    // _damagedEntities.push_back(damageableEntities[j]);
+                    // for (std::size_t i; i < serverDamagedEntities.size(); i++)
+                    std::unique_ptr<Rtype::Command::Enemy::Damage> damage_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Damage, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDamage);
+                    
+                    for (const auto& Ids : _serverToLocalEnemiesId)
+                        if (Ids.second == damageableEntities[j]) {
+                            damage_cmd->set_client(Ids.first);
+                        }
+                    damage_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                    _network->addCommandToInvoker(std::move(damage_cmd));
                 }
             }
             for (int j = 0; j < projectileEntities.size(); j++)

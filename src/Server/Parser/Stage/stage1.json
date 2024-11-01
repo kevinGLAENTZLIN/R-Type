@@ -600,7 +600,7 @@
         "time second": 29
     },
     "BOSS1_Core": {
-        "type": "BOSS1_core",
+        "type": "BOSS1_Core",
         "difficulty": 1,
         "position": {
             "x": 8,
@@ -608,7 +608,7 @@
         },
         "health": 20,
         "model": "boss1_core",
-        "time minute": 2,
-        "time second": 20
+        "time minute": 0,
+        "time second": 42
     }
 }

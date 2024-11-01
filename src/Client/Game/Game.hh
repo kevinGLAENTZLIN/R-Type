@@ -82,8 +82,7 @@ namespace Rtype {
         void createOtherPlayer(int id, float pos_x, float pos_y);
         std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         std::size_t createEnemy(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
-        void createBoss1();
-        void createBoss2();
+        void createBoss(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void movePlayer(int id, float x, float y);
         void failToConnect();
         void joinGame();
@@ -131,6 +130,8 @@ namespace Rtype {
         std::vector<std::size_t> getAllInputs();
         void sendInput(std::vector<std::size_t> vec);
         void sendProjectile();
+        void createBoss1(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life);
+        void createBoss2(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life);
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;

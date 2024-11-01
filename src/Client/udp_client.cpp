@@ -288,9 +288,13 @@ void Rtype::udpClient::setHandleProjectileMap() {
 
 void Rtype::udpClient::setHandleBossMap() {
     _handleBossMap[Utils::BossEnum::BossSpawn] = [this](Utils::Network::Response response) {
-        int BossType = response.PopParam<int>();
-        float X = response.PopParam<double>();
-        float Y = response.PopParam<double>();
+        int enemyType = response.PopParam<int>();
+        int enemyId = response.PopParam<int>();
+        double x = response.PopParam<double>();
+        double y = response.PopParam<double>();
+        int health = response.PopParam<int>();
+
+        _game->createBoss(enemyId, static_cast<enemiesTypeEnum_t>(enemyType), x, y, health);
     };
 
     _handleBossMap[Utils::BossEnum::BossDie] = [this](Utils::Network::Response response) {

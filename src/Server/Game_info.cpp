@@ -125,12 +125,22 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
         if (enemyData.getDifficulty() > _difficulty)
             _enemySpawnData.pop();
         else if (currentGameTimeInSeconds - _timeLastLevelEnded >= enemyData.getSpawnTimeInSeconds()) {
-            std::unique_ptr<Rtype::Command::Enemy::Spawn> spawn_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Spawn, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemySpawn);
+            if (enemyData.getType() != enemiesTypeEnum_t::BOSS1_Core) {
+                std::unique_ptr<Rtype::Command::Enemy::Spawn> spawn_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Spawn, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemySpawn);
 
-            spawn_cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
-            spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-            _network->addCommandToInvoker(std::move(spawn_cmd));
-            _game->createEnemy( getNbProjectiles(), enemyData.getType(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
+                spawn_cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
+                spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                _network->addCommandToInvoker(std::move(spawn_cmd));
+                _game->createEnemy( getNbProjectiles(), enemyData.getType(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
+            } else if (enemyData.getType() == enemiesTypeEnum_t::BOSS1_Core) {
+                std::unique_ptr<Rtype::Command::Boss::Spawn> spawn_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Boss::Spawn, Utils::InfoTypeEnum::Boss, Utils::BossEnum::BossSpawn);
+
+                spawn_cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
+                spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                _network->addCommandToInvoker(std::move(spawn_cmd));
+                _game->createEnemy( getNbProjectiles(), enemyData.getType(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
+ 
+            }
             accNbProjectiles();
             _enemySpawnData.pop();
         }

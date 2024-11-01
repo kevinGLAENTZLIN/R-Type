@@ -200,6 +200,22 @@ Rtype::Game::~Game()
     _boss2Balls.clear();
 }
 
+void Rtype::Game::createBoss(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
+{
+    switch (enemyType) {
+        case enemiesTypeEnum_t::BOSS1_Core:
+            createBoss1(entityId, enemyType, pos_x, pos_y, life);
+            break;
+        case enemiesTypeEnum_t::BOSS2_Core:
+            createBoss2(entityId, enemyType, pos_x, pos_y, life);
+            break;
+        default:
+            std::cerr << "Boss not recognized in createBoss method." << std::endl;
+            break;
+    }
+}
+
+
 std::size_t Rtype::Game::createEnemy(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
 {
     std::size_t enemy = _core->createEntity();
@@ -719,9 +735,9 @@ std::vector<int> Rtype::Game::getDeadEntities()
     return serverDeadEntities;
 }
 
-void Rtype::Game::createBoss1()
+void Rtype::Game::createBoss1(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
 {
-    createEnemy(BOSS1_Core, 8, -0.5, 4);
+    createEnemy(entityId, BOSS1_Core, pos_x, pos_y, life);
     createCyclingEnemy(BOSS1_Tail0, 6.0f, 3.0f, 6.05f, 2.95f);
     createCyclingEnemy(BOSS1_Tail1, 5.5f, 2.8f, 6.1f, 2.7f);
     createCyclingEnemy(BOSS1_Tail2, 5.1f, 2.5f, 5.8f, 2.4f);
@@ -744,13 +760,12 @@ void Rtype::Game::createBoss1()
     createCyclingEnemy(BOSS1_Tail19, -2.4f, 2.9f, 6.2f, -2.7f);
 }
 
-void Rtype::Game::createBoss2()
+void Rtype::Game::createBoss2(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
 {
-    float bossCoreX = 7;
-    float bossCoreY = -1;
+    float bossCoreX = pos_x;
+    float bossCoreY = pos_y;
 
-    createEnemy(BOSS2_Core, bossCoreX, bossCoreY, 10);
-
+    createEnemy(entityId, BOSS2_Core, bossCoreX, bossCoreY, life);
     _boss2Balls.push_back(createEnemy(BOSS2_Ball0, bossCoreX - 0.2, bossCoreY - 0.2, 1));
     _boss2Balls.push_back(createEnemy(BOSS2_Ball1, bossCoreX + 0.3, bossCoreY - 0.2, 1));
     _boss2Balls.push_back(createEnemy(BOSS2_Ball2, bossCoreX + 0.8, bossCoreY -0.2, 1));

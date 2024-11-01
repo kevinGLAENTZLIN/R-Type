@@ -13,39 +13,43 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
 {
     _network = std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client");
     _game = std::make_unique<Rtype::Game>(_network, true);
+
+    setHandleMaps();
+    connectClient();
+    read_server();
+
     _timeThread = std::thread([this]() {
+        // std::lock_guard<std::mutex> lock(_mutex);
         std::vector<uint32_t> missing_ack;
         std::size_t missing_ack_size = 0;
-        std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> cmd;
         std::size_t tail_size;
 
         while (true) {
+            std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> last_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             missing_ack = getMissingPackages();
             missing_ack_size = missing_ack.size();
-            tail_size = (~missing_ack_size) & 3;
+            tail_size = missing_ack_size & 3;
 
             for (size_t i = 0; i < (missing_ack_size >> 2); i++) {
-                cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
+            std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
                 cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
                 cmd->set_client(missing_ack[i * 4], missing_ack[i * 4 + 1], missing_ack[i * 4 + 2], missing_ack[i * 4 + 3]);
                 _network->addCommandToInvoker(std::move(cmd));
             }
+
             if (tail_size) {
-                cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
-                cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-                cmd->set_client(
+                last_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                last_cmd->set_client(
                     missing_ack[missing_ack_size - 1],
                     (tail_size & 2) ? missing_ack[missing_ack_size - 2] : 0,
                     (tail_size == 3) ? missing_ack[missing_ack_size - 3] : 0,
                     0
                 );
+                _network->addCommandToInvoker(std::move(last_cmd));
             }
         }
     });
-    setHandleMaps();
-    connectClient();
-    read_server();
 }
 
 Rtype::udpClient::~udpClient()

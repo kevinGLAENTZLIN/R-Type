@@ -68,6 +68,7 @@ namespace Rtype
             int _nbMaxPlayer;
             int _nbProjectiles; //! tmp
             unsigned int _tick;
+            unsigned int _timeLastLevelEnded;
             std::thread _tickThread;
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
             std::shared_ptr<Rtype::Network> _network;

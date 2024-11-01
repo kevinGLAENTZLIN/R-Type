@@ -135,6 +135,7 @@ void Rtype::udpServer::setHandleGameInfoMap() {
             spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend(), _games->at(id_room)->getGame());
             _network->addCommandToInvoker(std::move(spawn_cmd));
             CONSOLE_INFO("Player is spawning in game: ", id_room)
+            //! Spawn mob of the game
         }
     };
 
@@ -149,6 +150,8 @@ void Rtype::udpServer::setHandleGameInfoMap() {
         cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id());
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
+        _games->at(gameID)->disconnectPlayer(get_sender_client_id());
+        disconnect_client(get_sender_client_id());
     };
 }
 

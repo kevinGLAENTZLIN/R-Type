@@ -611,6 +611,7 @@ void Rtype::Game::initPlayOption(void)
         CONSOLE_INFO("Get available game", "")
         _isJoiningGame = false;
         _isAvailableGames = true;
+        clearAvailableGames();
         std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         cmd->set_client();

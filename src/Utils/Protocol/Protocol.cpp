@@ -32,7 +32,7 @@ namespace Utils
             bool bool_placeholder = false;
             std::any value;
 
-            std::cout << "Type: [" << type_ << "] of size: [" << size << "]"<< std::endl;
+            // std::cout << "Type: [" << type_ << "] of size: [" << size << "]"<< std::endl;
             switch (type_)
             {
             case 'c':

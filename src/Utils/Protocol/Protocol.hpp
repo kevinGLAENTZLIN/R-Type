@@ -93,7 +93,7 @@ namespace Utils
                 int16_t scaled_value;
 
                 if constexpr (std::is_same<T, uint32_t>::value) {
-                    std::cout << "Value: " << value << std::endl;
+                    // std::cout << "Value: " << value << std::endl;
                     if (isAck) {
                         converted_value.resize(ACK_SIZE);
                         std::memcpy(converted_value.data(), &value, ACK_SIZE);

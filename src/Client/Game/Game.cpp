@@ -551,7 +551,7 @@ void Rtype::Game::initCreationGame(void)
     _core->addComponent(increaseButtonEntity, ECS::Components::Position{520, 400});
     _core->addComponent(increaseButtonEntity, ECS::Components::Text{"+", 30, RAYWHITE});
     _core->addComponent(increaseButtonEntity, ECS::Components::Button{Rectangle{510, 390, 60, 60}, true, [this]() {
-        if (_playerCount < 4) {
+        if (_playerCount < 6) {
             _playerCount++;
             updatePlayerCountText();
         }
@@ -563,7 +563,7 @@ void Rtype::Game::initCreationGame(void)
     _core->addComponent(createButtonEntity, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
         std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Create_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame);
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-        cmd->set_client();
+        cmd->set_client(_selectedDifficulty + 1, _playerCount);
         _network->addCommandToInvoker(std::move(cmd));
         CONSOLE_INFO("Create game: ", " Sended")
     }});
@@ -611,6 +611,7 @@ void Rtype::Game::initPlayOption(void)
         CONSOLE_INFO("Get available game", "")
         _isJoiningGame = false;
         _isAvailableGames = true;
+        clearAvailableGames();
         std::unique_ptr<Rtype::Command::GameInfo::Games_available> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Games_available, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable);
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         cmd->set_client();

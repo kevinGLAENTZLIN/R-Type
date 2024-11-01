@@ -28,7 +28,7 @@ namespace Rtype
     class Game_info {
         public:
             Game_info();
-            Game_info(int id);
+            Game_info(int id, int difficulty, int nbMaxPlayer);
             ~Game_info();
 
             Game_info(const Game_info&) = delete;
@@ -64,6 +64,7 @@ namespace Rtype
         private:
             int _id;
             int _level;
+            int _difficulty;
             int _nbMaxPlayer;
             int _nbProjectiles; //! tmp
             unsigned int _tick;

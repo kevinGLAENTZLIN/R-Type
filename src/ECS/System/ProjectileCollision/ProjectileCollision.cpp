@@ -14,29 +14,32 @@ std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
     ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
     ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> &hitboxes,
     ECS::ComponentManager::SparseArray<ECS::Components::AI> &AIs,
-    std::vector<std::size_t> &projectileEntities, std::vector<std::size_t> &entities)
+    std::vector<std::size_t> &projectileEntities, std::vector<std::size_t> &entities,
+    std::vector<std::size_t> &AIEntities)
 {
     bool selfCollision = false;
     std::vector<std::size_t> entityCollided;
+    bool isAIShot = false;
+    bool isAIEntity = false;
 
     for (std::size_t j = 0; j < projectileEntities.size(); ++j) {
-        bool isAIShot = false;
         std::size_t projectile = projectileEntities[j];
         assert(positions[projectile].has_value());
         assert(hitboxes[projectile].has_value());
         auto &projectilePos = positions[projectile].value();
         auto &projectileHitbox = hitboxes[projectile].value();
+        isAIShot = false;
+
+        for (int i = 0; i < AIEntities.size(); i++)
+            if (AIEntities[i] == projectile)
+                isAIShot = true;
 
         if (projectilePos.getX() >= 11.0 || projectilePos.getX() <= -11.0) {
             entityCollided.push_back(projectile);
             continue;
         }
 
-        if (AIs.size() > 0 && AIs[projectile].has_value()) {
-            isAIShot = true;
-        }
-
-        for (std::size_t i = 0; i < entities.size(); ++i) {
+        for (std::size_t i = 0; i < entities.size(); i++) {
             for (std::size_t temp = 0; temp < projectileEntities.size(); temp++) {
                 if (entities[i] == projectileEntities[temp]) {
                     selfCollision = true;
@@ -53,11 +56,14 @@ std::vector<std::size_t> ECS::Systems::ProjectileCollision::projectileIsHit(
             assert(hitboxes[entity].has_value());
             auto &entityPos = positions[entity].value();
             auto &entityHitbox = hitboxes[entity].value();
-            bool isAIEntity = false;
-            if (AIs.size() > 0 && AIs[entity].has_value()) {
-                isAIEntity = true;
-            }
+            isAIEntity = true;
 
+            for (int k = 0; k < AIEntities.size(); k++)
+                if (AIEntities[k] == entity)
+                    isAIEntity = true;
+
+            std::cerr << "projectile: " << projectile << " " << isAIShot << std::endl;
+            std::cerr << "entiy: " << entity << " " << isAIEntity << std::endl;
             if ((isAIShot && isAIEntity) || (!isAIShot && !isAIEntity)) {
                 continue;
             }

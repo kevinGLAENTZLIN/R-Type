@@ -808,13 +808,9 @@ void Rtype::Game::initGame(int id)
     createBackgroundLayers(3.f , "background_layer1", 3);
     createBackgroundLayers(5.f , "background_layer2", 3);
     createPlayer(id, -10.0f, 0.0f, 50);
-    createPod(-2.0f, 0.0f);
-    createPod(0.0f, 0.0f);
-    createPod(2.0f, 0.0f);
-    createPod(4.0f, 0.0f);
-    createPod(6.0f, 0.0f);
-    createPod(8.0f, 0.0f);
+
     switchState(GameState::PLAY);
+
     // createPlayer(0, -10.0f, 0.0f, 50);
     // createOtherPlayer(1, -10.0f, 0.0f);
 
@@ -1007,7 +1003,6 @@ void Rtype::Game::createEnemyProjectile(int entityId, int projectileId, enemiesT
     _core->addComponent(projectile, ECS::Components::AI{projectileType});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
     _serverToLocalProjectilesId[projectileId] = projectile;
-    std::cerr << "7" << std::endl;
 }
 
 void Rtype::Game::createPlayerProjectile(int entityId, int projectileId)
@@ -1051,7 +1046,6 @@ void Rtype::Game::createPod(float posX, float posY)
 {
     std::size_t pod = _core->createEntity();
 
-    std::cout << "jonjaj " << posX << " " << posY << std::endl;
     if (_isRendering) {
         std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
         _core->addComponent(pod, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
@@ -1137,6 +1131,7 @@ void Rtype::Game::update() {
     std::vector<std::size_t> inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     std::vector<std::size_t> backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
     std::vector<std::size_t> AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
+    std::vector<std::size_t> AImabites = _core->getEntitiesWithComponent<ECS::Components::AI>();
     std::vector<std::size_t> collisionEntities = _core->getEntitiesWithComponent<ECS::Components::Position,
                                                                                  ECS::Components::Hitbox>();
     std::vector<std::size_t> damageableEntities = _core->getEntitiesWithComponent<ECS::Components::Health>();
@@ -1183,11 +1178,15 @@ void Rtype::Game::update() {
     }
 
     if (_isRendering) {
+        for (int i = 0; i < projectileEntities.size(); i++)
+            std::cout << "projectileEntities[" << i << "]: " << projectileEntities[i] << std::endl;
+        for (int i = 0; i < collisionEntities.size(); i++)
+            std::cout << "collisionEntities[" << i << "]: " << collisionEntities[i] << std::endl;
         std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
             _core->getComponents<ECS::Components::Position>(),
             _core->getComponents<ECS::Components::Hitbox>(),
             _core->getComponents<ECS::Components::AI>(),
-            projectileEntities, collisionEntities);
+            projectileEntities, collisionEntities, AImabites);
         auto healthComponents = _core->getComponents<ECS::Components::Health>();
         auto podsEntities = _core->getEntitiesWithComponent<ECS::Components::Pod>();
 

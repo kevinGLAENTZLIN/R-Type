@@ -1,4 +1,16 @@
 {
+    "Blaster0": {
+        "type": "BLASTER",
+        "difficulty": 1,
+        "position": {
+            "x": 10.5,
+            "y": -4.67
+        },
+        "health": 1,
+        "model": "enemy_one",
+        "time minute": 0,
+        "time second": 5
+    },
     "PataPata0_0": {
         "type": "PATAPATA",
         "difficulty": 1,

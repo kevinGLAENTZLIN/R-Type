@@ -55,7 +55,8 @@ namespace ECS {
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
                 ECS::ComponentManager::SparseArray<ECS::Components::Hitbox> & hitboxes,
                 ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
-                std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities);
+                std::vector<std::size_t> & projectileEntities, std::vector<std::size_t> & entities,
+                std::vector<std::size_t> & AIEntities);
         };
     }
 }

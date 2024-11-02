@@ -24,7 +24,7 @@ Rtype::Command::Enemy::Damage::~Damage()
 
 void Rtype::Command::Enemy::Damage::execute_client_side()
 {
-    std::cout << "i m about to take damages: " << _mobID << std::endl;
+//    std::cout << "i m about to take damages: " << _mobID << std::endl;
     sendToEndpoint(Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDamage, _mobID);
 }
 

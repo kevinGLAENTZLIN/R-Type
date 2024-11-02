@@ -12,7 +12,7 @@ std::vector<std::size_t> ECS::Systems::GetDeadEntities::getDeadEntities(
             deadEntities.push_back(entities[i]);
             continue;
         }
-        if (positions[entities[i]]->getX() < -11.0)
+        if (positions[entities[i]]->getX() < -12.0)
             deadEntities.push_back(entities[i]);
     }
     return deadEntities;

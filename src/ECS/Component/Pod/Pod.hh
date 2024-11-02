@@ -18,16 +18,20 @@ namespace ECS {
             std::size_t getPlayer();
             void setPlayer(std::size_t player);
 
-            std::size_t getLevel();
-            void setLevel(std::size_t level);
+            int getLevel();
+            void setLevel(int level);
 
             bool isUp();
             void setIsUp(bool isUp);
 
+            int getCooldown();
+            void setCooldown(int cooldown);
+
         private:
             std::size_t _player;
-            std::size_t _level;
+            int _level;
             bool _isUp;
+            std::size_t _cooldown;
         };
     }
 }

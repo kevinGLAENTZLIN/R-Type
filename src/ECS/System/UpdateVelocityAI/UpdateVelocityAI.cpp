@@ -16,11 +16,7 @@ void ECS::Systems::UpdateVelocityAI::update (
         enemiesTypeEnum_t aiType = AIs[aiId]->getEnemyType();
 
         if (aiType == MINIKIT) {
-            float amplitude = 0.05f;
-            float frequency = 2.0f;
-            velocities[aiId]->setX(0.05f);
-            velocities[aiId]->setY(
-                amplitude * std::sin(frequency * positions[aiId]->getX()));
+            velocities[aiId]->setX(-0.025f);
         }
         if (aiType == PATAPATA) {
             float amplitude = 0.05f;

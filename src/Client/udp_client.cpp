@@ -286,12 +286,9 @@ void Rtype::udpClient::setHandlePowerUpMap() {
         double x = response.PopParam<double>();
         double y = response.PopParam<double>();
 
-        // _game->createPod(id, x, y);
+        _game->createPod(id, x, y);
         //! Pour Arthur <3
-        // std::unique_ptr<Rtype::Command::PowerUp::Spawn> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::PowerUp::Spawn, Utils::InfoTypeEnum::PowerUp, Utils::PowerUpEnum::PowerUpSpawn);
-        // cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-        // cmd->set_client(x, y);
-        // _network->addCommandToInvoker(std::move(cmd));
+        // 
     };
     _handlePowerUpMap[Utils::PowerUpEnum::PowerUpDisappear] = [this](Utils::Network::Response response) {
         //TODO: Implement PowerUpDisappear

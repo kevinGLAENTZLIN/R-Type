@@ -90,7 +90,7 @@ namespace Rtype {
         void failToConnect();
         void joinGame();
         void createProjectile(int entityId, int projectileId);
-        void createPod(float posX, float posY);
+        void createPod(int entityId, float posX, float posY);
         void damageEntity(int entityId);
         void destroyEntity(int entityId);
         void setIsConnectedToServer(bool state);

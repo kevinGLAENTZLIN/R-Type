@@ -1120,12 +1120,11 @@ void Rtype::Game::createProjectile(int entityId, int projectileId)
     else if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end())
         createPlayerProjectile(entityId, projectileId);
     else if (_serverToLocalPodsId.find(entityId) != _serverToLocalPodsId.end()){
-        std::cout << "jaj" << std::endl;
         createPodProjectile(entityId, projectileId);
     }
 }
 
-void Rtype::Game::createPod(float posX, float posY)
+void Rtype::Game::createPod(int entityId, float posX, float posY)
 {
     std::size_t pod = _core->createEntity();
 
@@ -1138,6 +1137,7 @@ void Rtype::Game::createPod(float posX, float posY)
     _core->addComponent(pod, ECS::Components::Position{posX, posY});
     _core->addComponent(pod, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(pod, ECS::Components::Scale{1.0f});
+    _serverToLocalPodsId[entityId] = pod;
 }
 
 void Rtype::Game::damageEntity(int entityId)
@@ -1162,9 +1162,14 @@ void Rtype::Game::destroyEntity(int entityId)
         _serverToLocalPlayersId.erase(entityId);
     }
     if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
-        if (_core->getComponents<ECS::Components::AI>()[_serverToLocalEnemiesId.at(entityId)]->getEnemyType() == MINIKIT)
-            createPod(_core->getComponents<ECS::Components::Position>()[_serverToLocalEnemiesId.at(entityId)]->getX(),
-                _core->getComponents<ECS::Components::Position>()[_serverToLocalEnemiesId.at(entityId)]->getY());
+        if (_core->getComponents<ECS::Components::AI>()[_serverToLocalEnemiesId.at(entityId)]->getEnemyType() == MINIKIT && _isRendering) {
+            std::unique_ptr<Rtype::Command::PowerUp::Spawn> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::PowerUp::Spawn, Utils::InfoTypeEnum::PowerUp, Utils::PowerUpEnum::PowerUpSpawn);
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            float x = _core->getComponents<ECS::Components::Position>()[_serverToLocalEnemiesId.at(entityId)]->getX();
+            float y = _core->getComponents<ECS::Components::Position>()[_serverToLocalEnemiesId.at(entityId)]->getY();
+            cmd->set_client(x, y);
+            _network->addCommandToInvoker(std::move(cmd));
+        }
         toDestroy = _serverToLocalEnemiesId.at(entityId);
         _serverToLocalEnemiesId.erase(entityId);
     }
@@ -1172,7 +1177,6 @@ void Rtype::Game::destroyEntity(int entityId)
         toDestroy = _serverToLocalProjectilesId.at(entityId);
         _serverToLocalProjectilesId.erase(entityId);
     }
-    //std::cout << "Destroyed in destroyEntities : server(" << entityId << ")" << " local(" << toDestroy << ")" << std::endl;
     _core->destroyEntity(toDestroy);
 }
 

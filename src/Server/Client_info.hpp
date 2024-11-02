@@ -137,7 +137,7 @@ namespace Rtype {
              * 
              * @return The ACK number to be sent.
              */
-            int getAckToSend() const;
+            uint32_t getAckToSend() const;
 
             /**
              * @brief Increments the ACK number to be sent to the client.
@@ -196,17 +196,10 @@ namespace Rtype {
              * This method handle a variadic list of parameters, converts them to strings,
              * and stores them in the client's history.
              * 
-             * @param function_type The type of the command.
-             * @param function_index The index of the command.
-             * @param params The variadic parameters for the command.
+             * @param msg The command to add to the history.
              */
-            template <Utils::FunctionIndex T>
-            void pushCmdToHistory(Utils::InfoTypeEnum function_type, T function_index, std::va_list params)
+            void pushCmdToHistory(Utils::Network::bytes msg)
             {
-                Utils::ParametersMap::init_map();
-                std::string params_type = Utils::ParametersMap::getParameterTypePerFunctionClient(function_type, function_index);
-                Utils::Network::bytes msg = Utils::Network::Protocol::CreateMsg(_AckToSend, function_type, function_index, Utils::Network::Protocol::va_listToVector(params, params_type));
-
                 _history[_AckToSend] = msg;
                 setAckToSend();
             }
@@ -221,7 +214,7 @@ namespace Rtype {
             float _x;
             float _y;
             int _AckExpected;
-            int _AckToSend;
+            uint32_t _AckToSend;
             int _gameRoom;
             bool _inGame;
             bool _isAlive;

@@ -31,7 +31,7 @@ void Rtype::Command::Player::Die::execute_server_side()
     CONSOLE_INFO(_playerID, ": die (RIP)")
     for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-        sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerDie, _playerID);
+        sendToEndpoint(*player.second, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerDie, _playerID);
     }
     _players->at(_playerID)->setAliveStatus(false);
 }

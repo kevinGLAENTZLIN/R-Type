@@ -93,8 +93,8 @@ namespace Utils
                 int16_t scaled_value;
 
                 if constexpr (std::is_same<T, uint32_t>::value) {
-                    // std::cout << "Value: " << value << std::endl;
                     if (isAck) {
+                    std::cout << "ACK: " << value << std::endl;
                         converted_value.resize(ACK_SIZE);
                         std::memcpy(converted_value.data(), &value, ACK_SIZE);
                     } else {
@@ -212,6 +212,11 @@ namespace Utils
                 bytes msg;
                 std::size_t args_byte_bit_offset = 0x0;
                 std::size_t args_byte_position = 0x0;
+
+                std::cout << "ACK writing msg" << std::endl;
+                std::cout << "InfoType: " << static_cast<uint8_t>(info) << std::endl;
+                std::cout << "InfoFunction: " << static_cast<uint8_t>(functionDefiner) << std::endl;
+
 
                 appendFixedSizeTypeIntoBytes(msg, ack, true);
                 appendFixedSizeTypeIntoBytes(msg, info, false);

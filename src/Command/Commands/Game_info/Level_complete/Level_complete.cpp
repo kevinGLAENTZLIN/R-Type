@@ -29,5 +29,5 @@ void Rtype::Command::GameInfo::Level_complete::execute_server_side()
 {
     _gameInfo->goNextLevel();
     CONSOLE_INFO(_gameInfo->getRoomId(), " went to the next Level !")
-    sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete, _gameInfo.get());
+    sendToEndpoint(*_clientInfo, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete, _gameInfo.get());
 }

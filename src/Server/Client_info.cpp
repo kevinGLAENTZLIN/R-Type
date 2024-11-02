@@ -78,7 +78,7 @@ void Rtype::client_info::setAckToExpect()
 	_AckExpected++;
 }
 
-int Rtype::client_info::getAckToSend() const
+uint32_t Rtype::client_info::getAckToSend() const
 {
 	return _AckToSend;
 }

@@ -34,7 +34,7 @@ void Rtype::Command::GameInfo::Client_connection::execute_server_side()
     if (id == -1)
         return;
     _clients->insert({id, std::make_shared<Rtype::client_info>(Rtype::client_info(id, _port, _addr))});
-	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected, id);
+	sendToEndpoint(*_clients->at(id), Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected, id);
 }
 
 int Rtype::Command::GameInfo::Client_connection::get_available_client_id()

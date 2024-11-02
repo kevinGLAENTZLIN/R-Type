@@ -27,11 +27,12 @@ namespace Utils
         {
             char char_placeholder = '\0';
             int16_t int_placeholder = 0;
+            int32_t long_placeholder = 0;
             double float_placeholder = 0.0;
             bool bool_placeholder = false;
             std::any value;
 
-            std::cout << "Type: [" << type_ << "] of size: [" << size << "]"<< std::endl;
+            // std::cout << "Type: [" << type_ << "] of size: [" << size << "]"<< std::endl;
             switch (type_)
             {
             case 'c':
@@ -50,6 +51,10 @@ namespace Utils
             case 'b':
                 std::memcpy(&bool_placeholder, msg.data() + offset, size);
                 value =  std::any(bool_placeholder);
+                break;
+            case 'l':
+                std::memcpy(&long_placeholder, msg.data() + offset, size);
+                value = std::any(long_placeholder);
                 break;
             default:
                 throw std::runtime_error("Unknown type");

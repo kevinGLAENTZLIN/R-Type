@@ -19,9 +19,9 @@ void printByteAsBits(uint8_t byte)
 TEST_CASE("Protocol with data compression") {
     uint32_t ack = 4;
     bool param1 = true;
-    int32_t param2 = 42;
+    int param2 = 42;
     bool new_param1;
-    int32_t new_param2;
+    int new_param2;
 
     //                                 | ack        |I|F  |args_bytes |P1| P2
     Utils::Network::bytes msg_exemple = {4, 0, 0, 0, 0, 3, 0xfd, 0xff, 1, 42};
@@ -31,6 +31,15 @@ TEST_CASE("Protocol with data compression") {
     // Let say that the Server send a message to the Client
     Utils::Network::bytes msg = Utils::Network::Protocol::CreateMsg(ack, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame, args);
     CHECK(msg.size() == size_of_the_msg);
+    for (size_t i = 0; i < msg_exemple.size(); i++) {
+        std::cout << std::hex << (unsigned int)msg_exemple[i] << ", ";
+    }
+    std::cout << std::endl;
+    for (size_t i = 0; i < msg.size(); i++) {
+        std::cout << std::hex << (unsigned int)msg[i] << ", ";
+    }
+    std::cout << std::endl;
+    
     for (unsigned int i = 0; i < size_of_the_msg; i++) {
         CHECK(msg[i] == msg_exemple[i]);
     }
@@ -40,7 +49,7 @@ TEST_CASE("Protocol with data compression") {
     new_param1 = resp.PopParam<bool>();
     new_param2 = resp.PopParam<int32_t>();  
 
-    CHECK(resp.GetACK() == ack);
+    CHECK(resp.getACK() == ack);
     CHECK(resp.GetInfoType() == Utils::InfoTypeEnum::GameInfo);
     CHECK(resp.GetInfoFunction() == static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame));
 
@@ -51,9 +60,9 @@ TEST_CASE("Protocol with data compression") {
 TEST_CASE("Protocol without data compression") {
     uint32_t ack = 4;
     bool param1 = true;
-    int32_t param2 = -2022;
+    int param2 = -2022;
     bool new_param1;
-    int32_t new_param2;
+    int new_param2;
 
     //                                 | ack        |I|F  |args_bytes |P1| P2
     Utils::Network::bytes msg_exemple = {4, 0, 0, 0, 0, 3, 0xf9, 0xff, 1, 0x1a, 0xf8};
@@ -74,7 +83,7 @@ TEST_CASE("Protocol without data compression") {
     new_param1 = resp.PopParam<bool>();
     new_param2 = resp.PopParam<int32_t>();  
 
-    CHECK(resp.GetACK() == ack);
+    CHECK(resp.getACK() == ack);
     CHECK(resp.GetInfoType() == Utils::InfoTypeEnum::GameInfo);
     CHECK(resp.GetInfoFunction() == static_cast<uint8_t>(Utils::GameInfoEnum::JoinGame));
 
@@ -114,7 +123,7 @@ TEST_CASE("Protocol with float")
     new_param1 = resp.PopParam<double>();
     new_param2 = resp.PopParam<double>();  
 
-    CHECK(resp.GetACK() == ack);
+    CHECK(resp.getACK() == ack);
     CHECK(resp.GetInfoType() == Utils::InfoTypeEnum::Player);
     CHECK(resp.GetInfoFunction() == static_cast<uint8_t>(Utils::PlayerEnum::PlayerMove));
 

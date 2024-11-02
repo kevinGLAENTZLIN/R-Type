@@ -240,6 +240,14 @@ void Rtype::Game::movePlayer(int id, double x, double y)
     velocity.setY(y);
 }
 
+void Rtype::Game::setPlayerPos(int id, double x, double y)
+{
+    auto &position = _core->getComponent<ECS::Components::Position>(_serverToLocalPlayersId[id]);
+
+    position.setX(x);
+    position.setY(y);
+}
+
 void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibility)
 {
     std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));

@@ -34,7 +34,8 @@ namespace Utils
         JoinGame,
         GameWonLost,
         SafetyCheck,
-        LevelComplete
+        LevelComplete,
+        MissingPackages
     };
 
     // Enums for player-related functions.
@@ -42,6 +43,7 @@ namespace Utils
         PlayerSpawnOnGame = 0,
         PlayerDie,
         PlayerMove,
+        Position,
         PlayerAttack,
         PlayerGotPowerUp,
         PlayerHitAWall,
@@ -95,8 +97,8 @@ namespace Utils
                         std::is_same_v<T, PowerUpEnum> || std::is_same_v<T, ProjectileEnum>;
 
 
-    using PrimitiveType = std::variant<bool, char, int, double>;
-
+    using PrimitiveType = std::variant<uint32_t, bool, char, int, double>;
+    
     // Class managing a mapping of parameters for all functions of the protocol.
     class ParametersMap {
         public:
@@ -118,10 +120,12 @@ namespace Utils
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GameWonLost)}, {"", "b"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::SafetyCheck)}, {"", ""}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::LevelComplete)}, {"", "i"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::MissingPackages)}, {"llll", ""}},
 
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerDie)}, {"", "i"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"ff", "iff"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::Position)}, {"", "ff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerAttack)}, {"i", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerGotPowerUp)}, {"i", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerHitAWall)}, {"", "i"}},

@@ -13,15 +13,19 @@ namespace ECS {
 
         class Health {
         public:
-            Health(int health);
+            Health(int health, int invincibility = 0);
             ~Health() = default;
+
             int getHealth() const;
             void setHealth(int health);
+            void modifyHealthBy(int delta);
 
-        protected:
-
+            int getInvincibility() const;
+            void setInvincibility(int invincibility);
+            void modifyInvincibilityBy(int delta);
         private:
             int _health;
+            int _invincibility;
         };
     }
 }

@@ -7,12 +7,26 @@
 
 #pragma once
 
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
+
 #include <iostream>
 #include <string>
 #include <cstdarg>
 #include <map>
 #include <vector>
 #include "../Utils/ParametersMap/ParametersMap.hpp"
+#include <boost/asio.hpp>
+
+using boost::asio::ip::udp;
+using boost::asio::ip::address;
 
 /**
  * @file Client_info.cpp
@@ -68,28 +82,42 @@ namespace Rtype {
              * 
              * @return The X coordinate.
              */
-            int getX() const;
+            float getX() const;
 
             /**
              * @brief Sets the X coordinate of the client.
              * 
              * @param x The new X coordinate.
              */
-            void setX(int x);
+            void setX(float x);
+
+            /**
+             * @brief Moves the X coordinate of the client.
+             * 
+             * @param x The Add x to X coordinate.
+             */
+            void moveX(float x);
 
             /**
              * @brief Gets the Y coordinate of the client.
              * 
              * @return The Y coordinate.
              */
-            int getY() const;
+            float getY() const;
 
             /**
              * @brief Sets the Y coordinate of the client.
              * 
              * @param y The new Y coordinate.
              */
-            void setY(int y);
+            void setY(float y);
+
+            /**
+             * @brief Moves the Y coordinate of the client.
+             * 
+             * @param x The Add y to Y coordinate.
+             */
+            void moveY(float y);
 
             /**
              * @brief Gets the expected ACK number for the client.
@@ -157,6 +185,10 @@ namespace Rtype {
              */
             void setAddr(std::string address);
 
+            bool isAlive() const;
+
+            void setAliveStatus(bool is_alive);
+
             /**
              * @brief Adds a command to the client's command history.
              * 
@@ -170,6 +202,7 @@ namespace Rtype {
             template <Utils::FunctionIndex T>
             void pushCmdToHistory(Utils::InfoTypeEnum function_type, T function_index, std::va_list params)
             {
+                Utils::ParametersMap::init_map();
                 int nb_params = Utils::ParametersMap::getNbParameterPerFunctionClient(function_type, function_index);
                 std::string params_type = Utils::ParametersMap::getParameterTypePerFunctionClient(function_type, function_index);
                 std::vector<std::string> vector_params;
@@ -199,8 +232,8 @@ namespace Rtype {
 
         private:
             int _id;
-            int _x;
-            int _y;
+            float _x;
+            float _y;
             int _AckExpected;
             int _AckToSend;
             int _gameRoom;

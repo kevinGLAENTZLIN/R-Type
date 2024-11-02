@@ -12,6 +12,10 @@
 namespace ECS {
     namespace Systems {
 
+        /**
+        * @brief System class
+        *
+        */
         class System {
 
         public:

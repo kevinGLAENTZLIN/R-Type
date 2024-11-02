@@ -14,9 +14,8 @@ int main(int argc, char* argv[])
         return 1;
     }
     try {
-        boost::asio::io_service io_service;
-        Rtype::udpServer server(io_service, std::atoi(argv[1]));
-        io_service.run();
+        Rtype::udpServer server(std::atoi(argv[1]));
+        server.run();
     }
     catch (std::exception &error) {
         std::cerr << "Exception: " << error.what() << "\n";

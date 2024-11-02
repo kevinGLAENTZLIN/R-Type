@@ -12,15 +12,51 @@
 
 #include "udp_server.hpp"
 
-Rtype::udpServer::udpServer(boost::asio::io_service& io_service, short port)
+Rtype::udpServer::udpServer(short port)
+    : _ioService(), _signals(_ioService, SIGINT),  _stop(false)
 {
-    _network = std::make_shared<Rtype::Network>(io_service, port, "Server");
+    _network = std::make_shared<Rtype::Network>(_ioService, port, "Server");
     _clients = std::make_shared<std::map<int, std::shared_ptr<Rtype::client_info>>>();
     _games = std::make_shared<std::map<int, std::shared_ptr<Rtype::Game_info>>>();
     Utils::ParametersMap::init_map();
     std::memset(_data, 0, max_length);
     setHandleMaps();
     read_clients();
+    initSignalHandlers();
+}
+
+Rtype::udpServer::~udpServer()
+{
+    _ioService.stop();
+    if (_networkThread.joinable())
+        _networkThread.join();
+}
+
+void Rtype::udpServer::run()
+{
+    _networkThread = std::thread([this]() {
+        this->runNetwork();
+    });
+    while (!_stop) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
+
+void Rtype::udpServer::runNetwork()
+{
+    _ioService.run();
+}
+
+void Rtype::udpServer::initSignalHandlers()
+{
+    _signals.async_wait(
+        [this](boost::system::error_code ec, int signal_number) {
+            if (!ec) {
+                _stop = true;
+            }
+        }
+    );
 }
 
 void Rtype::udpServer::read_clients()

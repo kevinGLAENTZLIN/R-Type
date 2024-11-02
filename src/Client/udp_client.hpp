@@ -51,7 +51,7 @@ namespace Rtype {
         /**
          * @brief Run the network thread and the game.
          */
-        void run();  // This will now spawn two threads: one for game, one for network.
+        void run();
 
     private:
         void read_server();

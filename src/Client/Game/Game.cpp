@@ -297,7 +297,6 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
     if (!_isRendering && !_modelCreated) {
-        std::cout << "Model Loaded" << std::endl;
         _ressourcePool.addModel("ship_yellow");
         _modelCreated = true;
     }
@@ -312,7 +311,6 @@ void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
     _core->addComponent(otherPlayer, ECS::Components::Health{1, -1});
     _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = otherPlayer;
-    std::cout << "otherPlayer id: " << otherPlayer << std::endl; 
 }
 
 void Rtype::Game::destroyEntityMenu(void)
@@ -720,16 +718,18 @@ std::vector<int> Rtype::Game::getAIProjectile()
 {
     std::vector<int> serverProjectile;
 
-    serverProjectile.insert(serverProjectile.end(), _AIBydoShots.begin(), _AIBydoShots.end());
-    serverProjectile.insert(serverProjectile.end(), _AIHomingShots.begin(), _AIHomingShots.end());
-    _AIBydoShots.clear();
-    _AIHomingShots.clear();
-    for (std::size_t i; i < serverProjectile.size(); i++)
+    serverProjectile.insert(serverProjectile.end(), _projectilesToSend.begin(), _projectilesToSend.end());
+    _projectilesToSend.clear();
+    for (std::size_t i; i < serverProjectile.size(); i++) {
         for (const auto& Ids : _serverToLocalEnemiesId)
             if (Ids.second == serverProjectile[i]) {
                 serverProjectile[i] = Ids.first;
-                std::cout << "entity Id to make fire: " << Ids.first << std::endl;
             }
+        for (const auto& Ids : _serverToLocalPodsId)
+            if (Ids.second == serverProjectile[i]) {
+                serverProjectile[i] = Ids.first;
+            }
+    }
     // for (int i = 0; i < serverProjectile.size(); i++) {
     //     std::cout << "serverId[" << i << "]:" << serverProjectile[i];
     //     std::cout << "==> localId[" << i << "]:" << _serverToLocalEnemiesId[serverProjectile[i]] << std::endl;
@@ -760,13 +760,14 @@ std::vector<int> Rtype::Game::getDeadEntities()
             if (Ids.second == serverDeadEntities[i])
                 serverDeadEntities[i] = Ids.first;
         for (const auto& Ids : _serverToLocalEnemiesId)
-            if (Ids.second == serverDeadEntities[i]) {
+            if (Ids.second == serverDeadEntities[i])
                 serverDeadEntities[i] = Ids.first;
-            }
         for (const auto& Ids : _serverToLocalProjectilesId)
             if (Ids.second == serverDeadEntities[i])
                 serverDeadEntities[i] = Ids.first;
     }
+    //for (int i = 0; i < serverDeadEntities.size(); i++)
+        //std::cout << "serverDeadEntities[" << i << "] :" << serverDeadEntities[i] << std::endl;
     _deadEntities.clear();
     return serverDeadEntities;
 }
@@ -1054,6 +1055,7 @@ void Rtype::Game::createEnemyProjectile(int entityId, int projectileId, enemiesT
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::AI{projectileType});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+    //std::cout << "createProjectile : server("  << projectileId << ")" << " local(" << projectile << ")" << std::endl;
     _serverToLocalProjectilesId[projectileId] = projectile;
 }
 
@@ -1082,6 +1084,31 @@ void Rtype::Game::createPlayerProjectile(int entityId, int projectileId)
     _serverToLocalProjectilesId[projectileId] = projectile;
 }
 
+void Rtype::Game::createPodProjectile(int entityId, int projectileId)
+{
+    auto &positions = _core->getComponents<ECS::Components::Position>();
+    auto &hitboxes = _core->getComponents<ECS::Components::Hitbox>();
+
+    if (!positions[_serverToLocalPodsId[entityId]].has_value()) {
+        return;
+    }
+    const ECS::Components::Position &entityPos = positions[_serverToLocalPodsId[entityId]].value();
+    const ECS::Components::Hitbox &entityHitbox = hitboxes[_serverToLocalPodsId[entityId]].value();
+
+    std::size_t projectile = _core->createEntity();
+
+    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("base_projectile"));
+    _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
+    _core->addComponent(projectile, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Scale{1.0f});
+    _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
+    _core->addComponent(projectile, ECS::Components::Projectile{});
+    _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+    playSound("blasterLego");
+    _serverToLocalProjectilesId[projectileId] = projectile;
+}
+
 void Rtype::Game::createProjectile(int entityId, int projectileId)
 {
     if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
@@ -1092,6 +1119,10 @@ void Rtype::Game::createProjectile(int entityId, int projectileId)
     }
     else if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end())
         createPlayerProjectile(entityId, projectileId);
+    else if (_serverToLocalPodsId.find(entityId) != _serverToLocalPodsId.end()){
+        std::cout << "jaj" << std::endl;
+        createPodProjectile(entityId, projectileId);
+    }
 }
 
 void Rtype::Game::createPod(float posX, float posY)
@@ -1111,7 +1142,11 @@ void Rtype::Game::createPod(float posX, float posY)
 
 void Rtype::Game::damageEntity(int entityId)
 {
-    std::size_t toDamage = _serverToLocalEnemiesId.at(entityId);
+    std::size_t toDamage;
+    if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end())
+        toDamage = _serverToLocalPlayersId.at(entityId);
+    if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end())
+        toDamage = _serverToLocalEnemiesId.at(entityId);
     std::size_t currentHealth = _core->getComponent<ECS::Components::Health>(toDamage).getHealth();
 
     _core->getComponent<ECS::Components::Health>(toDamage).setHealth(currentHealth - 1);
@@ -1127,6 +1162,9 @@ void Rtype::Game::destroyEntity(int entityId)
         _serverToLocalPlayersId.erase(entityId);
     }
     if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
+        if (_core->getComponents<ECS::Components::AI>()[_serverToLocalEnemiesId.at(entityId)]->getEnemyType() == MINIKIT)
+            createPod(_core->getComponents<ECS::Components::Position>()[_serverToLocalEnemiesId.at(entityId)]->getX(),
+                _core->getComponents<ECS::Components::Position>()[_serverToLocalEnemiesId.at(entityId)]->getY());
         toDestroy = _serverToLocalEnemiesId.at(entityId);
         _serverToLocalEnemiesId.erase(entityId);
     }
@@ -1134,7 +1172,7 @@ void Rtype::Game::destroyEntity(int entityId)
         toDestroy = _serverToLocalProjectilesId.at(entityId);
         _serverToLocalProjectilesId.erase(entityId);
     }
-    std::cout << "toDestroy :" << toDestroy << std::endl;
+    //std::cout << "Destroyed in destroyEntities : server(" << entityId << ")" << " local(" << toDestroy << ")" << std::endl;
     _core->destroyEntity(toDestroy);
 }
 
@@ -1230,10 +1268,6 @@ void Rtype::Game::update() {
     }
 
     if (_isRendering) {
-        for (int i = 0; i < projectileEntities.size(); i++)
-            std::cout << "projectileEntities[" << i << "]: " << projectileEntities[i] << std::endl;
-        for (int i = 0; i < collisionEntities.size(); i++)
-            std::cout << "collisionEntities[" << i << "]: " << collisionEntities[i] << std::endl;
         std::vector<std::size_t> projectileEntityId = projectileCollisionSystem->projectileIsHit(
             _core->getComponents<ECS::Components::Position>(),
             _core->getComponents<ECS::Components::Hitbox>(),
@@ -1241,14 +1275,23 @@ void Rtype::Game::update() {
             projectileEntities, collisionEntities, AImabites);
         auto healthComponents = _core->getComponents<ECS::Components::Health>();
         auto podsEntities = _core->getEntitiesWithComponent<ECS::Components::Pod>();
+        _damagedEntities.insert(_damagedEntities.end(), projectileEntityId.begin(), projectileEntityId.end());
+        projectileEntityId.clear();
 
-        for (int i = 0; i < projectileEntityId.size(); i++) {
+        std::vector<std::size_t> hitByPodEntity = collisionSystem->AIHitPod(
+            _core->getComponents<ECS::Components::Position>(), _core->getComponents<ECS::Components::Hitbox>(),
+            _core->getComponents<ECS::Components::Health>(), _core->getComponents<ECS::Components::Pod>(),
+            podsEntities, _core->getEntitiesWithComponent<ECS::Components::AI, ECS::Components::Health>());
+        _damagedEntities.insert(_damagedEntities.end(), hitByPodEntity.begin(), hitByPodEntity.end());
+        hitByPodEntity.clear();
+
+        for (int i = 0; i < _damagedEntities.size(); i++) {
             for (int j = 0; j < damageableEntities.size(); j++) {
-                if (damageableEntities[j] == projectileEntityId[i] && healthComponents[damageableEntities[j]]->getInvincibility() == 0) {
+                if (damageableEntities[j] == _damagedEntities[i] && healthComponents[damageableEntities[j]]->getInvincibility() == 0) {
                     // _damagedEntities.push_back(damageableEntities[j]);
                     // for (std::size_t i; i < serverDamagedEntities.size(); i++)
-                    std::unique_ptr<Rtype::Command::Enemy::Damage> damage_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Damage, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDamage);
-                    
+                    std::unique_ptr<Rtype::Command::Enemy::Damage> damage_cmd =
+                        CONVERT_ACMD_TO_CMD(Rtype::Command::Enemy::Damage, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDamage);
                     for (const auto& Ids : _serverToLocalEnemiesId)
                         if (Ids.second == damageableEntities[j]) {
                             damage_cmd->set_client(Ids.first);
@@ -1258,26 +1301,24 @@ void Rtype::Game::update() {
                 }
             }
             for (int j = 0; j < projectileEntities.size(); j++)
-                if (projectileEntities[j] == projectileEntityId[i]) {
-                    _core->destroyEntity(projectileEntityId[i]);
+                if (projectileEntities[j] == _damagedEntities[i]) {
+                    //std::cout << "destroy projectile : " << projectileEntities[j] << std::endl;
+                    for (const auto& Ids : _serverToLocalProjectilesId)
+                        if (Ids.second == projectileEntities[j])
+                            _serverToLocalProjectilesId.erase(Ids.first);
+                    _core->destroyEntity(projectileEntities[j]);
                 }
         }
-        std::vector<std::size_t> hitByPodEntity = collisionSystem->AIHitPod(
-            _core->getComponents<ECS::Components::Position>(), _core->getComponents<ECS::Components::Hitbox>(),
-            _core->getComponents<ECS::Components::Health>(), _core->getComponents<ECS::Components::Pod>(),
-            podsEntities, _core->getEntitiesWithComponent<ECS::Components::AI, ECS::Components::Health>());
-        _damagedEntities.insert(_damagedEntities.end(), hitByPodEntity.begin(), hitByPodEntity.end());
-        projectileEntityId.clear();
-        hitByPodEntity.clear();
+        _damagedEntities.clear();
 
         std::vector<std::size_t> pickedUpPod = collisionSystem->PlayerPickedUpPod(
             _core->getComponents<ECS::Components::Position>(), _core->getComponents<ECS::Components::Hitbox>(),
             _core->getComponents<ECS::Components::Pod>(),
-            podsEntities,
-            playerEntities);
+            podsEntities, playerEntities);
 
         for (int i = 0; i < pickedUpPod.size(); i++) {
             std::size_t pod = pickedUpPod[i];
+            std::cout << "pod: " << pod << " " << _core->getComponents<ECS::Components::Pod>()[pod]->getLevel() << std::endl;
             if (_core->getComponents<ECS::Components::Pod>()[pod]->getLevel() < 0) {
                 _core->destroyEntity(pod);
                 continue;
@@ -1338,27 +1379,26 @@ void Rtype::Game::update() {
         deadEntities.clear();
     }
 */
-    // _AIBydoShots.clear();
+    auto podEntities = _core->getEntitiesWithComponent<ECS::Components::Pod>();
     std::vector<std::size_t> AIBydoShots = AIFiringProjectileSystem->aiFiringBydoShots(
         _core->getComponents<ECS::Components::AI>(),
         _core->getComponents<ECS::Components::Position>(),
         AIEntities);
     if (!_isRendering && AIBydoShots.size() > 0)
-        _AIBydoShots.insert(_AIBydoShots.end(), AIBydoShots.begin(), AIBydoShots.end());
+        _projectilesToSend.insert(_projectilesToSend.end(), AIBydoShots.begin(), AIBydoShots.end());
 
-    // for (std::size_t i = 0; i < AIBydoShots.size(); i++)
-    //     createEnemyProjectile(AIBydoShots[i], BYDOSHOT);
-
-    // _AIHomingShots.clear();
     std::vector<std::size_t> AIHomingShots = AIFiringProjectileSystem->aiFiringHomingShots(
-        _core->getComponents<ECS::Components::AI>(),
-        _core->getComponents<ECS::Components::Position>(),
-        AIEntities);
+        _core->getComponents<ECS::Components::AI>(), AIEntities);
     if (!_isRendering && AIHomingShots.size() > 0)
-        _AIHomingShots.insert(_AIHomingShots.end(), AIHomingShots.begin(), AIHomingShots.end());
-        
-    // for (std::size_t i = 0; i < _AIHomingShots.size(); i++)
-    //     createEnemyProjectile(_AIHomingShots[i], 250, HOMINGSHOT);
+        _projectilesToSend.insert(_projectilesToSend.end(), AIHomingShots.begin(), AIHomingShots.end());
+
+    std::vector<std::size_t> podShots = AIFiringProjectileSystem->podFiringShots(
+        _core->getComponents<ECS::Components::Pod>(), podEntities);
+    for (int i = 0; i < podShots.size(); i++)
+        std::cout << "podShots: " << podShots[i]<< std::endl;
+
+    if (!_isRendering && podShots.size() > 0)
+        _projectilesToSend.insert(_projectilesToSend.end(), podShots.begin(), podShots.end());
 
     if (false)
         _camera.Update(CAMERA_FREE);
@@ -1547,6 +1587,6 @@ void Rtype::Game::playSound(std::string name) {
     if (it != _soundMap.end()) {
         it->second.play();
     } else {
-        std::cerr << "Sound not found" << std::endl;
+        std::cout << "Sound not found" << std::endl;
     }
 }

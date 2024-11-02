@@ -110,6 +110,7 @@ std::vector<std::size_t> ECS::Systems::Collision::PlayerPickedUpPod(
                     playerPickedUpPod.push_back(pod);
                     continue;
                 }
+                std::cout << "pod level: " << pods[indexPod1]->getLevel() << std::endl;
                 if (pods[indexPod1]->getLevel() == 0) {
                     pods[indexPod1]->setLevel(1);
                     pods[pod]->setLevel(-1);

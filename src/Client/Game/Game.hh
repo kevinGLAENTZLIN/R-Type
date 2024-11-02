@@ -104,6 +104,7 @@ namespace Rtype {
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
         void createEnemyProjectile(int entityId, int projectileId, enemiesTypeEnum_t projectileType);
         void createPlayerProjectile(int entityId, int projectileId);
+        void createPodProjectile(int entityId, int projectileId);
         void loadMusic();
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
@@ -151,6 +152,7 @@ namespace Rtype {
         std::map<int, std::size_t> _serverToLocalPlayersId;
         std::map<int, std::size_t> _serverToLocalEnemiesId;
         std::map<int, std::size_t> _serverToLocalProjectilesId;
+        std::map<int, std::size_t> _serverToLocalPodsId;
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
         std::vector<std::size_t> _boss2Balls;
@@ -162,8 +164,7 @@ namespace Rtype {
         bool _modelCreated;
         bool _isConnectedToServer;
         std::vector<std::tuple<int, int, int>> _availableGames;
-        std::vector<std::size_t> _AIBydoShots;
-        std::vector<std::size_t> _AIHomingShots;
+        std::vector<std::size_t> _projectilesToSend;
         std::vector<std::size_t> _deadEntities;
         std::vector<std::size_t> _damagedEntities;
         std::thread _localServer;

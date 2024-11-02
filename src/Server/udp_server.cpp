@@ -225,7 +225,19 @@ void Rtype::udpServer::setHandlePlayerMap() {
 }
 
 void Rtype::udpServer::setHandlePowerUpMap() {
-    std::cerr << "PowerUpNotImplemented" << std::endl;
+    _handlePowerUpMap[Utils::PowerUpEnum::PowerUpSpawn] = [this](Utils::Network::Response response) {
+        std::unique_ptr<Rtype::Command::PowerUp::Spawn> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::PowerUp::Spawn, Utils::InfoTypeEnum::PowerUp, Utils::PowerUpEnum::PowerUpSpawn);
+        double x = response.PopParam<double>();
+        double y = response.PopParam<double>();
+        int gameID = _clients->at(get_sender_client_id())->getRoom();
+
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        cmd->set_server(_games->at(gameID)->getPlayers(), _games->at(gameID)->getNbProjectiles(), x, y);
+        _network->addCommandToInvoker(std::move(cmd));
+        _games->at(gameID)->accNbProjectiles();
+        // _game->createPod(id, x, y);
+        //! Pour Arthur <3
+    };
 }
 
 void Rtype::udpServer::setHandleEnemyMap() {

@@ -35,6 +35,8 @@ Rtype::Command::Factory::Factory()
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Boss), static_cast<uint8_t>(Utils::BossEnum::BossDie)}] = []() {return std::make_unique<Boss::Die>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Boss), static_cast<uint8_t>(Utils::BossEnum::BossSpawn)}] = []() {return std::make_unique<Boss::Spawn>();};
 
+    _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::PowerUp), static_cast<uint8_t>(Utils::PowerUpEnum::PowerUpSpawn)}] = []() {return std::make_unique<PowerUp::Spawn>();};
+
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Projectile), static_cast<uint8_t>(Utils::ProjectileEnum::ProjectileFired)}] = []() {return std::make_unique<Projectile::Fired>();};
     _commandMap[{static_cast<uint8_t>(Utils::InfoTypeEnum::Projectile), static_cast<uint8_t>(Utils::ProjectileEnum::ProjectileHit)}] = []() {return std::make_unique<Projectile::Hit>();};
 }

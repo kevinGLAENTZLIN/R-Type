@@ -30,6 +30,7 @@ set(LIB_CMD_SRC
     ./Commands/Player/Hit_wall/Hit_wall.cpp
     ./Commands/Player/Power_up/Power_up.cpp
     ./Commands/Player/Spawn/Spawn.cpp
+    ./Commands/Power_up/Spawn/Spawn.cpp
     ./Invoker/Command_invoker.cpp
     ../Utils/ParametersMap/ParametersMap.cpp
 )

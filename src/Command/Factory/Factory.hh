@@ -39,7 +39,7 @@
 #include "../Commands/Boss/Die/Die.hh"
 #include "../Commands/Boss/Spawn/Spawn.hh"
 
-// #include "../Commands/Power_up/"
+#include "../Commands/Power_up/Spawn/Spawn.hh"
 
 #include "../Commands/Projectile/Fired/Fired.hh"
 #include "../Commands/Projectile/Hit/Hit.hh"

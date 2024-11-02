@@ -142,7 +142,7 @@ namespace Utils
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossDie)}, {"", "i"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossAttack)}, {"", "ii"}},
 
-                    {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpSpawn)}, {"", ""}},
+                    {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpSpawn)}, {"ff", "iff"}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpDisappear)}, {"", ""}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpAttack)}, {"", ""}},
 

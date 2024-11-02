@@ -345,6 +345,8 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
         CONSOLE_INFO("Handle Response: ", (int)cmd_category)
         CONSOLE_INFO("Handle Response: ", (int)clientResponse.GetInfoFunction())
     }
+
+    try {
     switch (cmd_category) {
     case Utils::InfoTypeEnum::GameInfo:
         _handleGameInfoMap[static_cast<Utils::GameInfoEnum>(clientResponse.GetInfoFunction())](clientResponse);
@@ -368,6 +370,34 @@ void Rtype::udpClient::handleResponse(Utils::Network::Response clientResponse)
         std::cerr << "Unknown command category." << std::endl;
         break;
     }
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        switch (cmd_category) {
+            case Utils::InfoTypeEnum::GameInfo:
+                std::cerr << "GameInfoEnum: " << (int)clientResponse.GetInfoFunction() << std::endl;
+                break;
+            case Utils::InfoTypeEnum::Player:
+                std::cerr << "PlayerEnum: " << (int)clientResponse.GetInfoFunction() << std::endl;
+                break;
+            case  Utils::InfoTypeEnum::Enemy:
+                std::cerr << "EnemyEnum: " << (int)clientResponse.GetInfoFunction() << std::endl;
+                break;
+            case  Utils::InfoTypeEnum::PowerUp:
+                std::cerr << "PowerUpEnum: " << (int)clientResponse.GetInfoFunction() << std::endl;
+                break;
+            case  Utils::InfoTypeEnum::Projectile:
+                std::cerr << "ProjectileEnum: " << (int)clientResponse.GetInfoFunction() << std::endl;
+                break;
+            case  Utils::InfoTypeEnum::Boss:
+                std::cerr << "BossEnum: " << (int)clientResponse.GetInfoFunction() << std::endl;
+                break;
+            default:
+                std::cerr << "Unknown command category." << std::endl;
+                break;
+        }
+        exit(84);
+
+    };
 }
 
 void Rtype::udpClient::connectClient()

@@ -48,6 +48,9 @@
 #include "../../Utils/enemiesTypeEnum.hpp"
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
+#include <cstdlib>
+#include <thread>
+
 #define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
 #define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
@@ -90,6 +93,8 @@ namespace Rtype {
         void createPod(float posX, float posY);
         void damageEntity(int entityId);
         void destroyEntity(int entityId);
+        void setIsConnectedToServer(bool state);
+        void setIsRunning(bool state);
 
         std::vector<int> getAIProjectile();
         std::vector<int> getDamagedEntities();
@@ -155,10 +160,12 @@ namespace Rtype {
         bool _isAvailableGames;
         bool _isRendering;
         bool _modelCreated;
+        bool _isConnectedToServer;
         std::vector<std::tuple<int, int, int>> _availableGames;
         std::vector<std::size_t> _AIBydoShots;
         std::vector<std::size_t> _AIHomingShots;
         std::vector<std::size_t> _deadEntities;
         std::vector<std::size_t> _damagedEntities;
+        std::thread _localServer;
     };
 };

@@ -18,6 +18,7 @@
 #include <thread>
 #include <vector>
 #include <array>
+#include <atomic>
 
 #include "../Utils/Network/Network.hpp"
 
@@ -71,17 +72,18 @@ namespace Rtype {
         void setHandleProjectileMap();
         void setHandleBossMap();
 
+        /**
+         * @brief Run the IO context.
+         */
+        void runNetwork();
+
         std::unordered_map<Utils::GameInfoEnum, std::function<void(Utils::Network::Response)>> _handleGameInfoMap;
         std::unordered_map<Utils::PlayerEnum, std::function<void(Utils::Network::Response)>> _handlePlayerMap;
         std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
         std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
         std::unordered_map<Utils::EnemyEnum, std::function<void(Utils::Network::Response)>> _handleEnemyMap;
         std::unordered_map<Utils::BossEnum, std::function<void(Utils::Network::Response)>> _handleBossMap;
-
-        /**
-         * @brief Run the IO context.
-         */
-        void runNetwork();  // New method to handle the networking thread.
+        void initSignalHandlers();
 
         int _id;
         boost::asio::io_context _ioContext;
@@ -89,5 +91,7 @@ namespace Rtype {
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
         std::unique_ptr<Rtype::Game> _game;
+        boost::asio::signal_set _signals;
+        std::atomic<bool> _stop;
     };
 }

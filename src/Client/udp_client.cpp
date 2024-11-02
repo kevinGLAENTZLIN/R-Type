@@ -9,13 +9,14 @@
 #include "../Utils/Protocol/Protocol.hpp"
 
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort):
-    _id(-1), _ioContext()
+    _id(-1), _ioContext(), _signals(_ioContext, SIGINT),  _stop(false)
 {
     _network = std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client");
     _game = std::make_unique<Rtype::Game>(_network, true);
     setHandleMaps();
     connectClient();
     read_server();
+    initSignalHandlers();
 }
 
 Rtype::udpClient::~udpClient()
@@ -49,26 +50,42 @@ void Rtype::udpClient::runNetwork()
     _ioContext.run();
 }
 
+void Rtype::udpClient::initSignalHandlers()
+{
+    _signals.async_wait(
+        [this](boost::system::error_code ec, int signal_number) {
+            if (!ec) {
+                _stop = true;
+                _ioContext.stop();
+                _game->setIsRunning(false);
+            }
+        }
+    );
+}
 
 void Rtype::udpClient::read_server()
 {
     auto sender_endpoint = std::make_shared<udp::endpoint>();
 
-    _network->getSocket()->async_receive_from(boost::asio::buffer(_receiverBuffer), *sender_endpoint,
-    [this, sender_endpoint](const boost::system::error_code& error, std::size_t bytes_recv) {
-        Utils::Network::Response clientResponse;
-        Utils::Network::bytes data;
+    if (_stop)
+        return;
+    if (!_stop) {
+        _network->getSocket()->async_receive_from(boost::asio::buffer(_receiverBuffer), *sender_endpoint,
+        [this, sender_endpoint](const boost::system::error_code& error, std::size_t bytes_recv) {
+            Utils::Network::Response clientResponse;
+            Utils::Network::bytes data;
 
-        if (!error && bytes_recv > 0) {
-            data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
-            clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
-            handleResponse(clientResponse);
-        } else if (error)
-            std::cerr << "Error receiving data: " << error.message() << std::endl;
-        read_server();
-    });
+            if (!error && bytes_recv > 0) {
+                data = Utils::Network::bytes(std::begin(_receiverBuffer), std::end(_receiverBuffer));
+                clientResponse = Utils::Network::Protocol::ParseMsg(true, data);
+                handleResponse(clientResponse);
+            } else if (error) {
+                std::cerr << "Error receiving data: " << error.message() << std::endl;
+            }
+            read_server();
+        });
+    }
 }
-
 
 void Rtype::udpClient::setHandleMaps()
 {
@@ -84,7 +101,9 @@ void Rtype::udpClient::setHandleGameInfoMap()
 {
     _handleGameInfoMap[Utils::GameInfoEnum::NewClientConnected] = [this](Utils::Network::Response response) {
         std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Client_connection, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected);
+
         _id = response.PopParam<int>();
+        _game->setIsConnectedToServer(true);
         CONSOLE_INFO("Id set on client: ", _id);
     };
 

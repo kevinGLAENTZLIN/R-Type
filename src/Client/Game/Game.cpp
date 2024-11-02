@@ -19,7 +19,7 @@ std::vector<std::string> options = {"Start Game", "Options", "Quit"};
 
 Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
     : _network(network), _isRunning(true), _currentState(MENU),
-    _isJoiningGame(false), _isAvailableGames(false), _isRendering(render), _modelCreated(false)
+    _isJoiningGame(false), _isAvailableGames(false), _isRendering(render), _modelCreated(false), _isConnectedToServer(false)
 {
     _core = std::make_unique<ECS::Core::Core>();
 
@@ -198,6 +198,9 @@ Rtype::Game::~Game()
 {
     _ressourcePool.UnloadAll();
     _boss2Balls.clear();
+    
+    if (_localServer.joinable())
+        _localServer.join();
 }
 
 void Rtype::Game::createBoss(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life)
@@ -457,6 +460,17 @@ void Rtype::Game::failToConnect()
     std::cout << "There is no room available with this ID." << std::endl;
 }
 
+void Rtype::Game::setIsConnectedToServer(bool state)
+{
+    _isConnectedToServer = state;
+}
+
+void Rtype::Game::setIsRunning(bool state)
+{
+    _isRunning = state;
+}
+
+
 void Rtype::Game::joinGameID(void)
 {
     destroyEntityMenu();
@@ -577,11 +591,33 @@ void Rtype::Game::initCreationGame(void)
     _core->addComponent(createButtonEntity, ECS::Components::Position{400, 500});
     _core->addComponent(createButtonEntity, ECS::Components::Text{"Create Game", 30, RAYWHITE});
     _core->addComponent(createButtonEntity, ECS::Components::Button{Rectangle{350, 490, 300, 60}, true, [this]() {
-        std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Create_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame);
-        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-        cmd->set_client(_selectedDifficulty + 1, _playerCount);
-        _network->addCommandToInvoker(std::move(cmd));
-        CONSOLE_INFO("Create game: ", " Sended")
+        if (!_isConnectedToServer) {
+            if (system("ls | grep -q r-type_server") == 0 && !_localServer.joinable()) {
+                _network->setSenderEndpoint(udp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 2442)); //! Tmp get available port
+                int port = static_cast<int>(_network->getSenderEndpoint().port());
+
+                CONSOLE_INFO("A local server is now set.\nTo access to the server your local address is used (127.0.0.1) on the port ", port);
+                _localServer = std::thread([this, port]() {
+                    std::string cmd("./r-type_server " + std::to_string(port));
+
+                    system(cmd.c_str());
+                });
+               
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd_connection = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Client_connection, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::NewClientConnected);
+                cmd_connection->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                _network->addCommandToInvoker(std::move(cmd_connection));
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        }
+        if (_isConnectedToServer) {
+            std::unique_ptr<Rtype::Command::GameInfo::Create_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Create_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame);
+            
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+            cmd->set_client(_selectedDifficulty + 1, _playerCount);
+            _network->addCommandToInvoker(std::move(cmd));
+            CONSOLE_INFO("Create game: ", " Sended")
+        }
     }});
 
     std::size_t back = _core->createEntity();

@@ -85,10 +85,19 @@ void Rtype::udpServer::setHandleMaps() {
 void Rtype::udpServer::setHandleGameInfoMap() {
 
     _handleGameInfoMap[Utils::GameInfoEnum::NewClientConnected] = [this](Utils::Network::Response clientResponse) {
+        try {
+
         std::unique_ptr<Rtype::Command::GameInfo::Client_connection> cmd = convertACommandToCommand<Rtype::Command::GameInfo::Client_connection>(_network->createCommand(static_cast<uint8_t>(Utils::InfoTypeEnum::GameInfo), static_cast<uint8_t>(Utils::GameInfoEnum::NewClientConnected)));
         cmd->set_server(_clients, (int)_network->getSenderEndpoint().port(), _network->getSenderEndpoint().address().to_string());
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), 0);
         _network->addCommandToInvoker(std::move(cmd));
+        } catch (std::exception &e) {
+            std::cerr << "is from here" << e.what() << std::endl;
+            std::cerr << "is from here" << e.what() << std::endl;
+            std::cerr << "is from here" << e.what() << std::endl;
+            std::cerr << "is from here" << e.what() << std::endl;
+            std::cerr << "is from here" << e.what() << std::endl;
+        }
  
     };
 

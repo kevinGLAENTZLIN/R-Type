@@ -157,6 +157,20 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
     }
 }
 
+void Rtype::Game_info::computePlayer(void)
+{
+    std::unique_ptr<Command::Player::Position> cmd;
+
+    for (auto i_player = _players->begin(); i_player != _players->end(); i_player++) {
+        std::shared_ptr<Rtype::client_info> player = i_player->second;
+        cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Position, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), player->getAckToSend());
+        cmd->setClientInfo(player);
+        cmd->set_server(player->getX(), player->getY());
+        _network->addCommandToInvoker(std::move(cmd));
+    }
+}
+
 void Rtype::Game_info::computeTick(void)
 {
     int currentGameTimeInSeconds = 0;
@@ -171,6 +185,8 @@ void Rtype::Game_info::computeTick(void)
         _tick += 1;
         currentGameTimeInSeconds = _tick / 20;
         computeGame(currentGameTimeInSeconds);
+        if (_tick % 20 == 0)
+            computePlayer();
         if (_tick == MAX_UINT32 - 1) {
             _tick = 0;
             _timeLastLevelEnded = 0;

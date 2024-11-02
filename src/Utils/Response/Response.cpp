@@ -28,7 +28,7 @@ namespace Utils
             return _infoFunction;
         }
 
-        uint32_t Response::GetACK() const
+        uint32_t Response::getACK() const
         {
             return _ACK;
         }

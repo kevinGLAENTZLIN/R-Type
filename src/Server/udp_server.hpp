@@ -12,6 +12,15 @@
 
 #pragma once
 
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
 #include <cstdlib>
 #include <iostream>
 #include <map>

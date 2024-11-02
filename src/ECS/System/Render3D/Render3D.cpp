@@ -5,6 +5,7 @@
 ** SystemRender3D cpp
 */
 #include "Render3D.hh"
+#include <string>
 
 void ECS::Systems::SystemRender3D::update(
     ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,

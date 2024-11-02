@@ -10,7 +10,7 @@
 
 #include "../../Utils/Network/Network.hpp"
 #include <thread>
-#include<unistd.h>
+// #include<unistd.h>
 
 std::size_t ECS::CTypeRegistry::nextTypeIndex = 0;
 std::unordered_map<std::size_t, std::function<std::type_index()>> ECS::CTypeRegistry::indexToTypeMap;
@@ -275,6 +275,14 @@ void Rtype::Game::movePlayer(int id, double x, double y)
 
     velocity.setX(x);
     velocity.setY(y);
+}
+
+void Rtype::Game::setPlayerPos(int id, double x, double y)
+{
+    auto &position = _core->getComponent<ECS::Components::Position>(_serverToLocalPlayersId[id]);
+
+    position.setX(x);
+    position.setY(y);
 }
 
 void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibility)
@@ -1080,6 +1088,8 @@ void Rtype::Game::createPlayerProjectile(int entityId, int projectileId)
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});
+
+
     playSound("blasterLego");
     _serverToLocalProjectilesId[projectileId] = projectile;
 }
@@ -1360,6 +1370,10 @@ void Rtype::Game::update() {
                 sleep(3000);//GAMEOVER
         }
         if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
+        if (deadEntities[i] == _core->getEntitiesWithComponent<ECS::Components::Input>()[0])
+            //sleep(3000);//GAMEOVER
+            std::cout << "SEGV LOL" << std::endl;
+        else if (_core->getComponent<ECS::Components::AI>(deadEntities[i]).getEnemyType() == BOSS1_Core) {
             for (int i = BOSS1_Tail0; i <= BOSS1_Tail19; i++) {
                 auto AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
                 int tailId = 0;
@@ -1530,6 +1544,7 @@ void Rtype::Game::render() {
                            renderEntities3D,
                            _ressourcePool,
                            _camera);
+
 
     EndDrawing();
 }

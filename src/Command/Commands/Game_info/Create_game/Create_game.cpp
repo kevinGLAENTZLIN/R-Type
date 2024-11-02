@@ -54,5 +54,5 @@ void Rtype::Command::GameInfo::Create_game::execute_server_side()
     }
     _games->insert({room_id, std::make_shared<Game_info>(room_id, _difficulty, _maxNbPlayer)});
     CONSOLE_INFO("Create a new game: ", room_id)
-	sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame, room_id);
+	sendToEndpoint(*_clientInfo, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::CreateGame, room_id);
 }

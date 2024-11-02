@@ -6,7 +6,6 @@
 ** re use them after withtout reloading them.
 */
 #pragma once
-#include "raylib-cpp.hpp"
 #include <map>
 #include <iostream>
 #include <memory>
@@ -14,6 +13,18 @@
 #include <vector>
 #include <algorithm>
 #include <filesystem>
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
+
+#include "raylib-cpp.hpp"
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
+#include <array>
 #include <queue>
 #include <mutex>
 
@@ -23,8 +34,8 @@ namespace ECS {
         RessourcePool();
         ~RessourcePool() = default;
 
-        raylib::Model &getModel(std::string modelPath);
-        raylib::Texture &getTexture(std::string texturePath);
+        raylib::Model &getModel(const std::string &modelPath);
+        raylib::Texture &getTexture(const std::string &texturePath);
 
         void queueModelLoad(const std::string& modelPath);
         void requestLoadTexture(const std::string &texturePath);
@@ -33,7 +44,6 @@ namespace ECS {
         void addTexture(const std::string &TexturePath);
         void UnloadAll();
     private:
-
         std::map<const std::string, raylib::Model> _models;
         std::map<const std::string, raylib::Texture> _texturesModels;
         std::map<const std::string, raylib::Texture> _textures;

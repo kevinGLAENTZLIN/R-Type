@@ -18,7 +18,7 @@ int menuOption = 0;
 std::vector<std::string> options = {"Start Game", "Options", "Quit"};
 
 Rtype::Game::Game(std::shared_ptr<Rtype::Network> network, bool render)
-    : _network(network), _isRunning(true), _currentState(MENU),
+    : _network(network), _isRunning(true), _playerCount(2), _selectedDifficulty(1), _currentState(MENU),
     _isJoiningGame(false), _isAvailableGames(false), _isRendering(render), _modelCreated(false), _isConnectedToServer(false)
 {
     _core = std::make_unique<ECS::Core::Core>();

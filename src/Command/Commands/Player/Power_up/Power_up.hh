@@ -21,7 +21,7 @@ namespace Rtype
                     ~Power_up();
 
                     void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID, int powerUpID);
-                    void set_client(udp::endpoint endpoint, int powerUpID);
+                    void set_client();
 
                     void execute_client_side();
                     void execute_server_side();

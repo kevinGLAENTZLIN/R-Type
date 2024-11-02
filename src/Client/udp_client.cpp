@@ -220,11 +220,11 @@ void Rtype::udpClient::setHandlePlayerMap() {
 
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerGotPowerUp] = [this](Utils::Network::Response response) {
-
         int playerId = response.PopParam<int>();
+        int powerUpId = response.PopParam<int>();
 
-        std::cerr << "Player Move playerId not used" << std::endl;
-
+        //! Pour Arthur <3
+        // _game->equipPod(playerId, powerUpId);
     };
 
 

@@ -199,10 +199,15 @@ void Rtype::udpServer::setHandlePlayerMap() {
         std::unique_ptr<Rtype::Command::Player::Power_up> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Power_up, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp);
         int gameID = _clients->at(get_sender_client_id())->getRoom();
 
-
-        cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id(), clientResponse.PopParam<int>());
+        //! Pour Arthur <3
+        // std::unique_ptr<Rtype::Command::Player::Power_up> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Power_up, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp);
+        // cmd->set_client();
+        // cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
+        // _network->addCommandToInvoker(std::move(cmd));
+        cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id(), _games->at(gameID)->getNbProjectiles());
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
+        _games->at(gameID)->accNbProjectiles();
     };
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerHitAWall] = [this](Utils::Network::Response clientResponse) {

@@ -14,10 +14,8 @@ void Rtype::Command::Player::Power_up::set_server(std::shared_ptr<std::map<int, 
     _powerUpID = powerUpID;
 }
 
-void Rtype::Command::Player::Power_up::set_client(udp::endpoint endpoint, int powerUpID)
+void Rtype::Command::Player::Power_up::set_client()
 {
-    _endpoint = endpoint;
-    _powerUpID = powerUpID;
 }
 
 Rtype::Command::Player::Power_up::~Power_up()
@@ -26,8 +24,13 @@ Rtype::Command::Player::Power_up::~Power_up()
 
 void Rtype::Command::Player::Power_up::execute_client_side()
 {
+    sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp);
 }
 
 void Rtype::Command::Player::Power_up::execute_server_side()
 {
+    for (auto player: *_players) {
+        _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
+        sendToEndpoint(_endpoint, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp, _playerID, _powerUpID);
+    }
 }

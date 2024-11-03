@@ -44,6 +44,10 @@ raylib::Texture& ECS::RessourcePool::getTexture(const std::string &texturePath)
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)
 {
     std::string pathRessources = "./resources/" + TexturePath + "/" + TexturePath + ".png";
+    if (!std::filesystem::exists(pathRessources)) {
+        std::cerr << "Error: Texture path " << pathRessources << " does not exist." << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
     raylib::Texture defaultTexture(pathRessources);
 
     _textures.emplace(TexturePath, std::move(defaultTexture));
@@ -53,6 +57,10 @@ void ECS::RessourcePool::addModel(const std::string &modelPath)
 {
     std::string pathRessources = "./resources/" + modelPath + "/" + modelPath + ".obj";
     std::string pngTexturePath = pathRessources.substr(0, pathRessources.find_last_of('.')) + ".png";
+    if (!std::filesystem::exists(pathRessources) || !std::filesystem::exists(pngTexturePath)) {
+        std::cerr << "Error: Texture path " << pathRessources << " does not exist." << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
     raylib::Model defaultModel(pathRessources);
 
     if (std::filesystem::exists(pngTexturePath)) {

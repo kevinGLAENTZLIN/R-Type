@@ -2,7 +2,7 @@ name: Build, Push and Deploy R-Type Server Docker Image
 
 on:
   push:
-    branches: [RTY-120-deploy]
+    branches: [main]
 
 jobs:
   build-push-deploy-image:

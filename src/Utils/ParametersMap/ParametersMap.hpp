@@ -34,7 +34,8 @@ namespace Utils
         JoinGame,
         GameWonLost,
         SafetyCheck,
-        LevelComplete
+        LevelComplete,
+        MissingPackages
     };
 
     // Enums for player-related functions.
@@ -42,6 +43,7 @@ namespace Utils
         PlayerSpawnOnGame = 0,
         PlayerDie,
         PlayerMove,
+        Position,
         PlayerAttack,
         PlayerGotPowerUp,
         PlayerHitAWall,
@@ -78,7 +80,7 @@ namespace Utils
 
     /**
      * @brief A concept that constrains a type T to be one of the specified enumeration types.
-     * 
+     *
      * This concept ensures that the template parameter T can only be one of the following types:
      * - GameInfoEnum
      * - PlayerEnum
@@ -86,7 +88,7 @@ namespace Utils
      * - BossEnum
      * - PowerUpEnum
      * - ProjectileEnum
-     * 
+     *
      * Any type that does not match one of these enumerations will not satisfy this concept.
      */
     template <typename T>
@@ -95,44 +97,46 @@ namespace Utils
                         std::is_same_v<T, PowerUpEnum> || std::is_same_v<T, ProjectileEnum>;
 
 
-    using PrimitiveType = std::variant<bool, char, int, double>;
+    using PrimitiveType = std::variant<uint32_t, bool, char, int, double>;
     
     // Class managing a mapping of parameters for all functions of the protocol.
     class ParametersMap {
         public:
             /**
              * @brief Initialize the parameters map with all functions and their parameters.
-             * 
-             * Sets up the mapping of function types and indexes to their corresponding 
+             *
+             * Sets up the mapping of function types and indexes to their corresponding
              * parameter types expected by the server and client.
              */
-            static void init_map() 
+            static void init_map()
             {
                 if (!_parametersMap.empty())
                     return;
                 _parametersMap = {
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::NewClientConnected)}, {"", "i"}},
-                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", "i"}},
-                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"i", "i"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", "iii"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"", "i"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::JoinGame)}, {"i", "bi"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GameWonLost)}, {"", "b"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::SafetyCheck)}, {"", ""}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::LevelComplete)}, {"", "i"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::MissingPackages)}, {"llll", ""}},
 
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", "iii"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerDie)}, {"", "i"}},
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"ii", "iii"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"ff", "iff"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::Position)}, {"", "ff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerAttack)}, {"i", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerGotPowerUp)}, {"i", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerHitAWall)}, {"", "i"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerScore)}, {"", "i"}},
 
-                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", "iii"}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", "iiff"}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyDie)}, {"", "i"}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyMove)}, {"", ""}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyAttack)}, {"", "i"}},
 
-                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iii"}},
+                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iff"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossDie)}, {"", "i"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossAttack)}, {"", "ii"}},
 
@@ -140,7 +144,7 @@ namespace Utils
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpDisappear)}, {"", ""}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpAttack)}, {"", ""}},
 
-                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"iiiiii", "iiiiii"}},
+                    {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileFired)}, {"", "ii"}},
                     {{InfoTypeEnum::Projectile, static_cast<uint8_t>(ProjectileEnum::ProjectileHit)}, {"", "i"}},
                 };
             }
@@ -240,13 +244,13 @@ namespace Utils
         private:
             /**
              * @brief Map of function caategories and indexes to parameter types.
-             * 
-             * The map key is a pair consisting of the function category & index, 
-             * while the value is a pair of strings representing the parameter types 
+             *
+             * The map key is a pair consisting of the function category & index,
+             * while the value is a pair of strings representing the parameter types
              * expected by the server & client, respectively.
              * Parameter types are denoted by characters (e.g., b: Bool, c: Char, i: Int, f: Float).
              * The first string represents the server's expected parameters, while the second string represents the client's.
              */
-            static std::map<std::pair<InfoTypeEnum, uint8_t>, std::pair<std::string, std::string>> _parametersMap; 
+            static std::map<std::pair<InfoTypeEnum, uint8_t>, std::pair<std::string, std::string>> _parametersMap;
     };
 }

@@ -5,9 +5,9 @@ set(NAME_DEBUG_EXE "${RTYPE}-Utils-Debug")
 
 set(LIB_SOURCES
     ./ParametersMap/ParametersMap.cpp
-    ${CMAKE_SOURCE_DIR}/src/Client/Game/Game.cpp
     ./Response/Response.cpp
     ./Protocol/Protocol.cpp
+    ./Network/Network.cpp
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
@@ -27,5 +27,4 @@ target_include_directories(${NAME_LIB_UTILS} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}Protocol
     ${CMAKE_CURRENT_SOURCE_DIR}Response
-    ${CMAKE_SOURCE_DIR}/src/Client/Game
 )

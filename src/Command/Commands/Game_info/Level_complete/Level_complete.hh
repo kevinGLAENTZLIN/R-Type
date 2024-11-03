@@ -6,6 +6,15 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
 #include "../../../ACommand.hpp"
 #include "../../../../Server/Game_info.hh"
 
@@ -15,7 +24,7 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Level_complete: public ACommand{
+            class Level_complete: public ACommand {
                 public:
                     Level_complete() = default;
                     ~Level_complete();

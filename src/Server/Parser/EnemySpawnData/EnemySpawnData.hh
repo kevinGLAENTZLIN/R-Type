@@ -9,6 +9,7 @@
 #include <iostream>
 #include <numeric>
 #include <utility>
+#include "../../../Utils/enemiesTypeEnum.hpp"
 
 #include "../../../Utils/enemiesTypeEnum.hpp"
 
@@ -26,6 +27,7 @@ namespace Rtype {
         void setHealth(int health);
         void setModel(std::string model);
         void setSpawnTime(std::pair <int, int> spawnTime);
+        int getSpawnTimeInSeconds() const;
 
         enemiesTypeEnum_t getType() const;
         int getDifficulty() const;
@@ -43,6 +45,7 @@ namespace Rtype {
         float _position_y;
         int _health;
         std::string _model;
+        int _spawnTimeInSeconds;
         std::pair<int, int> _spawnTime;
     };
 }

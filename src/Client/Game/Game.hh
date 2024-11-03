@@ -22,6 +22,7 @@
 #include "../../ECS/Component/Background/Background.hpp"
 #include "../../ECS/Component/AI/AI.hh"
 #include "../../ECS/Component/Button/Button.hh"
+#include "../../ECS/Component/Light/Light.hh"
 #include "../../ECS/Component/Music/Music.hh"
 #include "../../ECS/Component/Sound/Sound.hh"
 #include "../../ECS/Component/Textfield/Textfield.hh"
@@ -44,9 +45,10 @@
 #include "../../ECS/System/TextfieldInput/TextfieldInput.hh"
 #include "../../ECS/System/RenderTextfield/RenderTextfield.hh"
 
+#include "../../Utils/enemiesTypeEnum.hpp"
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
-#include "../../Utils/enemiesTypeEnum.hpp"
+#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
 
 namespace Rtype {
     enum GameState {
@@ -54,24 +56,45 @@ namespace Rtype {
         PLAY,
     };
 
+    class Network;
+
     class Game {
     public:
-        Game();
+        Game(std::shared_ptr<Rtype::Network> network, bool render);
         ~Game();
 
         void run();
+        void runServer();
+        void movePlayer(int id, double x, double y);
+        void initGame(int id);
+
+        bool getJoiningGame();
+        void setIsJoiningGame(bool state);
+        bool getIsAvailableGames();
+        void setIsAvailableGames(bool state);
+
+        std::vector<std::tuple<int, int, int>> getAvailableGames();
+        void addAvailableGames(int game_id, int nb_player, int nb_player_max);
+        void clearAvailableGames();
         void createPlayer(int id, float pos_x, float pos_y, int invincibility);
         void createOtherPlayer(int id, float pos_x, float pos_y);
-        void createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
+        std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void createBoss1();
+        void createBoss2();
         void movePlayer(int id, float x, float y);
-        void createEnemyBydoShots(int id);
-        std::vector<std::size_t> getAllInputs();
+        void setPlayerPos(int id, double x, double y);
+        void createProjectile(int entityId, int projectileId);
+        void failToConnect();
+        void joinGame();
+
+        std::vector<int> getAIBydoShots();
+        std::vector<int> getAIHomingShots();
 
     private:
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
+        void createEnemyProjectile(int entityId, int projectileId, enemiesTypeEnum_t projectileType);
+        void createPlayerProjectile(int entityId, int projectileId);
         void loadMusic();
-        void createPlayerProjectile(std::size_t entityID);
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
         void update();
@@ -80,8 +103,6 @@ namespace Rtype {
         void renderMenu();
         void switchState(GameState newState);
         void initMenu();
-        void initGame();
-        void joinGame();
         void initOptions();
         void joinRandomGame();
         void joinGameID();
@@ -101,6 +122,9 @@ namespace Rtype {
         void updatePlayerCountText();
         void DrawProgressBar(int progress);
         void LoadAssets();
+        std::vector<std::size_t> getAllInputs();
+        void sendInput(std::vector<std::size_t> vec);
+        void sendProjectile();
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;
@@ -114,7 +138,18 @@ namespace Rtype {
         raylib::Camera3D _camera;
         std::map<int, std::size_t> _serverToLocalPlayersId;
         std::map<int, std::size_t> _serverToLocalEnemiesId;
+        std::map<int, std::size_t> _serverToLocalProjectilesId;
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
+        std::vector<std::size_t> _boss2Balls;
+
+        std::shared_ptr<Rtype::Network> _network;
+        bool _isJoiningGame;
+        bool _isAvailableGames;
+        bool _isRendering;
+        bool _modelCreated;
+        std::vector<std::tuple<int, int, int>> _availableGames;
+        std::vector<std::size_t> _AIBydoShots;
+        std::vector<std::size_t> _AIHomingShots;
     };
 };

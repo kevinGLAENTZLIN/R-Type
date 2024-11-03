@@ -6,7 +6,17 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
 
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
+
+#include "../Client/Game/Game.hh"
 #include <boost/asio.hpp>
 
 using boost::asio::ip::udp;

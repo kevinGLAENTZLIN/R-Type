@@ -10,15 +10,16 @@
 Rtype::EnemySpawnData::EnemySpawnData()
 {}
 
-void Rtype::EnemySpawnData::setType(enemiesTypeEnum_t type)
+void Rtype::EnemySpawnData::setType(enemiesTypeEnum_t enemyType)
 {
-    _type = type;
+    _type = enemyType;
 }
 
 void Rtype::EnemySpawnData::setDifficulty(int difficulty)
 {
     _difficulty = difficulty;
 }
+
 
 void Rtype::EnemySpawnData::setPositionX(float x)
 {
@@ -43,11 +44,17 @@ void Rtype::EnemySpawnData::setModel(std::string model)
 void Rtype::EnemySpawnData::setSpawnTime(std::pair <int, int> spawnTime)
 {
     _spawnTime = spawnTime;
+    _spawnTimeInSeconds = spawnTime.first * 60 + spawnTime.second;
 }
 
 enemiesTypeEnum_t Rtype::EnemySpawnData::getType() const
 {
     return _type;
+}
+
+int Rtype::EnemySpawnData::getSpawnTimeInSeconds() const
+{
+    return _spawnTimeInSeconds;
 }
 
 int Rtype::EnemySpawnData::getHealth() const

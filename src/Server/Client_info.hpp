@@ -7,12 +7,23 @@
 
 #pragma once
 
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
+
 #include <iostream>
 #include <string>
 #include <cstdarg>
 #include <map>
 #include <vector>
 #include "../Utils/ParametersMap/ParametersMap.hpp"
+#include "../Utils/Protocol/Protocol.hpp"
 #include <boost/asio.hpp>
 
 using boost::asio::ip::udp;
@@ -72,28 +83,42 @@ namespace Rtype {
              * 
              * @return The X coordinate.
              */
-            int getX() const;
+            float getX() const;
 
             /**
              * @brief Sets the X coordinate of the client.
              * 
              * @param x The new X coordinate.
              */
-            void setX(int x);
+            void setX(float x);
+
+            /**
+             * @brief Moves the X coordinate of the client.
+             * 
+             * @param x The Add x to X coordinate.
+             */
+            void moveX(float x);
 
             /**
              * @brief Gets the Y coordinate of the client.
              * 
              * @return The Y coordinate.
              */
-            int getY() const;
+            float getY() const;
 
             /**
              * @brief Sets the Y coordinate of the client.
              * 
              * @param y The new Y coordinate.
              */
-            void setY(int y);
+            void setY(float y);
+
+            /**
+             * @brief Moves the Y coordinate of the client.
+             * 
+             * @param x The Add y to Y coordinate.
+             */
+            void moveY(float y);
 
             /**
              * @brief Gets the expected ACK number for the client.
@@ -112,7 +137,7 @@ namespace Rtype {
              * 
              * @return The ACK number to be sent.
              */
-            int getAckToSend() const;
+            uint32_t getAckToSend() const;
 
             /**
              * @brief Increments the ACK number to be sent to the client.
@@ -171,52 +196,30 @@ namespace Rtype {
              * This method handle a variadic list of parameters, converts them to strings,
              * and stores them in the client's history.
              * 
-             * @param function_type The type of the command.
-             * @param function_index The index of the command.
-             * @param params The variadic parameters for the command.
+             * @param msg The command to add to the history.
              */
-            template <Utils::FunctionIndex T>
-            void pushCmdToHistory(Utils::InfoTypeEnum function_type, T function_index, std::va_list params)
+            void pushCmdToHistory(Utils::Network::bytes msg)
             {
-                Utils::ParametersMap::init_map();
-                int nb_params = Utils::ParametersMap::getNbParameterPerFunctionClient(function_type, function_index);
-                std::string params_type = Utils::ParametersMap::getParameterTypePerFunctionClient(function_type, function_index);
-                std::vector<std::string> vector_params;
-
-                for (int i = 0; i < nb_params; i++) {
-                    switch (params_type[i]) {
-                        case 'b':
-                            vector_params.push_back(std::to_string(va_arg(params, int)));
-                            break;
-                        case 'c':
-                            vector_params.push_back(std::to_string(va_arg(params, int)));
-                            break;
-                        case 'i':
-                            vector_params.push_back(std::to_string(va_arg(params, int)));
-                            break;
-                        case 'f':
-                            vector_params.push_back(std::to_string(va_arg(params, double)));
-                            break;
-                        default:
-                            std::cerr << "Unsupported type" << std::endl;
-                            break;
-                    }
-                }
-                _history[_AckToSend] = std::make_tuple(function_type, function_index, vector_params);
+                _history[_AckToSend] = msg;
                 setAckToSend();
+            }
+
+            Utils::Network::bytes getCmdFromHistory(int ack)
+            {
+                return _history[ack];
             }
 
         private:
             int _id;
-            int _x;
-            int _y;
+            float _x;
+            float _y;
             int _AckExpected;
-            int _AckToSend;
+            uint32_t _AckToSend;
             int _gameRoom;
             bool _inGame;
             bool _isAlive;
             int _port;
             std::string _addr;
-            std::map<int, std::tuple<int, int,  std::vector<std::string>>> _history;
+            std::map<int, Utils::Network::bytes> _history;
     };
 }

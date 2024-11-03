@@ -28,10 +28,18 @@ std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringBydoShots(
     return firingEntities;
 }
 
-std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringMissile(
+std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringHomingShots(
     ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
     ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
     std::vector<std::size_t> & entities)
 {
-    
+    std::vector<std::size_t> firingEntities;
+
+    for (std::size_t i = 0; i < entities.size(); i++) {
+        if (AIs[entities[i]]->getEnemyType() == BLASTER && AIs[entities[i]]->getCooldown() == 0) {
+            firingEntities.push_back(entities[i]);
+            AIs[entities[i]]->setCooldown(250);
+        }
+    }
+    return firingEntities;
 }

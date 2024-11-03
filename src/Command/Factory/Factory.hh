@@ -6,6 +6,16 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
+
 #include "../ICommand.hh"
 #include "../ACommand.hpp"
 #include "../../Utils/ParametersMap/ParametersMap.hpp"
@@ -20,11 +30,13 @@
 #include "../Commands/Game_info/Game_result/Game_result.hh"
 #include "../Commands/Game_info/Join_game/Join_game.hh"
 #include "../Commands/Game_info/Level_complete/Level_complete.hh"
+#include "../Commands/Game_info/Missing_packages/Missing_packages.hh"
 
 #include "../Commands/Player/Attack/Attack.hh"
 #include "../Commands/Player/Die/Die.hh"
 #include "../Commands/Player/Hit_wall/Hit_wall.hh"
 #include "../Commands/Player/Move/Move.hh"
+#include "../Commands/Player/Position/Position.hh"
 #include "../Commands/Player/Power_up/Power_up.hh"
 #include "../Commands/Player/Score/Score.hh"
 #include "../Commands/Player/Spawn/Spawn.hh"
@@ -51,7 +63,7 @@ namespace Rtype
                 Factory();
                 ~Factory() = default;
 
-                std::unique_ptr<ACommand> createCommand(uint8_t cmd_category, uint8_t cmd_index);
+                std::unique_ptr<Rtype::Command::ACommand> createCommand(uint8_t cmd_category, uint8_t cmd_index);
 
             protected:
             private:

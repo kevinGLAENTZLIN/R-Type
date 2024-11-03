@@ -6,6 +6,16 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
+
 #include "../../../ACommand.hpp"
 #include "../../../../Server/Client_info.hpp"
 
@@ -20,7 +30,7 @@ namespace Rtype
                     Spawn() = default;
                     ~Spawn();
 
-                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int mobType, int mobID, int x, int y);
+                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int mobType, int mobID, double x, double y);
                     void set_client();
 
                     void execute_client_side();
@@ -31,8 +41,8 @@ namespace Rtype
                     std::map<int, std::shared_ptr<Rtype::client_info>> _players;
                     int _mobType;
                     int _mobID;
-                    int _x;
-                    int _y;
+                    double _x;
+                    double _y;
             };
         }
     }

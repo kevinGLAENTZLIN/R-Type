@@ -11,7 +11,7 @@ void Rtype::Command::GameInfo::Games_available::set_client()
 {
 }
 
-void Rtype::Command::GameInfo::Games_available::set_server(std::shared_ptr<std::vector<std::shared_ptr<Rtype::Game_info>>> games)
+void Rtype::Command::GameInfo::Games_available::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::Game_info>>> games)
 {
     _games = games;
 }
@@ -27,8 +27,14 @@ void Rtype::Command::GameInfo::Games_available::execute_client_side()
 
 void Rtype::Command::GameInfo::Games_available::execute_server_side()
 {
+    bool sended = false;
+
     for (auto game: *_games) {
-        if (game->isGameAvailable())
-    	    sendToEndpoint(Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable, game->getRoomId());
+        if (game.second->isGameAvailable()) {
+    	    sendToEndpoint(*_clientInfo, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable, game.second->getRoomId(), game.second->getPlayers()->size(), game.second->getNbMaxPlayers());
+            sended |= true;
+        }
     }
+    if (!sended)
+    	sendToEndpoint(*_clientInfo, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::GamesAvailable, -1);
 }

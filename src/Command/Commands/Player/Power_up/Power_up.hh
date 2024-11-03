@@ -6,6 +6,15 @@
 */
 
 #pragma once
+#if defined(_WIN32)           
+	#define NOGDI
+	#define NOUSER
+#endif
+
+#if defined(_WIN32)
+	#undef near
+	#undef far
+#endif
 #include "../../../ACommand.hpp"
 #include "../../../../Server/Client_info.hpp"
 
@@ -20,7 +29,7 @@ namespace Rtype
                     Power_up() = default;
                     ~Power_up();
 
-                    void set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int playerID, int powerUpID);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID, int powerUpID);
                     void set_client(udp::endpoint endpoint, int powerUpID);
 
                     void execute_client_side();
@@ -29,7 +38,7 @@ namespace Rtype
                 protected:
                 private:
                     udp::endpoint _endpoint;
-                    std::map<int, std::shared_ptr<Rtype::client_info>> _players;
+                    std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
                     int _playerID;
                     int _powerUpID;
             };

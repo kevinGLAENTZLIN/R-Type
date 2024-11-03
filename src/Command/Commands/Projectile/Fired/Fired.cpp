@@ -7,24 +7,15 @@
 
 #include "Fired.hh"
 
-void Rtype::Command::Projectile::Fired::set_server(std::map<int, std::shared_ptr<Rtype::client_info>> players, int projectileType, int projectileID, int xOrigin, int yOrigin, int xVector, int yVector)
+void Rtype::Command::Projectile::Fired::set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int entityID, int projectileID)
 {
     _players = players;
-    _projectileType = projectileType;
+    _entityID = entityID;
     _projectileID = projectileID;
-    _xOrigin = xOrigin;
-    _yOrigin = yOrigin;
-    _xVector = xVector;
-    _yVector = yVector;
 }
 
-void Rtype::Command::Projectile::Fired::set_client(udp::endpoint endpoint, int projectileType, int projectileID, int xVector, int yVector)
+void Rtype::Command::Projectile::Fired::set_client()
 {
-    _endpoint = endpoint;
-    _projectileType = projectileType;
-    _projectileID = projectileID;
-    _xVector = xVector;
-    _yVector = yVector;
 }
 
 Rtype::Command::Projectile::Fired::~Fired()
@@ -33,8 +24,13 @@ Rtype::Command::Projectile::Fired::~Fired()
 
 void Rtype::Command::Projectile::Fired::execute_client_side()
 {
+    sendToEndpoint(Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired);
 }
 
 void Rtype::Command::Projectile::Fired::execute_server_side()
 {
+    for (auto player: *_players) {
+        _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
+        sendToEndpoint(*player.second, _endpoint, Utils::InfoTypeEnum::Projectile, Utils::ProjectileEnum::ProjectileFired, _entityID, _projectileID);
+    }
 }

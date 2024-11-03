@@ -31,14 +31,14 @@ void ECS::RessourcePool::UnloadAll()
     }
 }
 
-raylib::Model& ECS::RessourcePool::getModel(std::string modelPath)
+raylib::Model& ECS::RessourcePool::getModel(const std::string &modelPath)
 {
-    return _models[modelPath];
+    return _models.at(modelPath);
 }
 
-raylib::Texture& ECS::RessourcePool::getTexture(std::string texturePath)
+raylib::Texture& ECS::RessourcePool::getTexture(const std::string &texturePath)
 {
-    return _textures[texturePath];
+    return _textures.at(texturePath);
 }
 
 void ECS::RessourcePool::addTexture(const std::string &TexturePath)
@@ -62,4 +62,34 @@ void ECS::RessourcePool::addModel(const std::string &modelPath)
     }
 
     _models.emplace(modelPath, std::move(defaultModel));
+}
+
+void ECS::RessourcePool::queueModelLoad(const std::string &modelPath)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    _pendingLoads.push(modelPath);
+}
+
+void ECS::RessourcePool::requestLoadTexture(const std::string &texturePath)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    _pendingTextureLoads.push(texturePath);
+}
+
+void ECS::RessourcePool::processLoadQueue()
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    while (!_pendingLoads.empty()) {
+        std::string modelPath = _pendingLoads.front();
+        _pendingLoads.pop();
+        addModel(modelPath);
+    }
+    while (!_pendingTextureLoads.empty()) {
+            std::string texturePath = _pendingTextureLoads.front();
+            _pendingTextureLoads.pop();
+            addTexture(texturePath);
+        }
 }

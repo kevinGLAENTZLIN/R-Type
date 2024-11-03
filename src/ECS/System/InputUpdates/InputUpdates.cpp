@@ -15,9 +15,6 @@ std::size_t ECS::Systems::InputUpdates::updateInputs(
 {
     for (std::size_t i = 0; i < entities.size(); i++) {
         inputComponents[entities[i]]->setInputs(inputs);
-        if (IsKeyPressed(KEY_SPACE)) {
-            return entities[i];
-        }
     }
     return 10001;
 }

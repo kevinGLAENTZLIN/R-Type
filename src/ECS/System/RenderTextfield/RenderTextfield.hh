@@ -18,6 +18,14 @@ namespace ECS {
     namespace Systems {
         class RenderTextFieldSystem : public System {
         public:
+            /**
+            * @brief Render the textfields
+            * @param ECS::ComponentManager::SparseArray<ECS::Components::TextField> &textFields
+            * @param ECS::ComponentManager::SparseArray<ECS::Components::Text> &texts
+            * @param ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions
+            * @param const std::vector<std::size_t> &entities
+            * @return void
+            */
             void update(
                 ECS::ComponentManager::SparseArray<ECS::Components::TextField> &textFields,
                 ECS::ComponentManager::SparseArray<ECS::Components::Text> &texts,

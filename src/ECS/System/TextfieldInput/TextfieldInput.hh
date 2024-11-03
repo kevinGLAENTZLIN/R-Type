@@ -18,10 +18,19 @@ namespace ECS {
 
         class TextFieldInputSystem : public System {
         public:
+            /**
+            * @brief update the textfield input
+            * @param textFields
+            * @param entities
+            */
             void update(ECS::ComponentManager::SparseArray<ECS::Components::TextField> &textFields,
                         const std::vector<std::size_t> &entities);
 
         private:
+            /**
+            * @brief update the textfield input
+            * @param textField
+            */
             void handleKeyboardInput(ECS::Components::TextField &textField);
         };
 

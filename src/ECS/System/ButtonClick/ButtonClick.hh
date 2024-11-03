@@ -15,6 +15,12 @@ namespace ECS {
     namespace Systems {
         class ButtonClickSystem : public System {
             public:
+                /**
+                * @brief Button system handle the button click
+                * @param ECS::ComponentManager::SparseArray<ECS::Components::Button> &buttons
+                * @param std::vector<std::size_t> &entities
+                * @return void
+                */
                 void update(ECS::ComponentManager::SparseArray<ECS::Components::Button> &buttons,
                         const std::vector<std::size_t> &entities);
 

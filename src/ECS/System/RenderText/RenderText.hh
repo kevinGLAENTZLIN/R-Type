@@ -16,6 +16,13 @@ namespace ECS {
     namespace Systems {
     class RenderTextSystem : public System {
     public:
+    /**
+    * @brief Render the text
+    * @param ECS::ComponentManager::SparseArray<ECS::Components::Text> &text
+    * @param ECS::ComponentManager::SparseArray<ECS::Components::Position> &position
+    * @param std::vector<std::size_t> &entities
+    * @return void
+    */
     void update(ECS::ComponentManager::SparseArray<ECS::Components::Text> &texts,
                         ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
                         const std::vector<std::size_t> &entities);

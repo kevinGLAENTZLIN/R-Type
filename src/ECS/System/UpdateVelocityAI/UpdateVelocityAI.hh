@@ -15,18 +15,24 @@
 #include <map>
 #include <cmath>
 
-#if defined(_WIN32)           
+#if defined(_WIN32)
     #define M_PI 3.14159265358979323846
 #endif
 
 namespace ECS {
     namespace Systems {
-
         class UpdateVelocityAI : public System {
         public:
             UpdateVelocityAI() = default;
             ~UpdateVelocityAI() = default;
 
+            /**
+            * @brief This function updates the position of entities based on their velocity.
+            *
+            * @param velocities SparseArray of Velocity components where the velocities of entities are stored.
+            * @param positions SparseArray of Position components where the positions of entities are stored.
+            * @return void.
+            */
             void update(
                 ECS::ComponentManager::SparseArray<ECS::Components::Velocity> & velocities,
                 ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,

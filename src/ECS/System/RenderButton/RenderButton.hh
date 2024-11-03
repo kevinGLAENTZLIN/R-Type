@@ -17,6 +17,13 @@ namespace ECS {
     namespace Systems {
         class RenderButtonSystem : public System {
             public:
+                /**
+                * @brief Render the button
+                * @param ECS::ComponentManager::SparseArray<ECS::Components::Button> &buttons
+                * @param ECS::ComponentManager::SparseArray<ECS::Components::Text> &texts
+                * @param ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions
+                * @return void
+                */
                 void update(ECS::ComponentManager::SparseArray<ECS::Components::Button> &buttons,
                             ECS::ComponentManager::SparseArray<ECS::Components::Text> &texts,
                             ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,

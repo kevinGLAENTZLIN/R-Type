@@ -22,6 +22,14 @@ namespace ECS {
             SystemBackground() = default;
             ~SystemBackground() = default;
 
+            /**
+            * @brief Update the background of the entities
+            *
+            * @param ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions
+            * @param ECS::ComponentManager::SparseArray<ECS::Components::Background> &backgrounds
+            * @param std::vector<std::size_t> &entities
+            * @return void
+            */
             void update(ECS::ComponentManager::SparseArray<ECS::Components::Position> &positions,
                         ECS::ComponentManager::SparseArray<ECS::Components::Background> &backgrounds,
                         std::vector<std::size_t> &entities);

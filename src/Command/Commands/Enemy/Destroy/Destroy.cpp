@@ -31,7 +31,7 @@ void Rtype::Command::Enemy::Destroy::execute_server_side()
     for (auto player: *_players) {
         if (player.second->getRoom() == _roomID) {
             _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-            sendToEndpoint(_endpoint, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDestroy, _mobID);
+            sendToEndpoint(*player.second, _endpoint, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDestroy, _mobID);
         }
     }
 }

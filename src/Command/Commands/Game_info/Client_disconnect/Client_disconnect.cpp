@@ -31,7 +31,7 @@ void Rtype::Command::GameInfo::Client_disconnect::execute_server_side()
     for (auto player: *_players) {
         if (player.first != _id) {
             _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-            sendToEndpoint(_endpoint, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::ClientDisconnect, _id);
+            sendToEndpoint(*player.second, _endpoint, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::ClientDisconnect, _id);
         }
     }
 }

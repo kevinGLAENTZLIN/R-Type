@@ -32,6 +32,6 @@ void Rtype::Command::Enemy::Damage::execute_server_side()
 {
     for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-        sendToEndpoint(_endpoint, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDamage, _mobID);
+        sendToEndpoint(*player.second, _endpoint, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemyDamage, _mobID);
     }
 }

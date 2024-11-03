@@ -33,6 +33,6 @@ void Rtype::Command::Enemy::Spawn::execute_server_side()
 {
     for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-        sendToEndpoint(_endpoint, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemySpawn, _mobType, _mobID, _x, _y, _health);
+        sendToEndpoint(*player.second, _endpoint, Utils::InfoTypeEnum::Enemy, Utils::EnemyEnum::EnemySpawn, _mobType, _mobID, _x, _y, _health);
     }
 }

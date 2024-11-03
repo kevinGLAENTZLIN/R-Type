@@ -34,6 +34,6 @@ void Rtype::Command::PowerUp::Spawn::execute_server_side()
 {
 	for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-        sendToEndpoint(_endpoint, Utils::InfoTypeEnum::PowerUp, Utils::PowerUpEnum::PowerUpSpawn, _podID, _x, _y);
+        sendToEndpoint(*player.second, _endpoint, Utils::InfoTypeEnum::PowerUp, Utils::PowerUpEnum::PowerUpSpawn, _podID, _x, _y);
     }
 }

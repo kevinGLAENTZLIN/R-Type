@@ -30,7 +30,7 @@ void Rtype::Command::GameInfo::Level_complete::execute_server_side()
 {
     for (auto player: *_players) {
         _endpoint = udp::endpoint(address::from_string(player.second->getAddr()), player.second->getPort());
-        sendToEndpoint(*_clientInfo, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete, _level);
+        sendToEndpoint(*player.second, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete, _level);
     }
     // CONSOLE_INFO(_gameInfo->getRoomId(), " went to the next Level !")
     // sendToEndpoint(*_clientInfo, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::LevelComplete, _gameInfo.get());

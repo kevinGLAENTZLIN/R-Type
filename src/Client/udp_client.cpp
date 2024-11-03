@@ -25,12 +25,16 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
         std::size_t missing_ack_size = 0;
         std::size_t tail_size;
 
-        while (true) {
+        while (_stop.load() == false) {
+            std::cout << "stop :" << _stop.load() << std::endl;
             std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> last_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             missing_ack = getMissingPackages();
             missing_ack_size = missing_ack.size();
             tail_size = missing_ack_size & 3;
+
+            std::cout << "Missing ack size    : " << missing_ack_size << std::endl;
+            std::cout << "Missing ack size / 4: " << (missing_ack_size >> 2) << std::endl;
 
             for (size_t i = 0; i < (missing_ack_size >> 2); i++) {
             std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
@@ -69,6 +73,8 @@ Rtype::udpClient::~udpClient()
         _network->getSocket()->close();
     }
     _ioContext.stop();
+
+    _stop.store(true);
     if (_networkThread.joinable()) {
         _networkThread.join();
     }
@@ -96,8 +102,8 @@ void Rtype::udpClient::initSignalHandlers()
 {
     _signals.async_wait(
         [this](boost::system::error_code ec, int signal_number) {
-            if (!ec) {
-                _stop = true;
+            if (signal_number == SIGINT) {
+                _stop.store(true);
                 _ioContext.stop();
                 _game->setIsRunning(false);
             }

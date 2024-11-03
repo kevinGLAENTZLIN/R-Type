@@ -98,6 +98,7 @@ namespace Rtype {
         void initSignalHandlers();
 
         int _id;
+        int _destroyMin;
         boost::asio::io_context _ioContext;
         std::unordered_set<uint32_t> _recivedPackages;
         uint32_t _biggestAck;

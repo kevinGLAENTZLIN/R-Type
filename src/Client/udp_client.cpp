@@ -9,7 +9,7 @@
 #include "../Utils/Protocol/Protocol.hpp"
 
 Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort):
-    _id(-1), _ioContext(), _biggestAck(0), _signals(_ioContext, SIGINT),  _stop(false)
+    _id(-1), _destroyMin(-1), _ioContext(), _biggestAck(0), _signals(_ioContext, SIGINT),  _stop(false)
 {
     _network = std::make_shared<Rtype::Network>(_ioContext, serverAddr, serverPort, "Client");
     _game = std::make_unique<Rtype::Game>(_network, true);
@@ -194,9 +194,9 @@ void Rtype::udpClient::setHandleGameInfoMap()
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::JoinGame] = [this](Utils::Network::Response response) {
-        std::unique_ptr<Rtype::Command::GameInfo::Join_game> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Join_game, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::JoinGame);
         bool accepted = response.PopParam<bool>();
         int level = response.PopParam<int>();
+        int entityNb = response.PopParam<int>();
 
         if (!accepted) {
             _game->failToConnect();
@@ -204,6 +204,8 @@ void Rtype::udpClient::setHandleGameInfoMap()
         }
         CONSOLE_INFO("Joining game at level: ", level)
         _game->initGame(_id);
+        CONSOLE_INFO("Destroy min is ", entityNb)
+        _destroyMin = entityNb;
     };
 
     _handleGameInfoMap[Utils::GameInfoEnum::GameWonLost] = [this](Utils::Network::Response response) {
@@ -330,8 +332,11 @@ void Rtype::udpClient::setHandleEnemyMap() {
     _handleEnemyMap[Utils::EnemyEnum::EnemyDestroy] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();
 
-        CONSOLE_INFO(enemyId, " is destroyed")
-        _game->destroyEntity(enemyId);
+        CONSOLE_INFO(enemyId, _destroyMin)
+        if (enemyId >= _destroyMin) {
+            CONSOLE_INFO(enemyId, " is destroyed")
+            _game->destroyEntity(enemyId);
+        }
     };
     _handleEnemyMap[Utils::EnemyEnum::EnemyDamage] = [this](Utils::Network::Response response) {
         int enemyId = response.PopParam<int>();

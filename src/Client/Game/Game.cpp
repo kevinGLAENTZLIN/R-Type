@@ -1317,9 +1317,9 @@ void Rtype::Game::update() {
             for (int j = 0; j < projectileEntities.size(); j++)
                 if (projectileEntities[j] == _damagedEntities[i]) {
                     //std::cout << "destroy projectile : " << projectileEntities[j] << std::endl;
-                    for (const auto& Ids : _serverToLocalProjectilesId)
-                        if (Ids.second == projectileEntities[j])
-                            _serverToLocalProjectilesId.erase(Ids.first);
+                    // for (const auto& Ids : _serverToLocalProjectilesId)
+                    //     if (Ids.second == projectileEntities[j])
+                    //         _serverToLocalProjectilesId.erase(Ids.first);
                     _core->destroyEntity(projectileEntities[j]);
                 }
         }

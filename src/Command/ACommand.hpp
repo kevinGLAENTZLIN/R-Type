@@ -7,7 +7,7 @@
 
 #pragma once
 
-#if defined(_WIN32)           
+#if defined(_WIN32)
 	#define NOGDI
 	#define NOUSER
 #endif
@@ -48,6 +48,16 @@ namespace Rtype
                 virtual void execute_client_side() = 0;
                 virtual void execute_server_side() = 0;
 
+                /**
+                 * @brief Sets common attributes for sending a message.
+                 *
+                 * This method configures common parameters for sending commands to a client,
+                 * including the sender socket, the destination endpoint, and the acknowledgment (ack).
+                 *
+                 * @param sender_socket The socket used to send the message.
+                 * @param endpoint The destination endpoint.
+                 * @param ack The acknowledgment (ack) for the message.
+                 */
                 void setCommonPart(std::shared_ptr<udp::socket> sender_socket, udp::endpoint endpoint, int ack)
                 {
                     _senderSocket = sender_socket;
@@ -55,6 +65,18 @@ namespace Rtype
                     _ack = ack;
                 }
 
+                /**
+                 * @brief Sets common attributes for sending a message, including the game instance.
+                 *
+                 * This method configures common parameters for sending commands to a client,
+                 * including the sender socket, destination endpoint, acknowledgment (ack),
+                 * and a pointer to the `Game` object.
+                 *
+                 * @param sender_socket The socket used to send the message.
+                 * @param endpoint The destination endpoint.
+                 * @param ack The acknowledgment (ack) for the message.
+                 * @param game A pointer to the `Game` object associated with the command.
+                 */
                 void setCommonPart(std::shared_ptr<udp::socket> sender_socket, udp::endpoint endpoint, int ack, std::shared_ptr<Rtype::Game> game)
                 {
                     _senderSocket = sender_socket;
@@ -63,6 +85,17 @@ namespace Rtype
                     _game = game;
                 }
 
+                /**
+                 * @brief Sets common attributes for sending a message with a modifiable acknowledgment.
+                 *
+                 * This method configures common parameters for sending commands,
+                 * including the sender socket, destination endpoint, and an acknowledgment
+                 * passed by reference, allowing modification outside of the method.
+                 *
+                 * @param sender_socket The socket used to send the message.
+                 * @param endpoint The destination endpoint.
+                 * @param ack Reference to the acknowledgment (ack) for the message.
+                 */
                 void setCommonPart(std::shared_ptr<udp::socket> sender_socket, udp::endpoint endpoint, int &ack)
                 {
                     _senderSocket = sender_socket;
@@ -70,16 +103,40 @@ namespace Rtype
                     _ack = ack;
                 }
 
+                /**
+                 * @brief Sets the client information.
+                 *
+                 * Assigns a `client_info` object to contain information about the client who
+                 * sends or receives commands, facilitating tracking of sent or received commands.
+                 *
+                 * @param clientInfo Pointer to the `client_info` object of the client.
+                 */
                 void setClientInfo(std::shared_ptr<Rtype::client_info> clientInfo)
                 {
                     _clientInfo = clientInfo;
                 }
 
+                /**
+                 * @brief Sets the origin of the command (Client or Server).
+                 *
+                 * This method assigns the origin source of the command, facilitating
+                 * the selection of expected parameter types for each function.
+                 *
+                 * @param origins The origin source as a string, "Client" or "Server".
+                 */
                 void setOrigins(std::string origins)
                 {
                     _origins = origins;
                 }
 
+                /**
+                 * @brief Sets the game associated with the command.
+                 *
+                 * Associates a `Game` object to identify the game context in which
+                 * the command is executed.
+                 *
+                 * @param game Pointer to the `Game` object associated with the command.
+                 */
                 void setGame(std::shared_ptr<Rtype::Game> game)
                 {
                     _game = game;

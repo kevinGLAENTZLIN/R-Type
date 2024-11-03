@@ -12,7 +12,7 @@
 
 #pragma once
 
-#if defined(_WIN32)           
+#if defined(_WIN32)
 	#define NOGDI
 	#define NOUSER
 #endif
@@ -105,7 +105,8 @@ namespace Rtype {
         std::shared_ptr<Rtype::Network> _network;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
-
+        std::thread _timeThread;  // New thread for the time loop.
+        boost::asio::signal_set _signals;
         std::mutex _mutex;
         std::unique_ptr<Rtype::Game> _game;
         std::atomic<bool> _stop;

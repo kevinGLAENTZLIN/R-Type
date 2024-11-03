@@ -243,8 +243,10 @@ void Rtype::udpServer::setHandlePlayerMap() {
         double x = clientResponse.PopParam<double>();
         double y = clientResponse.PopParam<double>();
 
+        if (get_sender_client_id() == -1 || gameID == -1)
+            return;
         cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id(), x, y);
-        cmd->setCommonPart(_network->getSocket(), udp::endpoint(), _clients->at(get_sender_client_id())->getAckToSend());
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
     };
 

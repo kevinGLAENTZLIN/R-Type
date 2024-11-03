@@ -1001,9 +1001,11 @@ void Rtype::Game::sendInput(std::vector<std::size_t> vec)
             break;
         }
     }
-    cmd->set_client(x, y);
-    cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-    _network->addCommandToInvoker(std::move(cmd));
+    if (x != 0 || y != 0) {
+        cmd->set_client(x, y);
+        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+        _network->addCommandToInvoker(std::move(cmd));
+    }
 }
 
 std::vector<std::size_t> Rtype::Game::getAllInputs() {

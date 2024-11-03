@@ -35,6 +35,10 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
             for (size_t i = 0; i < (missing_ack_size >> 2); i++) {
             std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
                 cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+                std::cout << "+ 0" << missing_ack[i * 4] << std::endl;
+                std::cout << "+ 1" << missing_ack[i * 4 + 1] << std::endl;
+                std::cout << "+ 2" << missing_ack[i * 4 + 2] << std::endl;
+                std::cout << "+ 3" << missing_ack[i * 4 + 3] << std::endl;
                 cmd->set_client(missing_ack[i * 4], missing_ack[i * 4 + 1], missing_ack[i * 4 + 2], missing_ack[i * 4 + 3]);
                 _network->addCommandToInvoker(std::move(cmd));
             }

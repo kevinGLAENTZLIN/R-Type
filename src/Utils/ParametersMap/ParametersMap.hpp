@@ -101,7 +101,7 @@ namespace Utils
 
 
     using PrimitiveType = std::variant<uint32_t, bool, char, int, double>;
-    
+
     // Class managing a mapping of parameters for all functions of the protocol.
     class ParametersMap {
         public:

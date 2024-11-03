@@ -19,6 +19,7 @@ ECS::EntityManager::EntityManager::EntityManager():
 
 std::size_t ECS::EntityManager::EntityManager::createEntity()
 {
+    std::cout << "====== createEntity _mLivingEntityCount" << _mLivingEntityCount << std::endl;
     if (_mLivingEntityCount >= MAX_ENTITIES) {
         return MAX_ENTITIES;
     }

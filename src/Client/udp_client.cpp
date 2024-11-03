@@ -223,8 +223,9 @@ void Rtype::udpClient::setHandlePlayerMap() {
         int playerId = response.PopParam<int>();
         int powerUpId = response.PopParam<int>();
 
-        //! Pour Arthur <3
-        // _game->equipPod(playerId, powerUpId);
+        CONSOLE_INFO("playerId -> ", playerId);
+        CONSOLE_INFO("podId -> ", powerUpId);
+        _game->equipPod(playerId, powerUpId);
     };
 
 
@@ -238,10 +239,7 @@ void Rtype::udpClient::setHandlePlayerMap() {
         std::unique_ptr<Rtype::Command::Player::Score> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Score, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerScore);        int score = response.PopParam<int>();
 
         std::cerr << "The unused Score is: " << score << std::endl;
-
     };
-
-
 }
 
 void Rtype::udpClient::setHandleEnemyMap() {
@@ -287,8 +285,6 @@ void Rtype::udpClient::setHandlePowerUpMap() {
         double y = response.PopParam<double>();
 
         _game->createPod(id, x, y);
-        //! Pour Arthur <3
-        // 
     };
     _handlePowerUpMap[Utils::PowerUpEnum::PowerUpDisappear] = [this](Utils::Network::Response response) {
         //TODO: Implement PowerUpDisappear

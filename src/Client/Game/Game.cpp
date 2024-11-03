@@ -296,20 +296,19 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
 {
-    if (!_isRendering && !_modelCreated) {
-        _ressourcePool.addModel("ship_yellow");
-        _modelCreated = true;
-    }
-    std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
     std::size_t otherPlayer = _core->createEntity();
+
+    if (_isRendering) {
+        std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("ship_yellow"));
+        _core->addComponent(otherPlayer, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+        _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
+    }
 
     _core->addComponent(otherPlayer, ECS::Components::Position{pos_x, pos_y});
     _core->addComponent(otherPlayer, ECS::Components::Rotate{-90.0f, 0.0f, 0.0f});
     _core->addComponent(otherPlayer, ECS::Components::Scale{1.0f});
     _core->addComponent(otherPlayer, ECS::Components::Velocity{0.0f, 0.0f});
-    _core->addComponent(otherPlayer, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(otherPlayer, ECS::Components::Health{1, -1});
-    _core->addComponent(otherPlayer, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = otherPlayer;
 }
 
@@ -1111,6 +1110,7 @@ void Rtype::Game::createPodProjectile(int entityId, int projectileId)
 
 void Rtype::Game::createProjectile(int entityId, int projectileId)
 {
+    std::cout << "==== createProjectile() -> entityId: " << entityId << std::endl;
     if (_serverToLocalEnemiesId.find(entityId) != _serverToLocalEnemiesId.end()) {
         if (_core->getComponents<ECS::Components::AI>()[_serverToLocalEnemiesId[entityId]]->getEnemyType() == BLASTER)
             createEnemyProjectile(entityId, projectileId, HOMINGSHOT);
@@ -1120,6 +1120,7 @@ void Rtype::Game::createProjectile(int entityId, int projectileId)
     else if (_serverToLocalPlayersId.find(entityId) != _serverToLocalPlayersId.end())
         createPlayerProjectile(entityId, projectileId);
     else if (_serverToLocalPodsId.find(entityId) != _serverToLocalPodsId.end()){
+        std::cout << "====== jaj ======" << std::endl;
         createPodProjectile(entityId, projectileId);
     }
 }
@@ -1127,6 +1128,7 @@ void Rtype::Game::createProjectile(int entityId, int projectileId)
 void Rtype::Game::createPod(int entityId, float posX, float posY)
 {
     std::size_t pod = _core->createEntity();
+    std::cout << "==== createPod() -> (local)podId " << pod << " (server)podId: " << entityId << std::endl;
 
     if (_isRendering) {
         std::pair<float, float> TmpHitbox = ECS::Utils::getModelSize(_ressourcePool.getModel("enemy_one"));
@@ -1138,6 +1140,7 @@ void Rtype::Game::createPod(int entityId, float posX, float posY)
     _core->addComponent(pod, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(pod, ECS::Components::Scale{1.0f});
     _serverToLocalPodsId[entityId] = pod;
+    std::cout << "==== createPod() -> (local)podId " << _serverToLocalPodsId[entityId] << " (server)podId: " << entityId << std::endl;
 }
 
 void Rtype::Game::damageEntity(int entityId)
@@ -1174,6 +1177,7 @@ void Rtype::Game::destroyEntity(int entityId)
         _serverToLocalEnemiesId.erase(entityId);
     }
     if (_serverToLocalProjectilesId.find(entityId) != _serverToLocalProjectilesId.end()) {
+        std::cout << "====== Destroy " << _serverToLocalProjectilesId.at(entityId) << " in destroyEntity() ======" << std::endl;
         toDestroy = _serverToLocalProjectilesId.at(entityId);
         _serverToLocalProjectilesId.erase(entityId);
     }
@@ -1209,6 +1213,21 @@ void Rtype::Game::updateMenu() {
                                  textfieldEntities);
 }
 
+void Rtype::Game::sendPods(std::size_t podId)
+{
+    int serverPodId;
+
+    for (const auto& pod : _serverToLocalPodsId)
+        if (pod.second == podId)
+            serverPodId = pod.first;
+
+    std::cout << "podServerId: " << serverPodId << std::endl;
+    std::unique_ptr<Rtype::Command::Player::Power_up> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Power_up, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp);
+    cmd->set_client(serverPodId);
+    cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
+    _network->addCommandToInvoker(std::move(cmd));
+}
+
 void Rtype::Game::update() {
     auto velocitySystem = _core->getSystem<ECS::Systems::SystemVelocity>();
     auto collisionSystem = _core->getSystem<ECS::Systems::Collision>();
@@ -1225,7 +1244,7 @@ void Rtype::Game::update() {
     std::vector<std::size_t> inputEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::InputUpdates>());
     std::vector<std::size_t> backgroundEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::SystemBackground>());
     std::vector<std::size_t> AIEntities = _core->getEntitiesWithSignature(_core->getSystemSignature<ECS::Systems::UpdateVelocityAI>());
-    std::vector<std::size_t> AImabites = _core->getEntitiesWithComponent<ECS::Components::AI>();
+    std::vector<std::size_t> AIs = _core->getEntitiesWithComponent<ECS::Components::AI>();
     std::vector<std::size_t> collisionEntities = _core->getEntitiesWithComponent<ECS::Components::Position,
                                                                                  ECS::Components::Hitbox>();
     std::vector<std::size_t> damageableEntities = _core->getEntitiesWithComponent<ECS::Components::Health>();
@@ -1265,10 +1284,10 @@ void Rtype::Game::update() {
                                      playerCollisionEntities);
     }
 
-    std::vector<std::size_t> AIs = _core->getEntitiesWithComponent<ECS::Components::AI, ECS::Components::Health>();
-    for (std::size_t i = 0; i < AIs.size(); i++) {
-        if (_core->getComponents<ECS::Components::Health>()[AIs[i]]->getInvincibility() > 0)
-            _core->getComponents<ECS::Components::Health>()[AIs[i]]->modifyInvincibilityBy(-1);
+    std::vector<std::size_t> damageableAIs = _core->getEntitiesWithComponent<ECS::Components::AI, ECS::Components::Health>();
+    for (std::size_t i = 0; i < damageableAIs.size(); i++) {
+        if (_core->getComponents<ECS::Components::Health>()[damageableAIs[i]]->getInvincibility() > 0)
+            _core->getComponents<ECS::Components::Health>()[damageableAIs[i]]->modifyInvincibilityBy(-1);
     }
 
     if (_isRendering) {
@@ -1276,9 +1295,10 @@ void Rtype::Game::update() {
             _core->getComponents<ECS::Components::Position>(),
             _core->getComponents<ECS::Components::Hitbox>(),
             _core->getComponents<ECS::Components::AI>(),
-            projectileEntities, collisionEntities, AImabites);
+            projectileEntities, collisionEntities, AIs);
         auto healthComponents = _core->getComponents<ECS::Components::Health>();
         auto podsEntities = _core->getEntitiesWithComponent<ECS::Components::Pod>();
+        auto pods = _core->getComponents<ECS::Components::Pod>();
         _damagedEntities.insert(_damagedEntities.end(), projectileEntityId.begin(), projectileEntityId.end());
         projectileEntityId.clear();
 
@@ -1307,27 +1327,64 @@ void Rtype::Game::update() {
             for (int j = 0; j < projectileEntities.size(); j++)
                 if (projectileEntities[j] == _damagedEntities[i]) {
                     //std::cout << "destroy projectile : " << projectileEntities[j] << std::endl;
-                    for (const auto& Ids : _serverToLocalProjectilesId)
-                        if (Ids.second == projectileEntities[j])
-                            _serverToLocalProjectilesId.erase(Ids.first);
+                    // for (const auto& Ids : _serverToLocalProjectilesId)
+                    //     if (Ids.second == projectileEntities[j])
+                    //         _serverToLocalProjectilesId.erase(Ids.first);
+                    std::cout << "====== Destroy " << projectileEntities[j] << " in update() ======" << std::endl;
                     _core->destroyEntity(projectileEntities[j]);
                 }
         }
         _damagedEntities.clear();
 
-        std::vector<std::size_t> pickedUpPod = collisionSystem->PlayerPickedUpPod(
-            _core->getComponents<ECS::Components::Position>(), _core->getComponents<ECS::Components::Hitbox>(),
-            _core->getComponents<ECS::Components::Pod>(),
-            podsEntities, playerEntities);
+        std::vector<std::size_t> podsToSend;
+        if (_isRendering) {
+            std::size_t player = _core->getEntitiesWithComponent<ECS::Components::Input>()[0];
 
-        for (int i = 0; i < pickedUpPod.size(); i++) {
-            std::size_t pod = pickedUpPod[i];
-            std::cout << "pod: " << pod << " " << _core->getComponents<ECS::Components::Pod>()[pod]->getLevel() << std::endl;
-            if (_core->getComponents<ECS::Components::Pod>()[pod]->getLevel() < 0) {
-                _core->destroyEntity(pod);
-                continue;
+            std::vector<std::size_t> pickedUpPod = collisionSystem->PlayerPickedUpPod(
+                _core->getComponents<ECS::Components::Position>(), _core->getComponents<ECS::Components::Hitbox>(),
+                _core->getComponents<ECS::Components::Pod>(),
+                podsEntities, player);
+
+            for (int i = 0; i < pickedUpPod.size(); i++) {
+                std::cout << "pod is picked up hassoul!!" << std::endl;
+                std::size_t pod = pickedUpPod[i];
+                int nbPods = 0;
+                int indexPod1 = -1;
+                int indexPod2 = -1;
+                for (int i = 0; i < podsEntities.size(); i++)
+                    if (pods[podsEntities[i]]->getPlayer() == player){
+                        if (nbPods == 0)
+                            indexPod1 = podsEntities[i];
+                        if (nbPods == 1)
+                            indexPod2 = podsEntities[i];
+                        nbPods++;
+                    }
+                std::cout << "nbPods: " << nbPods << std::endl;
+                if (nbPods < 2) {
+                    std::cout << "sendPods: " << pod << std::endl;
+                    podsToSend.push_back(pod);
+                    continue;
+                }
+                std::cout << "pod level: " << pods[indexPod1]->getLevel() << std::endl;
+                if (pods[indexPod1]->getLevel() == 0) {
+                    podsToSend.push_back(pod);
+                    continue;
+                }
+                if (pods[indexPod2]->getLevel() == 0) {
+                    podsToSend.push_back(pod);
+                    continue;
+                }
+                if (pods[indexPod1]->getLevel() == 1 && pods[indexPod1]->getLevel() == 1) {
+                    podsToSend.push_back(pod);
+                    continue;
+                }
+            }
+
+            for (int i = 0; i < podsToSend.size(); i++) {
+                sendPods(podsToSend[i]);
             }
         }
+
         for (int i = 0; i < podsEntities.size(); i++) {
             std::size_t pod = podsEntities[i];
             std::size_t player = _core->getComponents<ECS::Components::Pod>()[pod]->getPlayer();
@@ -1340,7 +1397,7 @@ void Rtype::Game::update() {
                 _core->getComponents<ECS::Components::Position>()[pod]->setY(playerPos.second - 0.50);
             else
                 _core->getComponents<ECS::Components::Position>()[pod]->setY(playerPos.second + 0.75);
-        } 
+        }
     }
 
     if (!_isRendering) {
@@ -1398,14 +1455,68 @@ void Rtype::Game::update() {
 
     std::vector<std::size_t> podShots = AIFiringProjectileSystem->podFiringShots(
         _core->getComponents<ECS::Components::Pod>(), podEntities);
-    for (int i = 0; i < podShots.size(); i++)
-        std::cout << "podShots: " << podShots[i]<< std::endl;
-
     if (!_isRendering && podShots.size() > 0)
         _projectilesToSend.insert(_projectilesToSend.end(), podShots.begin(), podShots.end());
 
+    for (int i = 0; i < _projectilesToSend.size(); i++)
+        std::cout << "all Projectiles: " << _projectilesToSend[i]<< std::endl;
+
     if (false)
         _camera.Update(CAMERA_FREE);
+}
+
+void Rtype::Game::equipPod(int playerId, int podId)
+{
+    std::cout << "pod " << podId << " is picked up by " << playerId << " hassoul!!" << std::endl;
+    if (_serverToLocalPlayersId.begin() == _serverToLocalPlayersId.end())
+        std::cout << "jaj" << std::endl;
+    std::size_t player = _serverToLocalPlayersId.at(playerId);
+    std::size_t pod = _serverToLocalPodsId.at(podId);
+    auto pods = _core->getComponents<ECS::Components::Pod>();
+    std::vector<std::size_t> podsEntities = _core->getEntitiesWithComponent<ECS::Components::Pod>();
+    int nbPods = 0;
+    int indexPod1 = -1;
+    int indexPod2 = -1;
+    for (int i = 0; i < podsEntities.size(); i++)
+        if (pods[podsEntities[i]]->getPlayer() == player){
+            if (nbPods == 0)
+                indexPod1 = podsEntities[i];
+            if (nbPods == 1)
+                indexPod2 = podsEntities[i];
+            nbPods++;
+        }
+    std::cout << "nbPods: " << nbPods << std::endl;
+    if (nbPods < 2) {
+        std::cout << "first two pod picked up hassoul!!" << std::endl;
+        if (nbPods == 0)
+            _core->getComponents<ECS::Components::Pod>()[pod]->setIsUp(true);
+        _core->getComponents<ECS::Components::Pod>()[pod]->setPlayer(player);
+        return;
+    }
+    std::cout << "pod level: " << pods[indexPod1]->getLevel() << std::endl;
+    if (pods[indexPod1]->getLevel() == 0) {
+        std::cout << "pod1 +1 level!!" << std::endl;
+        _core->getComponents<ECS::Components::Pod>()[indexPod1]->setLevel(1);
+        std::cout << "pod to destroy: " << pod << std::endl;
+        _core->destroyEntity(pod);
+        //destroy_current_pod
+        return;
+    }
+    if (pods[indexPod2]->getLevel() == 0) {
+        std::cout << "pod2 +1 level!!" << std::endl;
+        _core->getComponents<ECS::Components::Pod>()[indexPod2]->setLevel(1);
+        _core->destroyEntity(pod);
+        //destroy_current_pod
+        return;
+    }
+    if (pods[indexPod1]->getLevel() == 1 && pods[indexPod1]->getLevel() == 1) {
+        std::cout << "pod1 & pod2 +1 level!!" << std::endl;
+        _core->getComponents<ECS::Components::Pod>()[indexPod1]->setLevel(2);
+        _core->getComponents<ECS::Components::Pod>()[indexPod2]->setLevel(2);
+        _core->destroyEntity(pod);
+        //destroy_current_pod
+        return;
+    }
 }
 
 bool Rtype::Game::getJoiningGame()

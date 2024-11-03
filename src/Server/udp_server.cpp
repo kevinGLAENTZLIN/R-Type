@@ -234,16 +234,14 @@ void Rtype::udpServer::setHandlePlayerMap() {
     _handlePlayerMap[Utils::PlayerEnum::PlayerGotPowerUp] = [this](Utils::Network::Response clientResponse) {
         std::unique_ptr<Rtype::Command::Player::Power_up> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Power_up, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp);
         int gameID = _clients->at(get_sender_client_id())->getRoom();
+        int podId = clientResponse.PopParam<int>();
 
-        //! Pour Arthur <3
-        // std::unique_ptr<Rtype::Command::Player::Power_up> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Power_up, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp);
-        // cmd->set_client();
-        // cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
-        // _network->addCommandToInvoker(std::move(cmd));
-        cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id(), _games->at(gameID)->getNbProjectiles());
+        CONSOLE_INFO("podId: ", podId);
+        CONSOLE_INFO("get_sender_client_id: ", get_sender_client_id());
+        cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id(), podId);
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
         _network->addCommandToInvoker(std::move(cmd));
-        _games->at(gameID)->accNbProjectiles();
+        _games->at(gameID)->getGame()->equipPod(get_sender_client_id(), podId);
     };
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerHitAWall] = [this](Utils::Network::Response clientResponse) {
@@ -270,14 +268,14 @@ void Rtype::udpServer::setHandlePowerUpMap() {
         std::unique_ptr<Rtype::Command::PowerUp::Spawn> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::PowerUp::Spawn, Utils::InfoTypeEnum::PowerUp, Utils::PowerUpEnum::PowerUpSpawn);
         double x = response.PopParam<double>();
         double y = response.PopParam<double>();
+        
         int gameID = _clients->at(get_sender_client_id())->getRoom();
 
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
         cmd->set_server(_games->at(gameID)->getPlayers(), _games->at(gameID)->getNbProjectiles(), x, y);
         _network->addCommandToInvoker(std::move(cmd));
+        _games->at(gameID)->getGame()->createPod(_games->at(gameID)->getNbProjectiles(), x, y);
         _games->at(gameID)->accNbProjectiles();
-        // _game->createPod(id, x, y);
-        //! Pour Arthur <3
     };
 }
 

@@ -95,6 +95,7 @@ namespace Rtype {
         void destroyEntity(int entityId);
         void setIsConnectedToServer(bool state);
         void setIsRunning(bool state);
+        void equipPod(int playerId, int podId);
 
         std::vector<int> getAIProjectile();
         std::vector<int> getDamagedEntities();
@@ -136,6 +137,7 @@ namespace Rtype {
         std::vector<std::size_t> getAllInputs();
         void sendInput(std::vector<std::size_t> vec);
         void sendProjectile();
+        void sendPods(std::size_t podId);
         void createBoss1(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life);
         void createBoss2(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life);
 

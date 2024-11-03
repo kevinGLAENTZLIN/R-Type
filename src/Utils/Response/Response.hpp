@@ -55,7 +55,7 @@ namespace Utils
              * @brief Get the ACK number.
              * @return The ACK number.
              */
-            uint32_t GetACK() const;
+            uint32_t getACK() const;
 
             /**
              * @brief Pops a parameter from the queue.

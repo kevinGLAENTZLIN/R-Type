@@ -82,6 +82,7 @@ namespace Rtype {
         void createBoss1();
         void createBoss2();
         void movePlayer(int id, float x, float y);
+        void setPlayerPos(int id, double x, double y);
         void createProjectile(int entityId, int projectileId);
         void failToConnect();
         void joinGame();

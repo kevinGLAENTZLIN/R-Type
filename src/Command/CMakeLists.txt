@@ -10,6 +10,7 @@ set(LIB_CMD_SRC
     ./Commands/Game_info/Join_game/Join_game.cpp
     ./Commands/Game_info/Games_available/Games_available.cpp
     ./Commands/Game_info/Client_connection/Client_connection.cpp
+    ./Commands/Game_info/Missing_packages/Missing_packages.cpp
     ./Commands/Boss/Attack/Attack.cpp
     ./Commands/Boss/Die/Die.cpp
     ./Commands/Boss/Spawn/Spawn.cpp
@@ -19,6 +20,7 @@ set(LIB_CMD_SRC
     ./Commands/Enemy/Die/Die.cpp
     ./Commands/Enemy/Spawn/Spawn.cpp
     ./Commands/Player/Move/Move.cpp
+    ./Commands/Player/Position/Position.cpp
     ./Commands/Player/Attack/Attack.cpp
     ./Commands/Player/Die/Die.cpp
     ./Commands/Player/Score/Score.cpp
@@ -53,6 +55,7 @@ target_include_directories(${NAME_LIB_CMD} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Game_info/Join_game
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Game_info/Games_available
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Game_info/Client_connection
+    ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Game_info/Missing_packages
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Boss
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Boss/Attack
     ${CMAKE_CURRENT_SOURCE_DIR}/Commands/Boss/Die

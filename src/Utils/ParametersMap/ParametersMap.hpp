@@ -35,6 +35,7 @@ namespace Utils
         GameWonLost,
         SafetyCheck,
         LevelComplete,
+        ClientDisconnect,
         MissingPackages
     };
 
@@ -55,7 +56,9 @@ namespace Utils
         EnemySpawn = 0,
         EnemyDie,
         EnemyMove,
-        EnemyAttack
+        EnemyAttack,
+        EnemyDestroy,
+        EnemyDamage
     };
 
     // Enums for boss-related functions.
@@ -115,32 +118,31 @@ namespace Utils
                 _parametersMap = {
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::NewClientConnected)}, {"", "i"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GamesAvailable)}, {"", "iii"}},
-                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"", "i"}},
-                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::JoinGame)}, {"i", "bi"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::CreateGame)}, {"ii", "i"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::JoinGame)}, {"i", "bii"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::GameWonLost)}, {"", "b"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::SafetyCheck)}, {"", ""}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::LevelComplete)}, {"", "i"}},
+                    {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::ClientDisconnect)}, {"", "i"}},
                     {{InfoTypeEnum::GameInfo, static_cast<uint8_t>(GameInfoEnum::MissingPackages)}, {"llll", ""}},
 
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerDie)}, {"", "i"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"ff", "iff"}},
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::Position)}, {"", "ff"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::Position)}, {"", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerAttack)}, {"i", "ii"}},
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerGotPowerUp)}, {"i", "ii"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerGotPowerUp)}, {"", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerHitAWall)}, {"", "i"}},
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerScore)}, {"", "i"}},
-
-                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemySpawn)}, {"", "iiff"}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyDie)}, {"", "i"}},
-                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyMove)}, {"", ""}},
                     {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyAttack)}, {"", "i"}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyDestroy)}, {"", "i"}},
+                    {{InfoTypeEnum::Enemy, static_cast<uint8_t>(EnemyEnum::EnemyDamage)}, {"i", "i"}},
 
-                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iff"}},
+                    {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossSpawn)}, {"", "iiffi"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossDie)}, {"", "i"}},
                     {{InfoTypeEnum::Boss, static_cast<uint8_t>(BossEnum::BossAttack)}, {"", "ii"}},
 
-                    {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpSpawn)}, {"", ""}},
+                    {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpSpawn)}, {"ff", "iff"}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpDisappear)}, {"", ""}},
                     {{InfoTypeEnum::PowerUp, static_cast<uint8_t>(PowerUpEnum::PowerUpAttack)}, {"", ""}},
 

@@ -188,8 +188,9 @@ namespace Utils
                         case 'l':
                             int_arg = va_arg(params, int);
                             args.push_back(int_arg);
+                            break;
                         default:
-                            throw std::runtime_error("Unknown type");
+                            throw std::runtime_error(std::string("Unknown type from map: ") + c);
                             break;
                     }
                 }
@@ -214,9 +215,8 @@ namespace Utils
                 std::size_t args_byte_position = 0x0;
 
                 std::cout << "ACK writing msg" << std::endl;
-                std::cout << "InfoType: " << static_cast<uint8_t>(info) << std::endl;
-                std::cout << "InfoFunction: " << static_cast<uint8_t>(functionDefiner) << std::endl;
-
+                std::cout << "InfoType: " << static_cast<uint32_t>(static_cast<uint8_t>(info)) << std::endl;
+                std::cout << "InfoFunction: " << static_cast<uint32_t>(static_cast<uint8_t>(functionDefiner)) << std::endl;
 
                 appendFixedSizeTypeIntoBytes(msg, ack, true);
                 appendFixedSizeTypeIntoBytes(msg, info, false);

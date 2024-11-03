@@ -28,6 +28,7 @@
 #include <thread>
 #include <vector>
 #include <array>
+#include <atomic>
 #include <unordered_set>
 
 #include "../Utils/Network/Network.hpp"
@@ -61,7 +62,7 @@ namespace Rtype {
         /**
          * @brief Run the network thread and the game.
          */
-        void run();  // This will now spawn two threads: one for game, one for network.
+        void run();
 
         std::vector<uint32_t> getMissingPackages(); // used in the time thread
     private:
@@ -83,26 +84,30 @@ namespace Rtype {
         void setHandleProjectileMap();
         void setHandleBossMap();
 
+        /**
+         * @brief Run the IO context.
+         */
+        void runNetwork();
+
         std::unordered_map<Utils::GameInfoEnum, std::function<void(Utils::Network::Response)>> _handleGameInfoMap;
         std::unordered_map<Utils::PlayerEnum, std::function<void(Utils::Network::Response)>> _handlePlayerMap;
         std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
         std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
         std::unordered_map<Utils::EnemyEnum, std::function<void(Utils::Network::Response)>> _handleEnemyMap;
         std::unordered_map<Utils::BossEnum, std::function<void(Utils::Network::Response)>> _handleBossMap;
-
-        /**
-         * @brief Run the IO context.
-         */
-        void runNetwork();  // New method to handle the networking thread.
+        void initSignalHandlers();
 
         int _id;
+        int _destroyMin;
         boost::asio::io_context _ioContext;
         std::unordered_set<uint32_t> _recivedPackages;
         uint32_t _biggestAck;
         std::shared_ptr<Rtype::Network> _network;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
-        std::thread _timeThread;
+
+        std::mutex _mutex;
         std::unique_ptr<Rtype::Game> _game;
+        std::atomic<bool> _stop;
     };
 }

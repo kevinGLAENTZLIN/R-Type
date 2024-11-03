@@ -22,9 +22,11 @@
 #include <string>
 #include <memory>
 #include <thread>
-#include <vector>
+#include <stack>
 #include "Client_info.hpp"
 #include "Parser/LoadData/LoadData.hh"
+
+#define MAX_UINT32  (4294967295U)
 
 namespace Rtype
 {
@@ -35,7 +37,7 @@ namespace Rtype
     class Game_info {
         public:
             Game_info();
-            Game_info(int id);
+            Game_info(int id, int difficulty, int nbMaxPlayer);
             ~Game_info();
 
             Game_info(const Game_info&) = delete;
@@ -72,18 +74,21 @@ namespace Rtype
         private:
             int _id;
             int _level;
+            int _difficulty;
             int _nbMaxPlayer;
             int _nbProjectiles; //! tmp
             unsigned int _tick;
+            unsigned int _timeLastLevelEnded;
             std::thread _tickThread;
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
             std::shared_ptr<Rtype::Network> _network;
             LoadData _loadData;
-            std::vector<Rtype::EnemySpawnData> _enemySpawnData;
+            std::stack<Rtype::EnemySpawnData> _enemySpawnData;
             std::size_t _nextEnemyIndex;
             std::shared_ptr<Rtype::Game> _game;
             bool _toSetNetwork;
             std::thread _gameThread;
+            std::mutex _playersMutex;
             // Todo compile with Game class
     };
 }

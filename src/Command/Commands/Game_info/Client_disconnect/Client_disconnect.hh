@@ -2,19 +2,10 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** Level_complete
+** Client_disconnect
 */
 
 #pragma once
-#if defined(_WIN32)           
-	#define NOGDI
-	#define NOUSER
-#endif
-
-#if defined(_WIN32)
-	#undef near
-	#undef far
-#endif
 #include "../../../ACommand.hpp"
 #include "../../../../Server/Game_info.hh"
 
@@ -24,20 +15,20 @@ namespace Rtype
     {
         namespace GameInfo
         {
-            class Level_complete: public ACommand {
+            class Client_disconnect: public ACommand {
                 public:
-                    Level_complete() = default;
-                    ~Level_complete();
+                    Client_disconnect() = default;
+                    ~Client_disconnect();
 
                     void set_client();
-                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int level);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int id);
 
                     void execute_client_side();
                     void execute_server_side();
 
                 protected:
                 private:
-                    int _level;
+                    int _id;
                     std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
             };
         }

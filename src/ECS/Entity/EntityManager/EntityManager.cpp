@@ -20,7 +20,6 @@ ECS::EntityManager::EntityManager::EntityManager():
 std::size_t ECS::EntityManager::EntityManager::createEntity()
 {
     if (_mLivingEntityCount >= MAX_ENTITIES) {
-        std::cout << "JAJ" << std::endl;
         return MAX_ENTITIES;
     }
     std::size_t id = _mAvailableEntities.top();

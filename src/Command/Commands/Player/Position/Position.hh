@@ -19,12 +19,13 @@ namespace Rtype
             private:
                 double _x;
                 double _y;
+                int _player_id;
             public:
                 Position() = default;
                 ~Position();
 
                 void set_client();
-                void set_server(double x, double y);
+                void set_server(int player_id, double x, double y);
 
                 void execute_client_side();
                 void execute_server_side();

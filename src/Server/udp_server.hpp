@@ -46,15 +46,19 @@ namespace Rtype {
         public:
             /**
              * @brief Constructor for the udpServer class.
-             * @param io_service The io_service object for handling asynchronous methods.
              * @param port The port on which the server will listen.
              */
-            udpServer(boost::asio::io_service& io_service, short port);
+            udpServer(short port);
 
             /**
              * @brief Destructor for the udpServer class.
              */
-            ~udpServer() = default;
+            ~udpServer();
+
+            /**
+             * @brief Run the network thread and the game.
+             */
+            void run();
 
             /**
              * @brief Read asynchronously data from clients.
@@ -96,6 +100,11 @@ namespace Rtype {
              */
             void disconnect_client(int client_id);
 
+            /**
+             * @brief Run the IO service.
+             */
+            void runNetwork();
+
             template <typename T>
             std::unique_ptr<T> convertACommandToCommand(std::unique_ptr<Rtype::Command::ACommand> base) {
                 static_assert(std::is_base_of<Rtype::Command::ACommand, T>::value);
@@ -114,18 +123,25 @@ namespace Rtype {
             void setHandleGameInfoMap();
             void setHandlePlayerMap();
             void setHandlePowerUpMap();
+            void setHandleEnemyMap();
             void setHandleProjectileMap();
 
             std::unordered_map<Utils::GameInfoEnum, std::function<void(Utils::Network::Response)>> _handleGameInfoMap;
             std::unordered_map<Utils::PlayerEnum, std::function<void(Utils::Network::Response)>> _handlePlayerMap;
             std::unordered_map<Utils::PowerUpEnum, std::function<void(Utils::Network::Response)>> _handlePowerUpMap;
             std::unordered_map<Utils::ProjectileEnum, std::function<void(Utils::Network::Response)>> _handleProjectileMap;
+            std::unordered_map<Utils::EnemyEnum, std::function<void(Utils::Network::Response)>> _handleEnemyMap;
+            void initSignalHandlers();
 
+            boost::asio::io_service _ioService;
             std::shared_ptr<Rtype::Network> _network;
             udp::endpoint _senderEndpoint;
             enum { max_length = 1024 }; // Maximum length of the receive buffer.
             char _data[max_length];
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _clients;
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::Game_info>>> _games;
+            std::thread _networkThread;
+            boost::asio::signal_set _signals;
+            std::atomic<bool> _stop;
     };
 }

@@ -10,6 +10,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 endif()
 
+add_compile_options(-g)
+add_link_options(-g)
+
 if (WIN32)
     set(CMAKE_GENERATOR "Visual Studio 17 2022")
     set(CMAKE_GENERATOR_PLATFORM "x64")

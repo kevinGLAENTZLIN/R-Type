@@ -2,19 +2,10 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** Power_up
+** Destroy
 */
 
 #pragma once
-#if defined(_WIN32)           
-	#define NOGDI
-	#define NOUSER
-#endif
-
-#if defined(_WIN32)
-	#undef near
-	#undef far
-#endif
 #include "../../../ACommand.hpp"
 #include "../../../../Server/Client_info.hpp"
 
@@ -22,14 +13,14 @@ namespace Rtype
 {
     namespace Command
     {
-        namespace Player
+        namespace Enemy
         {
-            class Power_up: public ACommand{
+            class Destroy: public ACommand{
                 public:
-                    Power_up() = default;
-                    ~Power_up();
+                    Destroy() = default;
+                    ~Destroy();
 
-                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int playerID, int powerUpID);
+                    void set_server(std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> players, int mobID, int roomId);
                     void set_client();
 
                     void execute_client_side();
@@ -37,10 +28,9 @@ namespace Rtype
             
                 protected:
                 private:
-                    udp::endpoint _endpoint;
                     std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _players;
-                    int _playerID;
-                    int _powerUpID;
+                    int _mobID;
+                    int _roomID;
             };
         }
     }

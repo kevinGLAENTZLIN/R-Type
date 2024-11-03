@@ -15,7 +15,7 @@
 #include <vector>
 
 typedef enum enemiesTypeEnum_e {
-    UNKNOWN,
+    UNKNOWN = 0,
     MINIKIT,
     PATAPATA,
     BUG,

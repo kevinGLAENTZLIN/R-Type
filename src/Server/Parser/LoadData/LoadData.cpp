@@ -29,6 +29,8 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
         return;
     }
 
+    std::vector<Rtype::EnemySpawnData> enemies;
+
     for (const auto& enemyKey : root.getMemberNames()) {
         const Json::Value& enemyData = root[enemyKey];
 
@@ -49,9 +51,14 @@ void Rtype::LoadData::LoadDataFromFile(const std::string &path)
         enemy.setHealth(health);
         enemy.setModel(model);
         enemy.setSpawnTime({timeMinute, timeSecond});
-
-        _enemySpawnData.push_back(enemy);
+        enemies.push_back(enemy); 
     }
+
+    std::sort(enemies.begin(), enemies.end(), [](const Rtype::EnemySpawnData &a, const Rtype::EnemySpawnData &b) {
+        return a.getSpawnTimeInSeconds() > b.getSpawnTimeInSeconds();
+    });
+    for (const auto &tmp: enemies)
+        _enemySpawnData.push(tmp);
 }
 
 enemiesTypeEnum_t Rtype::LoadData::convertStringToEnumType(const std::string &text)
@@ -65,10 +72,11 @@ enemiesTypeEnum_t Rtype::LoadData::convertStringToEnumType(const std::string &te
 
 void Rtype::LoadData::clearEnemySpawnData()
 {
-    _enemySpawnData.clear();
+    while (!_enemySpawnData.empty())
+        _enemySpawnData.pop();
 }
 
-std::vector<Rtype::EnemySpawnData> Rtype::LoadData::GetEnemySpawnData() const
+std::stack<Rtype::EnemySpawnData> Rtype::LoadData::GetEnemySpawnData() const
 {
     return _enemySpawnData;
 }

@@ -26,6 +26,7 @@
 #include "../../ECS/Component/Music/Music.hh"
 #include "../../ECS/Component/Sound/Sound.hh"
 #include "../../ECS/Component/Textfield/Textfield.hh"
+#include "../../ECS/Component/Pod/Pod.hh"
 
 #include "../../ECS/System/SystemManager/SystemManager.hpp"
 
@@ -48,7 +49,8 @@
 #include "../../Utils/enemiesTypeEnum.hpp"
 #include "../../ECS/RessourcePool/RessourcePool.hh"
 
-#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
+#include <cstdlib>
+#include <thread>
 
 namespace Rtype {
     enum GameState {
@@ -79,21 +81,28 @@ namespace Rtype {
         void createPlayer(int id, float pos_x, float pos_y, int invincibility);
         void createOtherPlayer(int id, float pos_x, float pos_y);
         std::size_t createEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
-        void createBoss1();
-        void createBoss2();
+        std::size_t createEnemy(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
+        void createBoss(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int health);
         void movePlayer(int id, float x, float y);
         void setPlayerPos(int id, double x, double y);
-        void createProjectile(int entityId, int projectileId);
         void failToConnect();
         void joinGame();
+        void createProjectile(int entityId, int projectileId);
+        void createPod(int entityId, float posX, float posY);
+        void damageEntity(int entityId);
+        void destroyEntity(int entityId);
+        void setIsConnectedToServer(bool state);
+        void setIsRunning(bool state);
 
-        std::vector<int> getAIBydoShots();
-        std::vector<int> getAIHomingShots();
+        std::vector<int> getAIProjectile();
+        std::vector<int> getDamagedEntities();
+        std::vector<int> getDeadEntities();
 
     private:
         std::size_t createCyclingEnemy(enemiesTypeEnum_t enemyType, float pos_x, float pos_y, float dest_x, float dest_y);
         void createEnemyProjectile(int entityId, int projectileId, enemiesTypeEnum_t projectileType);
         void createPlayerProjectile(int entityId, int projectileId);
+        void createPodProjectile(int entityId, int projectileId);
         void loadMusic();
         void destroyProjectile(std::size_t entityID);
         void createBackgroundLayers(float speed, std::string modelPath, int numberOfPanel);
@@ -125,6 +134,8 @@ namespace Rtype {
         std::vector<std::size_t> getAllInputs();
         void sendInput(std::vector<std::size_t> vec);
         void sendProjectile();
+        void createBoss1(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life);
+        void createBoss2(int entityId, enemiesTypeEnum_t enemyType, float pos_x, float pos_y, int life);
 
         std::map<std::string, ECS::Components::Musica> _musicMap;
         std::map<std::string, ECS::Components::SoundEffect> _soundMap;
@@ -139,6 +150,7 @@ namespace Rtype {
         std::map<int, std::size_t> _serverToLocalPlayersId;
         std::map<int, std::size_t> _serverToLocalEnemiesId;
         std::map<int, std::size_t> _serverToLocalProjectilesId;
+        std::map<int, std::size_t> _serverToLocalPodsId;
         std::map<std::string, std::size_t> _mapEntityMusic;
         ECS::RessourcePool _ressourcePool;
         std::vector<std::size_t> _boss2Balls;
@@ -148,8 +160,11 @@ namespace Rtype {
         bool _isAvailableGames;
         bool _isRendering;
         bool _modelCreated;
+        bool _isConnectedToServer;
         std::vector<std::tuple<int, int, int>> _availableGames;
-        std::vector<std::size_t> _AIBydoShots;
-        std::vector<std::size_t> _AIHomingShots;
+        std::vector<std::size_t> _projectilesToSend;
+        std::vector<std::size_t> _deadEntities;
+        std::vector<std::size_t> _damagedEntities;
+        std::thread _localServer;
     };
 };

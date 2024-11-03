@@ -30,7 +30,6 @@ std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringBydoShots(
 
 std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringHomingShots(
     ECS::ComponentManager::SparseArray<ECS::Components::AI> & AIs,
-    ECS::ComponentManager::SparseArray<ECS::Components::Position> & positions,
     std::vector<std::size_t> & entities)
 {
     std::vector<std::size_t> firingEntities;
@@ -41,5 +40,28 @@ std::vector<std::size_t> ECS::Systems::AIFiringProjectile::aiFiringHomingShots(
             AIs[entities[i]]->setCooldown(250);
         }
     }
+    return firingEntities;
+}
+
+std::vector<std::size_t> ECS::Systems::AIFiringProjectile::podFiringShots(
+    ECS::ComponentManager::SparseArray<ECS::Components::Pod> & pods,
+    std::vector<std::size_t> & entities)
+{
+    std::vector<std::size_t> firingEntities;
+
+    for (std::size_t i = 0; i < entities.size(); i++) {
+        if (pods[entities[i]]->getCooldown() > 0 && pods[entities[i]]->getLevel() > 0)
+            pods[entities[i]]->setCooldown(pods[entities[i]]->getCooldown() -1);
+        if (pods[entities[i]]->getCooldown() > 0 && pods[entities[i]]->getLevel() > 1)
+            pods[entities[i]]->setCooldown(pods[entities[i]]->getCooldown() -1);
+
+        if (pods[entities[i]]->getCooldown() == 0 && pods[entities[i]]->getLevel() > 0) {
+            std::cout << "pods[" << i << "] cd: " << pods[entities[i]]->getCooldown() << " level: " << pods[entities[i]]->getLevel() << std::endl;
+            pods[entities[i]]->setCooldown(50);
+            firingEntities.push_back(entities[i]);
+        }
+    }
+    for (int i = 0; i < firingEntities.size(); i++)
+        std::cout << "firingEntities: " << firingEntities[i]<< std::endl;
     return firingEntities;
 }

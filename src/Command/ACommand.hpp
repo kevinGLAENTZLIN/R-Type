@@ -110,7 +110,6 @@ namespace Rtype
                     clientInfo.pushCmdToHistory(msg);
                     va_end(params);
                     if (_senderSocket) {
-                        std::lock_guard<std::mutex> lock(_senderSocketMutex);
                         _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
                         [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
                     }
@@ -140,7 +139,6 @@ namespace Rtype
                     clientInfo.pushCmdToHistory(msg);
                     va_end(params);
                     if (_senderSocket) {
-                        std::lock_guard<std::mutex> lock(_senderSocketMutex);
                         _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
                         [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
                     }
@@ -170,7 +168,6 @@ namespace Rtype
                     msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
                     va_end(params);
                     if (_senderSocket) {
-                        std::lock_guard<std::mutex> lock(_senderSocketMutex);
                         _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
                         [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
                     }
@@ -199,7 +196,6 @@ namespace Rtype
                     msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
                     va_end(params);
                     if (_senderSocket) {
-                        std::lock_guard<std::mutex> lock(_senderSocketMutex);
                         _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
                         [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
                     }
@@ -236,7 +232,6 @@ namespace Rtype
                 std::string _origins;
                 std::shared_ptr<Rtype::client_info> _clientInfo;
                 std::shared_ptr<Rtype::Game> _game;
-                std::mutex _senderSocketMutex;
         };
     }
 }

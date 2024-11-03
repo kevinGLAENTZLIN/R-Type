@@ -98,16 +98,16 @@ namespace Rtype {
         void initSignalHandlers();
 
         int _id;
+        int _destroyMin;
         boost::asio::io_context _ioContext;
         std::unordered_set<uint32_t> _recivedPackages;
         uint32_t _biggestAck;
         std::shared_ptr<Rtype::Network> _network;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
+
         std::mutex _mutex;
-        std::thread _timeThread;
         std::unique_ptr<Rtype::Game> _game;
-        boost::asio::signal_set _signals;
         std::atomic<bool> _stop;
     };
 }

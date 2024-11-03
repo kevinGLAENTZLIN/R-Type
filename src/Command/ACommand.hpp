@@ -109,8 +109,10 @@ namespace Rtype
                     msg = Utils::Network::Protocol::CreateMsg(clientInfo.getAckToSend(), function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
                     clientInfo.pushCmdToHistory(msg);
                     va_end(params);
-                    _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
-                    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    if (_senderSocket) {
+                        _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
+                        [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    }
                 }
 
                 /**
@@ -136,8 +138,10 @@ namespace Rtype
                     msg = Utils::Network::Protocol::CreateMsg(clientInfo.getAckToSend(), function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
                     clientInfo.pushCmdToHistory(msg);
                     va_end(params);
-                    _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
-                    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    if (_senderSocket) {
+                        _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
+                        [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    }
                 }
 
 
@@ -163,8 +167,10 @@ namespace Rtype
                     va_copy(params_copy, params);
                     msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
                     va_end(params);
-                    _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
-                    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    if (_senderSocket) {
+                        _senderSocket->async_send_to(boost::asio::buffer(msg), _endpoint,
+                        [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    }
                 }
 
                 /**
@@ -189,8 +195,10 @@ namespace Rtype
                     va_copy(params_copy, params);
                     msg = Utils::Network::Protocol::CreateMsg(_ack, function_type, function_index, Utils::Network::Protocol::va_listToVector(params_copy, params_type));
                     va_end(params);
-                    _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
-                    [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    if (_senderSocket) {
+                        _senderSocket->async_send_to(boost::asio::buffer(msg), endpoint,
+                        [this] (boost::system::error_code ec, std::size_t recvd_bytes) {});
+                    }
                 }
 
 

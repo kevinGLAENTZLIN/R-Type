@@ -52,8 +52,6 @@
 #include <cstdlib>
 #include <thread>
 
-#define CONVERT_ACMD_TO_CMD(TYPE, CMD_CATEGORY, CMD_INDEX)  _network->convertACommandToCommand<TYPE>(_network->createCommand(static_cast<uint8_t>(CMD_CATEGORY), static_cast<uint8_t>(CMD_INDEX)))
-
 namespace Rtype {
     enum GameState {
         MENU,

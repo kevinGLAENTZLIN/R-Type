@@ -263,7 +263,7 @@ std::size_t Rtype::Game::createCyclingEnemy(enemiesTypeEnum_t enemyType, float p
     _core->addComponent(enemy, ECS::Components::Scale{1.0f});
     _core->addComponent(enemy, ECS::Components::Velocity{0.0f, 0.0f});
     _core->addComponent(enemy, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
-    _core->addComponent(enemy, ECS::Components::Render3D{"enemy_one"});
+    _core->addComponent(enemy, ECS::Components::Render3D{"boss_one_part"});
     _core->addComponent(enemy, ECS::Components::AI{enemyType, std::make_pair(pos_x, pos_y), std::make_pair(dest_x, dest_y)});
     _serverToLocalEnemiesId[enemy] = enemy;
     return enemy;
@@ -300,6 +300,12 @@ void Rtype::Game::createPlayer(int id, float pos_x, float pos_y, int invincibili
         });
     _core->addComponent(player, ECS::Components::Render3D{"ship_yellow"});
     _serverToLocalPlayersId[id] = player;
+
+    std::size_t boss = _core->createEntity();
+    _core->addComponent(boss, ECS::Components::Position{8.0f, 2.0f, -1.0f});
+    _core->addComponent(boss, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
+    _core->addComponent(boss, ECS::Components::Scale{1.0f});
+    _core->addComponent(boss, ECS::Components::Render3D{"boss_one"});
 }
 
 void Rtype::Game::createOtherPlayer(int id, float pos_x, float pos_y)
@@ -1086,7 +1092,7 @@ void Rtype::Game::createPlayerProjectile(int entityId, int projectileId)
     _core->addComponent(projectile, ECS::Components::Position{entityPos.getX() + entityHitbox.getWidth(), entityPos.getY()});
     _core->addComponent(projectile, ECS::Components::Rotate{0.0f, 0.0f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Scale{1.0f});
-    _core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
+    //_core->addComponent(projectile, ECS::Components::Hitbox{TmpHitbox.first, TmpHitbox.second});
     _core->addComponent(projectile, ECS::Components::Velocity{0.2f, 0.0f});
     _core->addComponent(projectile, ECS::Components::Projectile{});
     _core->addComponent(projectile, ECS::Components::Render3D{"base_projectile"});

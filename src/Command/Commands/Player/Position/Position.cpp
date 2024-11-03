@@ -29,4 +29,3 @@ void Rtype::Command::Player::Position::execute_client_side()
 void Rtype::Command::Player::Position::execute_server_side()
 {
     sendToEndpoint(*_clientInfo, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::Position, _player_id, _x, _y);
-}

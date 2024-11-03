@@ -188,12 +188,14 @@ void Rtype::udpServer::setHandleGameInfoMap() {
         std::unique_ptr<Rtype::Command::GameInfo::Client_disconnect> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Client_disconnect, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::ClientDisconnect);
         int gameID = _clients->at(get_sender_client_id())->getRoom();
 
-        CONSOLE_INFO("Client is disconnecting", "")
-        cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id());
-        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
-        cmd->setClientInfo(_clients->at(get_sender_client_id()));
-        _network->addCommandToInvoker(std::move(cmd));
-        _games->at(gameID)->disconnectPlayer(get_sender_client_id());
+        if (_games->find(gameID) != _games->end()) {
+            CONSOLE_INFO("Client is disconnecting", "")
+            cmd->set_server(_games->at(gameID)->getPlayers(), get_sender_client_id());
+            cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _clients->at(get_sender_client_id())->getAckToSend());
+            cmd->setClientInfo(_clients->at(get_sender_client_id()));
+            _network->addCommandToInvoker(std::move(cmd));
+            _games->at(gameID)->disconnectPlayer(get_sender_client_id());
+        }
         disconnect_client(get_sender_client_id());
     };
 

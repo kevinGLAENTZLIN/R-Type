@@ -157,19 +157,33 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
     }
 }
 
-void Rtype::Game_info::computePlayer(void)
+void Rtype::Game_info::computePlayer()
 {
-    std::unique_ptr<Command::Player::Position> cmd;
 
-    for (auto i_player = _players->begin(); i_player != _players->end(); i_player++) {
-        std::shared_ptr<Rtype::client_info> player = i_player->second;
-        cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Position, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::Position);
-        cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), player->getAckToSend());
-        cmd->setClientInfo(player);
-        cmd->set_server(player->getX(), player->getY());
-        _network->addCommandToInvoker(std::move(cmd));
-    }
+    //! Disabled for now
+    // for (auto i_player = _players->begin(); i_player != _players->end(); i_player++) {
+    //     std::shared_ptr<Rtype::client_info> receiver = i_player->second;
+        
+    //     for (auto player = _players->begin(); player != _players->end(); player++) 
+    //     {   
+    //         if (player->second->isAlive() == false)
+    //             continue;
+    //         // Create a new unique_ptr for each command
+    //         auto cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Position, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::Position);
+            
+    //         // Check cmd was successfully created
+    //         if (cmd) {
+    //             cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), receiver->getAckToSend());
+    //             cmd->setClientInfo(receiver);
+    //             cmd->set_server(player->second->getId(), player->second->getX(), player->second->getY());
+
+    //             // Move cmd into addCommandToInvoker to transfer ownership
+    //             _network->addCommandToInvoker(std::move(cmd));
+    //         }
+    //     }
+    // }
 }
+
 
 void Rtype::Game_info::computeTick(void)
 {

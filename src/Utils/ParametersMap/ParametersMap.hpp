@@ -129,7 +129,7 @@ namespace Utils
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerSpawnOnGame)}, {"", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerDie)}, {"", "i"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerMove)}, {"ff", "iff"}},
-                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::Position)}, {"", "ff"}},
+                    {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::Position)}, {"", "iff"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerAttack)}, {"i", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerGotPowerUp)}, {"", "ii"}},
                     {{InfoTypeEnum::Player, static_cast<uint8_t>(PlayerEnum::PlayerHitAWall)}, {"", "i"}},

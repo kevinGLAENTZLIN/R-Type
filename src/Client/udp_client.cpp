@@ -265,10 +265,11 @@ void Rtype::udpClient::setHandlePlayerMap() {
     };
 
     _handlePlayerMap[Utils::PlayerEnum::Position] = [this](Utils::Network::Response response) {
+        int player_id = response.PopParam<int>();
         double x = response.PopParam<double>();
         double y = response.PopParam<double>();
 
-        _game->setPlayerPos(_id, x, y);
+        _game->setPlayerPos(player_id, x, y);
     };
 
     _handlePlayerMap[Utils::PlayerEnum::PlayerAttack] = [this](Utils::Network::Response response) {

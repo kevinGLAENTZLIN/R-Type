@@ -8,22 +8,10 @@
 #include "Position.hpp"
 #include <ostream>
 
-/**
- * @brief Constructor of Position component.
- *
- * @tparam float x, float y, float z.
- * @return void.
- */
 ECS::Components::Position::Position(float x, float y, float z):
     _xOriginalPos(x), _yOriginalPos(y), _zOriginalPos(z), _x(x),  _y(y), _z(z)
 {}
 
-/**
- * @brief Getter _X to Position component.
- *
- * @tparam void.
- * @return Float based on private attribute _x which represent position in row of an position entity.
- */
 float ECS::Components::Position::getX() const
 {
     return _x;

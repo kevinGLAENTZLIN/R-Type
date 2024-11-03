@@ -95,6 +95,12 @@ namespace ECS {
                 _componentManager->getComponents<T>().insertAt(entity, component);
             }
 
+            /**
+            * @brief Return std::vector of entities with a specific component
+            *
+            * @tparam T The type of the component to be added.
+            * @return std::vector<std::size_t> A vector of entity IDs with the matching component.
+            */
             template<typename... T>
             std::vector<std::size_t> getEntitiesWithComponent() const {
                 std::vector<std::size_t> matchingEntities;
@@ -107,7 +113,7 @@ namespace ECS {
                         matchingEntities.push_back(entity);
                 return matchingEntities;
             };
-            
+
             /**
              * @brief Retrieves all entities with a matching signature.
              *
@@ -150,11 +156,23 @@ namespace ECS {
                 _systemManager->entitySignatureChanged(entity, signature);
             }
 
+            /**
+             * @brief Retrieves the signature of a specific entity.
+             *
+             * @param entity The ID of the entity.
+             * @return Signature The signature of the entity.
+             */
             template<typename T>
             Signature getSystemSignature() const {
                 return _systemManager->getSignature<T>();
             }
 
+            /**
+             * @brief Retrieves a system from the system manager.
+             *
+             * @tparam T The type of the system.
+             * @return std::shared_ptr<T> A shared pointer to the system.
+             */
             template<typename T>
             std::shared_ptr<T> getSystem() const {
                 return _systemManager->getSystem<T>();

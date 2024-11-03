@@ -21,6 +21,12 @@ namespace ECS {
 
         class ComponentManager {
         public:
+
+            /**
+            * @brief Register a component type to the ComponentManager.
+            *
+            * @tparam Component The component type to register.
+            */
             template <class Component>
             void registerComponent() {
                 std::type_index typeIndex = std::type_index(typeid(Component));
@@ -39,11 +45,23 @@ namespace ECS {
                 };
             }
 
+            /**
+            * @brief get all components of a specific type.
+            *
+            * @tparam Component The component type to get.
+            * @return SparseArray<Component>& The SparseArray of the component type.
+            */
             template <class Component>
             SparseArray<Component>& getComponents() {
                 return std::any_cast<SparseArray<Component>&>(_sparseArrays.at(std::type_index(typeid(Component))));
             }
 
+            /**
+            * @brief destroy an entity and reset all its components.
+            *
+            * @param entity The entity to destroy.
+            * @param signature The signature of the entity.
+            */
             void entityDestroyed(std::size_t entity, const Signature& signature) {
                 for (std::size_t i = 0; i < signature.size(); i++) {
                     if (signature[i]) {

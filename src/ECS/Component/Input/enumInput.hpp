@@ -7,7 +7,7 @@
 #pragma once
 
 #include <iostream>
-#if defined(_WIN32)           
+#if defined(_WIN32)
 	#define NOGDI
 	#define NOUSER
 #endif
@@ -22,6 +22,9 @@
 namespace ECS {
     namespace Components {
 
+        /**
+        * @brief Enum of the different inputs
+        */
         typedef enum enumInput_e {
             MENU = 0,
             RIGHT = 1,

@@ -163,7 +163,7 @@ void Rtype::Game_info::computePlayer(void)
 
     for (auto i_player = _players->begin(); i_player != _players->end(); i_player++) {
         std::shared_ptr<Rtype::client_info> player = i_player->second;
-        cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Position, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerMove);
+        cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Position, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::Position);
         cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), player->getAckToSend());
         cmd->setClientInfo(player);
         cmd->set_server(player->getX(), player->getY());

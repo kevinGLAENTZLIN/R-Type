@@ -104,6 +104,7 @@ namespace Rtype {
         std::shared_ptr<Rtype::Network> _network;
         std::array<char, 1024> _receiverBuffer;
         std::thread _networkThread;  // New thread for the network loop.
+        std::mutex _mutex;
         std::thread _timeThread;
         std::unique_ptr<Rtype::Game> _game;
         boost::asio::signal_set _signals;

@@ -20,7 +20,7 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
     initSignalHandlers();
 
     _timeThread = std::thread([this]() {
-        // std::lock_guard<std::mutex> lock(_mutex);
+        std::lock_guard<std::mutex> lock(_mutex);
         std::vector<uint32_t> missing_ack;
         std::size_t missing_ack_size = 0;
         std::size_t tail_size;

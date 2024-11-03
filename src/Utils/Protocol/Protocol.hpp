@@ -188,8 +188,9 @@ namespace Utils
                         case 'l':
                             int_arg = va_arg(params, int);
                             args.push_back(int_arg);
+                            break;
                         default:
-                            throw std::runtime_error("Unknown type");
+                            throw std::runtime_error(std::string("Unknown type from map: ") + c);
                             break;
                     }
                 }

@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#if defined(_WIN32)           
+#if defined(_WIN32)
 	#define NOGDI
 	#define NOUSER
 #endif
@@ -36,38 +36,170 @@ namespace Rtype
 
     class Game_info {
         public:
+            /**
+            * @brief GameInfo constructor.
+            * @param void
+            * @return void
+            */
             Game_info();
+
+            /**
+            * @brief GameInfo constructor.
+            * @param id
+            * @param difficulty
+            * @param nbMaxPlayer
+            * @return void
+            */
             Game_info(int id, int difficulty, int nbMaxPlayer);
+
+            /**
+            * @brief GameInfo destructor.
+            * @param void
+            * @return void
+            */
             ~Game_info();
 
             Game_info(const Game_info&) = delete;
             Game_info& operator=(const Game_info&) = delete;
 
+            /**
+            * @brief GameInfo move constructor.
+            * @param other
+            * @return void
+            */
             Game_info(Game_info&& other) noexcept;
+
+            /**
+            * @brief GameInfo move assignement operator.
+            * @param other
+            * @return GameInfo&
+            */
             Game_info& operator=(Game_info&& other) noexcept;
 
+            /**
+            * @brief computeGame function.
+            * @param currentGameTimeInSeconds
+            * @return void
+            */
             void computeGame(int currentGameTimeInSeconds);
+
+            /**
+            * @brief computePlayer function.
+            * @param void
+            * @return void
+            */
             void computePlayer(void);
+
+            /**
+            * @brief computeTick function.
+            * @param void
+            * @return void
+            */
             void computeTick(void);
 
+            /**
+            * @brief setNetwork function.
+            * @param std::shared_ptr<Rtype::Network> network
+            * @return void
+            */
             void setNetwork(std::shared_ptr<Rtype::Network> network);
+
+            /**
+            * @brief getNetwork function.
+            * @param void
+            * @return std::shared_ptr<Rtype::Network>
+            */
             std::shared_ptr<Rtype::Game> getGame();
 
+            /**
+            * @brief getNetwork function.
+            * @param void
+            * @return void
+            */
             void runGame();
 
+            /**
+            * @brief gameStatus function.
+            * @param void
+            * @return void
+            */
             bool gameStatus(void);
+
+            /**
+            * @brief goNextLevel function.
+            * @param void
+            * @return void
+            */
             void goNextLevel(void);
+
+            /**
+            * @brief getLevel function.
+            * @param void
+            * @return int
+            */
             int getLevel(void);
+
+            /**
+            * @brief getRoomId function.
+            * @param void
+            * @return int
+            */
             int getRoomId(void);
+
+            /**
+            * @brief isGameAvailable function.
+            * @param void
+            * @return bool
+            */
             bool isGameAvailable(void);
+
+            /**
+            * @brief getToSetNetwork function.
+            * @param void
+            * @return bool
+            */
             bool getToSetNetwork();
+
+            /**
+            * @brief getPlayers function.
+            * @param void
+            * @return std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>>
+            */
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> getPlayers(void);
+
+            /**
+            * @brief getNbMaxPlayers function.
+            * @param void
+            * @return int
+            */
             int getNbMaxPlayers();
 
+            /**
+            * @brief connectPlayer function.
+            * @param std::shared_ptr<Rtype::client_info> player
+            * @return void
+            */
             void connectPlayer(std::shared_ptr<Rtype::client_info> player);
+
+            /**
+            * @brief disconnectPlayer function.
+            * @param int id
+            * @return void
+            */
             void disconnectPlayer(int id);
 
+            /**
+            * @brief getNbProjectiles function.
+            * @param void
+            * @return int
+            */
             int getNbProjectiles();
+
+            /**
+            * @brief accNbProjectiles function.
+            * @param void
+            * @return void
+            */
             void accNbProjectiles();
 
         protected:

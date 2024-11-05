@@ -13,16 +13,16 @@
 #include <vector>
 
 Rtype::Game_info::Game_info():
-	_id(-1), _level(0), _difficulty(1), _nbMaxPlayer(6), _nbProjectiles(100), _tick(0), _timeLastLevelEnded(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
+	_id(-1), _level(1), _difficulty(1), _nbMaxPlayer(6), _nbProjectiles(100), _tick(0), _timeLastLevelEnded(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
 {
 }
 
 Rtype::Game_info::Game_info(int id, int difficulty, int nbMaxPlayer):
-	_id(id), _level(0), _difficulty(difficulty), _nbMaxPlayer(nbMaxPlayer), _nbProjectiles(100), _tick(0), _timeLastLevelEnded(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
+	_id(id), _level(1), _difficulty(difficulty), _nbMaxPlayer(nbMaxPlayer), _nbProjectiles(100), _tick(0), _timeLastLevelEnded(0), _players(), _nextEnemyIndex(0), _toSetNetwork(true)
 {
     _loadData.LoadDataFromFile("stage1.json");
     _enemySpawnData = _loadData.GetEnemySpawnData();
-	_tickThread = std::thread([this]() { computeTick(); });
+    _tickThread = std::thread([this]() { computeTick(); });
 }
 
 Rtype::Game_info::~Game_info()
@@ -132,7 +132,7 @@ void Rtype::Game_info::computeGame(int currentGameTimeInSeconds)
                 spawn_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
                 _network->addCommandToInvoker(std::move(spawn_cmd));
                 _game->createEnemy( getNbProjectiles(), enemyData.getType(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
-            } else if (enemyData.getType() == enemiesTypeEnum_t::BOSS1_Core) {
+            } else if (enemyData.getType() == enemiesTypeEnum_t::BOSS1_Core || enemyData.getType() == enemiesTypeEnum_t::BOSS2_Core) {
                 std::unique_ptr<Rtype::Command::Boss::Spawn> spawn_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Boss::Spawn, Utils::InfoTypeEnum::Boss, Utils::BossEnum::BossSpawn);
 
                 spawn_cmd->set_server(_players, enemyData.getType(), getNbProjectiles(), enemyData.getPositionX(), enemyData.getPositionY(), enemyData.getHealth());
@@ -227,6 +227,7 @@ void Rtype::Game_info::goNextLevel(void)
     _level += 1;
     _loadData.LoadDataFromFile(nextLevel);
     _enemySpawnData = _loadData.GetEnemySpawnData();
+    std::cout << "\n\n\n==================================" << nextLevel << "================================\n\n" << std::endl;
     if (_enemySpawnData.empty()) {
         _loadData.clearEnemySpawnData();
         _level = 1;
@@ -281,11 +282,15 @@ int Rtype::Game_info::getNbMaxPlayers()
 
 int Rtype::Game_info::getNbProjectiles()
 {
+    std::lock_guard<std::mutex> lock(_nbProjectileMutex);
+
     return _nbProjectiles;
 }
 
 void Rtype::Game_info::accNbProjectiles()
 {
+    std::lock_guard<std::mutex> lock(_nbProjectileMutex);
+
     _nbProjectiles += 1;
 }
 

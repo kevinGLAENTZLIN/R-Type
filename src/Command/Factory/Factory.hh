@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#if defined(_WIN32)           
+#if defined(_WIN32)
 	#define NOGDI
 	#define NOUSER
 #endif
@@ -63,9 +63,34 @@ namespace Rtype
     {
         class Factory {
             public:
+                /**
+                * @brief Constructs a Factory object and initializes the command map.
+                *
+                * This constructor sets up a mapping between command category/index pairs and
+                * their respective command creation functions. It allows the factory to create
+                * command objects dynamically based on these mappings.
+                */
                 Factory();
+
+                /**
+                * @brief Destructs the Factory object.
+                *
+                * Default destructor; clears any internal resources if necessary.
+                */
                 ~Factory() = default;
 
+                /**
+                * @brief Creates a command object based on a category and index identifier.
+                *
+                * This method retrieves the appropriate command creation function from the map
+                * using the provided category and index, and returns a unique pointer to the
+                * newly created command object. If the category/index pair is not mapped,
+                * it returns a null pointer.
+                *
+                * @param cmd_category The command category identifier.
+                * @param cmd_index The command index within the category.
+                * @return A unique pointer to an `ACommand` object, or nullptr if the command is not found.
+                */
                 std::unique_ptr<Rtype::Command::ACommand> createCommand(uint8_t cmd_category, uint8_t cmd_index);
 
             protected:

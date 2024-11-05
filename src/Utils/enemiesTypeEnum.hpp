@@ -14,6 +14,12 @@
 #include <map>
 #include <vector>
 
+/**
+* @brief enemiesTypeEnum_t is an enum class that represent the type of an entity.
+*
+* @tparam void.
+* @return void.
+*/
 typedef enum enemiesTypeEnum_e {
     UNKNOWN = 0,
     MINIKIT,
@@ -88,6 +94,12 @@ typedef enum enemiesTypeEnum_e {
 
 class ecsUtils {
 public:
+    /**
+    * @brief getTypeFromString is a static function that return the enemiesTypeEnum_t from a string.
+    *
+    * @tparam const std::string & type.
+    * @return enemiesTypeEnum_t.
+    */
     static enemiesTypeEnum_t getTypeFromString(const std::string & type) {
         if (type == "MINIKIT")
             return MINIKIT;
@@ -110,6 +122,12 @@ public:
         return UNKNOWN;
     };
 
+    /**
+    * @brief getDistance is a static function that return the distance between two positions.
+    *
+    * @tparam const std::pair<float, float> & pos1, const std::pair<float, float> & pos2.
+    * @return float.
+    */
     static float getDistance(const std::pair<float, float> & pos1,
                              const std::pair<float, float> & pos2) {
         float X1 = pos1.first;
@@ -121,6 +139,12 @@ public:
                          (Y2 - Y1) * (Y2 - Y1));
     }
 
+    /**
+    * @brief getClosestPlayer is a static function that return the closest player from a list of players.
+    *
+    * @tparam const std::pair<float, float> & currentPos, std::vector<std::pair<float, float>> posToCompare.
+    * @return std::size_t.
+    */
     static std::size_t getClosestPlayer(
         const std::pair<float, float> & currentPos,
         std::vector<std::pair<float, float>> posToCompare)

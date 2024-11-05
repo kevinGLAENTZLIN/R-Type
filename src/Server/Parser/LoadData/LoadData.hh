@@ -19,11 +19,39 @@ namespace Rtype {
 
     class LoadData {
         public:
+            /**
+            * @brief Loaddate constructor.
+            * @param void
+            * @return void
+            */
             LoadData();
+
+            /**
+            * @brief Loaddate destructor.
+           * @param void
+           * @return void
+           */
             ~LoadData() = default;
 
+            /**
+            * @brief Load data from a file.
+            * @param const std::string &path
+            * @return void
+            */
             void LoadDataFromFile(const std::string &path);
+
+            /**
+            * @brief Get enemy spawn data.
+            * @param void
+            * @return std::stack<Rtype::EnemySpawnData>
+            */
             std::stack<Rtype::EnemySpawnData> GetEnemySpawnData() const;
+
+            /**
+            * @brief Clear enemy spawn data.
+            * @param void
+            * @return void
+            */
             void clearEnemySpawnData();
 
         private:

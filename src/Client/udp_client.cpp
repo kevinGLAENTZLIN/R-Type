@@ -18,40 +18,6 @@ Rtype::udpClient::udpClient(const std::string &serverAddr, const int serverPort)
     connectClient();
     read_server();
     initSignalHandlers();
-
-    _timeThread = std::thread([this]() {
-        std::lock_guard<std::mutex> lock(_mutex);
-        std::vector<uint32_t> missing_ack;
-        std::size_t missing_ack_size = 0;
-        std::size_t tail_size;
-
-        while (_stop.load() == false) {
-            std::cout << "stop :" << _stop.load() << std::endl;
-            std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> last_cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            missing_ack = getMissingPackages();
-            missing_ack_size = missing_ack.size();
-            tail_size = missing_ack_size & 3;
-
-            for (size_t i = 0; i < (missing_ack_size >> 2); i++) {
-            std::unique_ptr<Rtype::Command::GameInfo::Missing_packages> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::GameInfo::Missing_packages, Utils::InfoTypeEnum::GameInfo, Utils::GameInfoEnum::MissingPackages);
-                cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-                cmd->set_client(missing_ack[i * 4], missing_ack[i * 4 + 1], missing_ack[i * 4 + 2], missing_ack[i * 4 + 3]);
-                _network->addCommandToInvoker(std::move(cmd));
-            }
-
-            if (tail_size) {
-                last_cmd->setCommonPart(_network->getSocket(), _network->getSenderEndpoint(), _network->getAckToSend());
-                last_cmd->set_client(
-                    missing_ack[missing_ack_size - 1],
-                    (tail_size & 2) ? missing_ack[missing_ack_size - 2] : 0,
-                    (tail_size == 3) ? missing_ack[missing_ack_size - 3] : 0,
-                    0
-                );
-                _network->addCommandToInvoker(std::move(last_cmd));
-            }
-        }
-    });
 }
 
 Rtype::udpClient::~udpClient()
@@ -220,19 +186,13 @@ void Rtype::udpClient::setHandleGameInfoMap()
         int level = response.PopParam<int>();
 
         std::cerr << "Level " << level << " completed." << std::endl;
-        //? Changer le fond ?
     };
     _handleGameInfoMap[Utils::GameInfoEnum::ClientDisconnect] = [this](Utils::Network::Response response) {
         int id = response.PopParam<int>();
 
         _game->destroyEntity(id);
     };
-    
-    _handleGameInfoMap[Utils::GameInfoEnum::MissingPackages] = [this](Utils::Network::Response response) {
-        (void)response;
-        std::cerr << "Missing packages should not be recived by the client" << std::endl;
-    };
-    
+
     _handleGameInfoMap[Utils::GameInfoEnum::MissingPackages] = [this](Utils::Network::Response response) {
         (void)response;
         std::cerr << "Missing packages should not be recived by the client" << std::endl;
@@ -284,8 +244,9 @@ void Rtype::udpClient::setHandlePlayerMap() {
         int playerId = response.PopParam<int>();
         int powerUpId = response.PopParam<int>();
 
-        //! Pour Arthur <3
-        // _game->equipPod(playerId, powerUpId);
+        CONSOLE_INFO("playerId -> ", playerId);
+        CONSOLE_INFO("podId -> ", powerUpId);
+        _game->equipPod(playerId, powerUpId);
     };
 
 
@@ -299,10 +260,7 @@ void Rtype::udpClient::setHandlePlayerMap() {
         std::unique_ptr<Rtype::Command::Player::Score> cmd = CONVERT_ACMD_TO_CMD(Rtype::Command::Player::Score, Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerScore);        int score = response.PopParam<int>();
 
         std::cerr << "The unused Score is: " << score << std::endl;
-
     };
-
-
 }
 
 void Rtype::udpClient::setHandleEnemyMap() {
@@ -351,8 +309,6 @@ void Rtype::udpClient::setHandlePowerUpMap() {
         double y = response.PopParam<double>();
 
         _game->createPod(id, x, y);
-        //! Pour Arthur <3
-        // 
     };
     _handlePowerUpMap[Utils::PowerUpEnum::PowerUpDisappear] = [this](Utils::Network::Response response) {
         //TODO: Implement PowerUpDisappear

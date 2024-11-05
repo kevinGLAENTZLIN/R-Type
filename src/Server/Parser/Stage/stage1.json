@@ -1058,7 +1058,7 @@
     },
 
     "BOSS1_Core": {
-        "type": "BOSS1_core",
+        "type": "BOSS1_Core",
         "difficulty": 1,
         "position": {
             "x": 8,

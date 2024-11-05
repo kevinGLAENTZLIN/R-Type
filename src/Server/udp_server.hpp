@@ -12,7 +12,7 @@
 
 #pragma once
 
-#if defined(_WIN32)           
+#if defined(_WIN32)
 	#define NOGDI
 	#define NOUSER
 #endif
@@ -136,7 +136,7 @@ namespace Rtype {
             boost::asio::io_service _ioService;
             std::shared_ptr<Rtype::Network> _network;
             udp::endpoint _senderEndpoint;
-            enum { max_length = 1024 }; // Maximum length of the receive buffer.
+            enum { max_length = 1024 };
             char _data[max_length];
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::client_info>>> _clients;
             std::shared_ptr<std::map<int, std::shared_ptr<Rtype::Game_info>>> _games;

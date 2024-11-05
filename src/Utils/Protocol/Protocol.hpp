@@ -39,6 +39,13 @@ namespace Utils
             static const std::size_t FUNCTION_TYPE_SIZE = sizeof(uint8_t);
             static const std::size_t DESCRIPTOR_SIZE = sizeof(uint16_t);
 
+            /**
+            * @brief Appends a fixed-size type into a bytes vector.
+            *
+            * @tparam T have to be Primitive type.
+            * @param msg The bytes vector to append the value to.
+            * @param value The value to append.
+            */
             template <typename T>
             static void updateDescriptor(uint16_t &descriptor, std::size_t &bit_position, T value)
             {
@@ -94,7 +101,7 @@ namespace Utils
 
                 if constexpr (std::is_same<T, uint32_t>::value) {
                     if (isAck) {
-                    std::cout << "ACK: " << value << std::endl;
+                        // std::cerr << "ACK: " << value << std::endl;
                         converted_value.resize(ACK_SIZE);
                         std::memcpy(converted_value.data(), &value, ACK_SIZE);
                     } else {
@@ -213,10 +220,6 @@ namespace Utils
                 bytes msg;
                 std::size_t args_byte_bit_offset = 0x0;
                 std::size_t args_byte_position = 0x0;
-
-                std::cout << "ACK writing msg" << std::endl;
-                std::cout << "InfoType: " << static_cast<uint32_t>(static_cast<uint8_t>(info)) << std::endl;
-                std::cout << "InfoFunction: " << static_cast<uint32_t>(static_cast<uint8_t>(functionDefiner)) << std::endl;
 
                 appendFixedSizeTypeIntoBytes(msg, ack, true);
                 appendFixedSizeTypeIntoBytes(msg, info, false);

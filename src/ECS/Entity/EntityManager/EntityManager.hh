@@ -13,6 +13,7 @@
 #include <array>
 #include <bitset>
 #include <cstdint>
+#include <mutex>
 
 #define MAX_ENTITIES 10000
 
@@ -37,6 +38,7 @@ namespace ECS {
             std::stack<std::size_t> _mAvailableEntities;
             std::array<Signature, MAX_ENTITIES> _mSignatures;
             std::size_t _mLivingEntityCount;
+            std::mutex _mMutex;
         };
     }
 }

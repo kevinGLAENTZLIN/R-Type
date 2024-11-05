@@ -14,8 +14,9 @@ void Rtype::Command::Player::Power_up::set_server(std::shared_ptr<std::map<int, 
     _powerUpID = powerUpID;
 }
 
-void Rtype::Command::Player::Power_up::set_client()
+void Rtype::Command::Player::Power_up::set_client(int podId)
 {
+    _powerUpID = podId;
 }
 
 Rtype::Command::Player::Power_up::~Power_up()
@@ -24,7 +25,7 @@ Rtype::Command::Player::Power_up::~Power_up()
 
 void Rtype::Command::Player::Power_up::execute_client_side()
 {
-    sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp);
+    sendToEndpoint(Utils::InfoTypeEnum::Player, Utils::PlayerEnum::PlayerGotPowerUp, _powerUpID);
 }
 
 void Rtype::Command::Player::Power_up::execute_server_side()

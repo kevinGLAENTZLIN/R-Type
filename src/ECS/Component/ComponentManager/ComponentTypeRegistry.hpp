@@ -8,9 +8,9 @@
 /**
  * @file ComponentTypeRegistry.hpp
  * @brief ComponentTypeRegisty class declaration.
- * It manages the Ids of the different component types 
+ * It manages the Ids of the different component types
  *
- * This class assigns a unique std:size_t id to the given type when the 
+ * This class assigns a unique std:size_t id to the given type when the
  * getTypeId<Component> function is called for the first time for a type.
  * It retrieves the corresponding id if the component type has already been registered.
  */
@@ -28,9 +28,9 @@ namespace ECS {
 
         /**
          * @brief ComponentTypeRegisty class declaration.
-         * It manages the Ids of the different component types 
+         * It manages the Ids of the different component types
          *
-         * This class assigns a unique std:size_t id to the given type when the 
+         * This class assigns a unique std:size_t id to the given type when the
          * getTypeId<Component> function is called for the first time for a type.
          * It retrieves the corresponding id if the component type has already been registered.
          */
@@ -50,7 +50,6 @@ namespace ECS {
             static std::size_t getTypeId() {
                 static std::size_t index = nextTypeIndex++;
                 if (indexToTypeMap.count(index) == 0) {
-                    // Enregistrement dans la map inverse
                     indexToTypeMap[index] = []() -> std::type_index {
                         return std::type_index(typeid(Component));
                     };
@@ -58,13 +57,22 @@ namespace ECS {
                 return index;
             }
 
+            /**
+            * @brief TypeId static access.
+            *
+            * Returns a new index for the given type if it's the first time it's called.
+            * Returns the corresponding index if it has already been mapped.
+            *
+            * @tparam Component Component Type to be mapped or returned.
+            * @return Index of the mapped type.
+            */
             static std::type_index getTypeFromId(std::size_t id) {
                 if (indexToTypeMap.count(id) == 0) {
                     throw std::runtime_error("Invalid TypeId: no such type registered.");
                 }
                 return indexToTypeMap.at(id)();
             }
-        
+
         private:
             /**
              * @brief Static variable used to assign a new index to each new type.

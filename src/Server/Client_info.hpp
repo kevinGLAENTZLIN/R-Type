@@ -7,7 +7,7 @@
 
 #pragma once
 
-#if defined(_WIN32)           
+#if defined(_WIN32)
 	#define NOGDI
 	#define NOUSER
 #endif
@@ -39,8 +39,8 @@ namespace Rtype {
 
     /**
      * @brief The client_info class represents information about a client in the R-Type game.
-     * 
-     * This class stores various attributes of a client such as their ID, position, address, 
+     *
+     * This class stores various attributes of a client such as their ID, position, address,
      * and connection information. It also provides methods to manipulate and retrieve these attributes.
      */
     class client_info {
@@ -52,7 +52,7 @@ namespace Rtype {
 
             /**
              * @brief Parameterized constructor for client_info.
-             * 
+             *
              * @param id The unique identifier for the client.
              * @param port The port number used by the client.
              * @param addr The IP address of the client.
@@ -66,63 +66,63 @@ namespace Rtype {
 
             /**
              * @brief Gets the unique identifier of the client.
-             * 
+             *
              * @return The client's ID.
              */
             int getId() const;
 
             /**
              * @brief Sets the unique identifier of the client.
-             * 
+             *
              * @param id The new ID for the client.
              */
             void setId(int id);
 
             /**
              * @brief Gets the X coordinate of the client.
-             * 
+             *
              * @return The X coordinate.
              */
             float getX() const;
 
             /**
              * @brief Sets the X coordinate of the client.
-             * 
+             *
              * @param x The new X coordinate.
              */
             void setX(float x);
 
             /**
              * @brief Moves the X coordinate of the client.
-             * 
+             *
              * @param x The Add x to X coordinate.
              */
             void moveX(float x);
 
             /**
              * @brief Gets the Y coordinate of the client.
-             * 
+             *
              * @return The Y coordinate.
              */
             float getY() const;
 
             /**
              * @brief Sets the Y coordinate of the client.
-             * 
+             *
              * @param y The new Y coordinate.
              */
             void setY(float y);
 
             /**
              * @brief Moves the Y coordinate of the client.
-             * 
+             *
              * @param x The Add y to Y coordinate.
              */
             void moveY(float y);
 
             /**
              * @brief Gets the expected ACK number for the client.
-             * 
+             *
              * @return The expected ACK number.
              */
             int getAckToExpect() const;
@@ -134,7 +134,7 @@ namespace Rtype {
 
             /**
              * @brief Gets the ACK number to be sent to the client.
-             * 
+             *
              * @return The ACK number to be sent.
              */
             uint32_t getAckToSend() const;
@@ -146,42 +146,42 @@ namespace Rtype {
 
             /**
              * @brief Gets the game room number the client is in.
-             * 
+             *
              * @return The game room number.
              */
             int getRoom() const;
 
             /**
              * @brief Sets the game room number for the client.
-             * 
+             *
              * @param room The new game room number.
              */
             void setRoom(int room);
 
             /**
              * @brief Gets the port number used by the client.
-             * 
+             *
              * @return The client's port number.
              */
             int getPort() const;
 
             /**
              * @brief Sets the port number for the client.
-             * 
+             *
              * @param port The new port number.
              */
             void setPort(int port);
 
             /**
              * @brief Gets the IP address of the client.
-             * 
+             *
              * @return The client's IP address.
              */
             std::string getAddr() const;
 
             /**
              * @brief Sets the IP address of the client.
-             * 
+             *
              * @param address The new IP address.
              */
             void setAddr(std::string address);
@@ -192,10 +192,10 @@ namespace Rtype {
 
             /**
              * @brief Adds a command to the client's command history.
-             * 
+             *
              * This method handle a variadic list of parameters, converts them to strings,
              * and stores them in the client's history.
-             * 
+             *
              * @param msg The command to add to the history.
              */
             void pushCmdToHistory(Utils::Network::bytes msg)
@@ -204,6 +204,12 @@ namespace Rtype {
                 setAckToSend();
             }
 
+            /**
+            * @brief Gets a command from the client's command history.
+            *
+            * @param ack The ACK number of the command to retrieve.
+            * @return The command from the history.
+            */
             Utils::Network::bytes getCmdFromHistory(int ack)
             {
                 return _history[ack];

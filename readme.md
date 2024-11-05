@@ -83,7 +83,6 @@ Or Reset the project by running the following command:
 
 And that's it! You can now use the `build.sh` script to build the project with ease. 🚀
 
-## Example of usage in Windows
+## Documentation
 
-If you are using Windows, you can use the `build.bat` script to build the project. Here is an example of how to use it:
-The same commands are available in the `build.bat` script as in the `build.sh` script and they do the same thing.
+The documentation is available on gitbook: [R-Type Documentation](https://epitech-16.gitbook.io/r-type)

@@ -1,0 +1,32 @@
+name: Build, Push and Deploy R-Type Server Docker Image
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    build-push-deploy-image:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+            id-token: write
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+            - name: Log in to the Container registry
+              uses: docker/login-action@v3.3.0
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor}}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Set repository name in lowercase
+              id: repo_name
+              run: echo "REPO_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v2
+              with:
+                  context: .
+                  push: true
+                  tags: ghcr.io/${{ env.REPO_NAME }}:latest

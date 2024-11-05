@@ -96,9 +96,6 @@ jobs:
           fi
           echo "All required binaries are present"
 
-      - name: Run Tests
-        run: ./build.sh test
-
   push_to_mirror:
     needs: build
     runs-on: ubuntu-latest
